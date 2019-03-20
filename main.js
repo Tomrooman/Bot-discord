@@ -33,11 +33,11 @@ var playSong = function (message, url) {
         .join()
         .then(function (connection) {
             connectionObj = connection
-            let stream = connection.play(ytdl(url, { filter: 'audioonly' }))
+            let stream = connection.playStream(ytdl(url, { filter: 'audioonly' }))
             // stream.pause()
             // stream.resume()
             stream.setVolume(0.5)
-            stream.on('end', () => {
+            stream.on('finish', () => {
                 console.log('Left channel by end')
                 connectionObj.channel.leave()
                 connectionObj = false
