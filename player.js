@@ -15,9 +15,11 @@ exports.playSong = function (message, url) {
             // stream.resume()
             stream.setVolume(0.5)
             stream.on('end', () => {
-                console.log('Left channel by end')
-                connectionObj.channel.leave()
-                connectionObj = false
+                setTimeout(() => {
+                    console.log('Left channel by end')
+                    connectionObj.channel.leave()
+                    connectionObj = false
+                }, 2000)
             })
             stream.on('error', (err) => {
                 console.log(`Erreur : ${err}`)
