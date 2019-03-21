@@ -37,7 +37,7 @@ var playSong = function (message, url) {
             // stream.pause()
             // stream.resume()
             stream.setVolume(0.5)
-            stream.on('end', () => {
+            stream.on('finish', () => {
                 console.log('Left channel by end')
                 connectionObj.channel.leave()
                 connectionObj = false
