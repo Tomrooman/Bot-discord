@@ -17,7 +17,9 @@ exports.playSong = function (message, url) {
             stream.on('end', () => {
                 setTimeout(() => {
                     console.log('Left channel by end')
-                    connectionObj.channel.leave()
+                    if (connectionObj) {
+                        connectionObj.channel.leave()
+                    }
                     connectionObj = false
                     stream = false
                 }, 2000)
