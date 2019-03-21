@@ -1,0 +1,7 @@
+$ git config credential.helper store
+$ git push https://github.com/Tomrooman/Bot-discord
+
+Username for 'https://github.com': <USERNAME>
+Password for 'https://USERNAME@github.com': <PASSWORD>
+
+git config --global credential.helper "cache --timeout 7200"
