@@ -8,8 +8,14 @@ exports.dispatcher = function (message) {
                 Player.playSong(message, words[1])
             }
         }
-        if (words[0].substr(2, words[0].length - 2) === 'stop') {
-            Player.stop()
+        if (words[0].substr(2, words[0].length - 2) === 'quit') {
+            Player.quit()
+        }
+        if (words[0].substr(2, words[0].length - 2) === 'pause') {
+            Player.pause()
+        }
+        if (words[0].substr(2, words[0].length - 2) === 'resume') {
+            Player.resume()
         }
     }
     else {
