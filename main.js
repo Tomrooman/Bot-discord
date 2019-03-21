@@ -33,7 +33,7 @@ var playSong = function (message, url) {
         .join()
         .then(function (connection) {
             connectionObj = connection
-            let stream = connection.playFile(ytdl(url, { filter: 'audioonly' }))
+            let stream = connectionObj.playFile(ytdl(url, { filter: 'audioonly' }))
             // stream.pause()
             // stream.resume()
             stream.setVolume(0.5)
