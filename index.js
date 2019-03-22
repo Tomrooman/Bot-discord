@@ -6,8 +6,8 @@ const bot = new Discord.Client()
 bot.login('NTU3NTg5ODM5NTg3OTY2OTc3.D3KgUA.Hstysro-edujF5PxjKCfvufpwbI')
 
 bot.on('ready', () => {
-    bot.user.setActivity('Stalyr le boss')
-    console.log(`Logged in as ${bot.user.tag}!`);
+    //bot.user.setActivity('Stalyr le boss')
+    console.log('----- Connected -----')
 })
 
 bot.on('message', (message) => {

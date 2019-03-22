@@ -1,1 +1,17 @@
-https://discordapp.com/oauth2/authorize?&client_id=557589839587966977&scope=bot&permissions=3402880
+https://discordapp.com/oauth2/authorize?&client_id=557589839587966977&scope=bot&permissions=3664960
+
+---------- PERMISSIONS ----------
+|	     			|
+|	     Parler		|
+|         Se connecter		|
+|	Voir les salons		|
+|       Intégrer des liens	|
+|       Gérer les messages	|
+|      Envoyer des messages  	|
+|      Attacher des fichiers	|
+|      Ajouter des réactions	|
+|     Mentionner tout le monde	|
+|    Voir les anciens messages	|
+|  Utiliser des émojis externes	|
+|				|
+|_______________________________|
