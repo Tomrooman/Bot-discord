@@ -1,4 +1,5 @@
-const Player = require('./player.js')
+const Player  = require('./player.js')
+const Message = require('./message.js')
 
 exports.dispatcher = function (message) {
     if (message.content.length > 2) {
@@ -16,6 +17,14 @@ exports.dispatcher = function (message) {
         }
         if (words[0].substr(2, words[0].length - 2) === 'resume') {
             Player.resume()
+        }
+        if (words[0].substr(2, words[0].length - 2) === 'remove') {
+            if (words[1] && Number.isFinite(parseInt(words[1])) && parseInt(words[1]) > 0) {
+                Message.remove(message, parseInt(words[1]))
+            }
+        }
+        if (words[0].substr(2, words[0].length - 2) === 'clear') {
+            Message.remove(message, 'all')
         }
     }
     else {
