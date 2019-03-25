@@ -41,6 +41,9 @@ exports.quit = function(message) {
         connectionsArray[userChannel.id].channel.leave()
         delete connectionsArray[userChannel.id]
         delete streamsArray[userChannel.id]
+        if (!!pausedArray[userChannel.id]) {
+            delete pausedArray[userChannel.id]
+        }
     }
     else {
         message.channel.send('Not connected in voice channel')
