@@ -1,57 +1,64 @@
 const ytdl = require('ytdl-core')
+const Helper = require('./helper.js')
 
-var connectionObj = false
-var stream = false
-var paused = false
+var connectionsArray = []
+var streamsArray = []
+var pausedArray = []
 
 exports.playSong = function (message, url) {
-    let voiceChannel = message.guild.channels
-        .filter(function (channel) { return channel.type === 'voice' })
-        .first()
-    voiceChannel
+    let voiceChannel = Helper.take_user_voiceChannel(message)
+    if (voiceChannel) {
+        voiceChannel
         .join()
         .then(function (connection) {
-            connectionObj = connection
-            stream = connectionObj.playStream(ytdl(url, { filter: 'audioonly' }))
-            stream.setVolume(0.5)
-            stream.on('end', () => {
+            connectionsArray[connection.channel.id] = connection
+            streamsArray[connection.channel.id] = connectionsArray[connection.channel.id].playStream(ytdl(url, { filter: 'audioonly' }))
+            streamsArray[connection.channel.id].setVolume(0.5)
+            streamsArray[connection.channel.id].on('end', () => {
                 setTimeout(() => {
                     console.log('Left channel by end')
-                    if (connectionObj) {
-                        connectionObj.channel.leave()
+                    if (!!connectionsArray[connection.channel.id]) {
+                        connectionsArray[connection.channel.id].channel.leave()
+                        delete connectionsArray[connection.channel.id]
+                        delete streamsArray[connection.channel.id]
                     }
-                    connectionObj = false
-                    stream = false
                 }, 2000)
             })
-            stream.on('error', (err) => {
+            streamsArray[connection.channel.id].on('error', (err) => {
                 console.log(`Erreur : ${err}`)
             })
+            
         })
-};
-
-exports.quit = function() {
-    if (connectionObj) {
-        console.log('Left channel by quit')
-        connectionObj.channel.leave()
-        connectionObj = false
-        stream = false
     }
     else {
-        console.log('Not connected in voice channel')
+        message.reply('You need to join a voice channel first!');
+    }
+};
+
+exports.quit = function(message) {
+    let userChannel = Helper.take_user_voiceChannel(message)
+    if (!!connectionsArray[userChannel.id]) {
+        connectionsArray[userChannel.id].channel.leave()
+        delete connectionsArray[userChannel.id]
+        delete streamsArray[userChannel.id]
+    }
+    else {
+        message.channel.send('Not connected in voice channel')
     }
 }
 
-exports.pause = function() {
-    if (stream) {
-        stream.pause()
-        paused = true
+exports.pause = function(message) {
+    let userChannel = Helper.take_user_voiceChannel(message)
+    if (!!streamsArray[userChannel.id]) {
+        streamsArray[userChannel.id].pause()
+        pausedArray[userChannel.id] = 'onPause'
     }
 }
 
-exports.resume = function() {
-    if (paused) {
-        stream.resume()
-        paused = false
+exports.resume = function(message) {
+    let userChannel = Helper.take_user_voiceChannel(message)
+    if (!!pausedArray[userChannel.id]) {
+        streamsArray[userChannel.id].resume()
+        delete pausedArray[userChannel.id]
     }
 }
