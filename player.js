@@ -3,7 +3,7 @@ const Helper = require('./helper.js')
 
 var connectionsArray = []
 var streamsArray = []
-var pausedArray = []
+var pausedArray = [] 
 
 exports.playSong = function (message, url) {
     let voiceChannel = Helper.take_user_voiceChannel(message)
@@ -17,19 +17,11 @@ exports.playSong = function (message, url) {
             streamsArray[connection.channel.id].on('end', () => {
                 setTimeout(() => {
                     console.log('Left channel by end')
-<<<<<<< HEAD
-                    if (connectionObj) {
-                        connectionObj.channel.leave()
-                    }
-                    connectionObj = false
-                    stream = false
-=======
                     if (!!connectionsArray[connection.channel.id]) {
                         connectionsArray[connection.channel.id].channel.leave()
                         delete connectionsArray[connection.channel.id]
                         delete streamsArray[connection.channel.id]
                     }
->>>>>>> 82631bc0fa29288eb7e6fdb1640683220d033929
                 }, 2000)
             })
             streamsArray[connection.channel.id].on('error', (err) => {
