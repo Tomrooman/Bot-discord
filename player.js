@@ -3,7 +3,7 @@ const Helper = require('./helper.js')
 
 var connectionsArray = []
 var streamsArray = []
-var pausedArray = [] 
+var pausedArray = []
 
 exports.playSong = function (message, url) {
     let voiceChannel = Helper.take_user_voiceChannel(message)
