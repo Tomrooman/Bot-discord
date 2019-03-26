@@ -48,8 +48,10 @@ function playSong(message, connection) {
             console.log('End music')
             if (!!playlistArray[connection.channel.id]) {
                 delete playlistArray[connection.channel.id][0]
-                console.log('playlsit array : ', playlistArray[connection.channel.id][0])
+                /*
+                Tu dois remettre a 0 les index
                 console.log('playlsit array : ', playlistArray[connection.channel.id][1])
+                */
                 if (!!!playlistArray[connection.channel.id][0]) {
                     delete playlistArray[connection.channel.id]
                     delete connectedGuild[message.guild.id]
