@@ -1,6 +1,7 @@
 const ytdl = require('ytdl-core')
 const Helper = require('./helper.js')
 const axios = require('axios')
+const _ = require('lodash')
 
 var connectionsArray = []
 var streamsArray = []
@@ -48,10 +49,7 @@ function playSong(message, connection) {
             console.log('End music')
             if (!!playlistArray[connection.channel.id]) {
                 delete playlistArray[connection.channel.id][0]
-                /*
-                Tu dois remettre a 0 les index
-                console.log('playlsit array : ', playlistArray[connection.channel.id][1])
-                */
+                playlistArray[connection.channel.id] = _.compact(playlistArray[connection.channel.id])
                 if (!!!playlistArray[connection.channel.id][0]) {
                     delete playlistArray[connection.channel.id]
                     delete connectedGuild[message.guild.id]
