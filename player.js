@@ -90,11 +90,8 @@ function quit(message) {
         connectionsArray[userChannel.id].channel.leave()
         delete connectionsArray[userChannel.id]
         delete streamsArray[userChannel.id]
-<<<<<<< HEAD
-=======
         delete playlistArray[userChannel.id]
         delete connectedGuild[message.guild.id]
->>>>>>> 93b1493c7190fc92dcab7a182482528389f1d7f9
         if (!!pausedArray[userChannel.id]) {
             delete pausedArray[userChannel.id]
         }
