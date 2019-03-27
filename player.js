@@ -53,6 +53,7 @@ function playSong(message, connection) {
                 if (!!!playlistArray[connection.channel.id][0]) {
                     delete playlistArray[connection.channel.id]
                     delete connectedGuild[message.guild.id]
+                    connectionsArray[connection.channel.id].channel.leave()
                 }
                 else {
                     playSong(message, connection)
