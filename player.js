@@ -1,33 +1,34 @@
 const ytdl = require('ytdl-core')
 const Helper = require('./helper.js')
-const axios = require('axios')
 const _ = require('lodash')
+const { google } = require('googleapis')
 
 var connectionsArray = []
 var streamsArray = []
 var pausedArray = []
 var playlistArray = []
+var playlistInfos = []
 var connectedGuild = []
 
 function playSongs(message, url) {
     let voiceChannel = Helper.take_user_voiceChannel(message)
     if (voiceChannel) {
         if (!!!connectedGuild[message.guild.id]) {
-            voiceChannel
-                .join()
-                .then(function (connection) {
-                    connectedGuild[message.guild.id] = voiceChannel.id
-                    console.log('guild id : ', message.guild.id)
-                    setTimeout(() => {
-                        //playSong(message, connection, url, false)
-                        getURL(message, connection, url)
-                    }, 1000)
-                })
+            if (url.indexOf('playlist') !== -1) {
+                getPlaylist(voiceChannel, message, url)
+            }
+            else {
+                getVideo(voiceChannel, message, url)
+            }
         }
         else {
             if (connectedGuild[message.guild.id] === voiceChannel.id) {
-                //playSong(message, connectionsArray[voiceChannel.id], url, false)
-                getURL(message, connectionsArray[voiceChannel.id], url, true)
+                if (url.indexOf('playlist') !== -1) {
+                    getPlaylist(voiceChannel, message, url, false)
+                }
+                else {
+                    getVideo(voiceChannel, message, url, false)
+                }
             }
             else {
                 message.channel.send("Vous n'êtes pas dans le même canal que le bot !")
@@ -36,24 +37,24 @@ function playSongs(message, url) {
 
     }
     else {
-        message.reply('You need to join a voice channel first!');
+        message.reply('You need to join a voice channel first !');
     }
 };
 
 function playSong(message, connection) {
+    message.channel.send('Play : ' + playlistInfos[connection.channel.id][0].title)
     connectionsArray[connection.channel.id] = connection
     streamsArray[connection.channel.id] = connectionsArray[connection.channel.id].playStream(ytdl(playlistArray[connection.channel.id][0], { filter: 'audioonly' }))
     streamsArray[connection.channel.id].setVolume(0.5)
     streamsArray[connection.channel.id].on('end', () => {
         setTimeout(() => {
-            console.log('End music')
             if (!!playlistArray[connection.channel.id]) {
                 delete playlistArray[connection.channel.id][0]
+                delete playlistInfos[connection.channel.id][0]
                 playlistArray[connection.channel.id] = _.compact(playlistArray[connection.channel.id])
+                playlistInfos[connection.channel.id] = _.compact(playlistInfos[connection.channel.id])
                 if (!!!playlistArray[connection.channel.id][0]) {
-                    delete playlistArray[connection.channel.id]
-                    delete connectedGuild[message.guild.id]
-                    connectionsArray[connection.channel.id].channel.leave()
+                    quit(message)
                 }
                 else {
                     playSong(message, connection)
@@ -66,23 +67,96 @@ function playSong(message, connection) {
     })
 }
 
-function getURL(message, connection, url, queued = false) {
-    // check if url is correct & put youtube link in playlist array
-    if (!!!playlistArray[connection.channel.id]) {
-        playlistArray[connection.channel.id] = []
-    }
-    //playlistArray[connection.channel.id].push('https://www.youtube.com/watch?v=9w_zn3uRwPU')
-    console.log('added music')
-    axios.get(url)
-        .then(response => {
-            console.log('STATUS : ', response.status)
-            if (response.status !== '404') {
-                playlistArray[connection.channel.id].push(url)
-                if (queued === false) {
-                    playSong(message, connection)
+function getPlaylist(voiceChannel, message, url, playSongParams = true, pageToken = '', play = false, connection = false) {
+    let playlistId = url.substr(url.indexOf('list=') + 5, url.length - (url.indexOf('list=') + 5))
+    if (!!playlistId) {
+        let service = google.youtube('v3')
+        service.playlistItems.list({
+            key: "AIzaSyDDRQTDxXfvACI7AQwYrR25KqpR-7ZNNLE",
+            playlistId: playlistId,
+            maxResults: 50,
+            pageToken: pageToken,
+            part: "snippet, contentDetails"
+        }, function (err, response) {
+            if (err) {
+                console.log('The API returned an error: ' + err);
+                message.channel.send("Une erreur c'est produite !")
+                return false;
+            }
+            else {
+                if (response.data.items.length) {
+                    if (playSongParams) {
+                        voiceChannel.join()
+                            .then(connection => {
+                                playlistArray[voiceChannel.id] = []
+                                playlistInfos[voiceChannel.id] = []
+                                connectedGuild[message.guild.id] = voiceChannel.id
+                                addPlaylistItems(voiceChannel, message, url, response.data, false, connection, 'play')
+                            })
+                    }
+                    else {
+                        addPlaylistItems(voiceChannel, message, url, response.data, false, connection, play)
+                    }
                 }
             }
-        })
+        });
+    }
+}
+
+function addPlaylistItems(voiceChannel, message, url, data, playSongParams, connection, play = false) {
+    let videoURL = 'https://www.youtube.com/watch?v='
+    data.items.map(item => {
+        playlistArray[voiceChannel.id].push(videoURL + item.snippet.resourceId.videoId)
+        playlistInfos[voiceChannel.id].push({title : item.snippet.title})
+    })
+    if (!!data.nextPageToken) {
+        getPlaylist(voiceChannel, message, url, playSongParams, data.nextPageToken, play, connection)
+    }
+    else {
+        if (play === 'play') {
+            playSong(message, connection)
+        }
+    }
+}
+
+function getVideo(voiceChannel, message, url, playSongParams = true) {
+    let videoId = url.substr(url.indexOf("watch?v=") + 8, url.indexOf('&list') - (url.indexOf("watch?v=") + 8))
+    if (!!videoId) {
+        let service = google.youtube('v3')
+        service.videos.list({
+            key: "AIzaSyDDRQTDxXfvACI7AQwYrR25KqpR-7ZNNLE",
+            id: videoId,
+            part: "snippet, contentDetails"
+        }, function (err, response) {
+            if (err) {
+                console.log('The API returned an error: ' + err);
+                message.channel.send("Une erreur c'est produite !")
+                return false;
+            }
+            else {
+                if (response.data.items.length) {
+                    if (playSongParams) {
+                        voiceChannel.join()
+                            .then(connection => {
+                                playlistInfos[voiceChannel.id] = []
+                                playlistArray[voiceChannel.id] = []
+                                playlistArray[voiceChannel.id].push(url)
+                                playlistInfos[voiceChannel.id].push({title : response.data.items[0].snippet.title})
+                                connectedGuild[message.guild.id] = voiceChannel.id
+                                playSong(message, connection)
+                            })
+                    }
+                    else {
+                        playlistArray[voiceChannel.id].push(url)
+                        playlistInfos[voiceChannel.id].push({title : "Video title"})
+                    }
+                }
+            }
+        });
+    }
+    else {
+        message.channel.send('URL invalide !')
+    }
 }
 
 function quit(message) {
@@ -92,6 +166,7 @@ function quit(message) {
         delete connectionsArray[userChannel.id]
         delete streamsArray[userChannel.id]
         delete playlistArray[userChannel.id]
+        delete playlistInfos[userChannel.id]
         delete connectedGuild[message.guild.id]
         if (!!pausedArray[userChannel.id]) {
             delete pausedArray[userChannel.id]
@@ -118,9 +193,21 @@ function resume(message) {
     }
 }
 
+function next(message) {
+    let userChannel = Helper.take_user_voiceChannel(message)
+    if (!!streamsArray[userChannel.id] && connectedGuild[message.guild.id] === userChannel.id) {
+        if (!!playlistArray[userChannel.id]) {
+            streamsArray[userChannel.id].destroy()
+        }
+    }
+    else {
+        message.channel.send("Vous n'êtes pas dans le même canal que le bot !")
+    }
+}
+
 exports.playSongs = playSongs
 exports.playSong = playSong
-exports.getURL = getURL
 exports.quit = quit
 exports.pause = pause
 exports.resume = resume
+exports.next = next
