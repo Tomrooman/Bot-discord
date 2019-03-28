@@ -173,7 +173,7 @@ function quit(message) {
         }
     }
     else {
-        message.channel.send('Not connected in voice channel')
+        message.channel.send("Vous n'êtes pas dans le même canal que le bot !")
     }
 }
 
