@@ -42,7 +42,7 @@ function playSongs(message, url) {
 };
 
 function playSong(message, connection) {
-    message.channel.send('Play : ' + playlistInfos[connection.channel.id][0].title)
+    sendMusicEmbed(message, connection)
     connectionsArray[connection.channel.id] = connection
     streamsArray[connection.channel.id] = connectionsArray[connection.channel.id].playStream(ytdl(playlistArray[connection.channel.id][0], { filter: 'audioonly' }))
     streamsArray[connection.channel.id].setVolume(0.5)
@@ -65,6 +65,31 @@ function playSong(message, connection) {
     streamsArray[connection.channel.id].on('error', (err) => {
         console.log(`Erreur : ${err}`)
     })
+}
+
+function sendMusicEmbed(message, connection) {
+    message.channel.send({"embed": {
+        "color": 2043396,
+        "footer": {
+          "icon_url": "https://cdn.discordapp.com/embed/avatars/0.png",
+          "text": "Syx bot"
+        },
+    
+        "author": {
+          "name": "Music",
+          "icon_url": "https://i2.wp.com/www.lesforetsduperche.fr/wp-content/uploads/2017/06/note-de-musique.png"
+        },
+        "fields": [
+          {
+            "name": "Title",
+            "value": playlistInfos[connection.channel.id][0].title
+          },
+          {
+            "name": "Queued",
+            "value": `${playlistArray[connection.channel.id].length - 1}`
+          }
+        ]
+      }})
 }
 
 function getPlaylist(voiceChannel, message, url, playSongParams = true, pageToken = '', play = false, connection = false) {
@@ -116,6 +141,9 @@ function addPlaylistItems(voiceChannel, message, url, data, playSongParams, conn
         if (play === 'play') {
             playSong(message, connection)
         }
+        else {
+            sendMusicEmbed(message, connection)
+        }
     }
 }
 
@@ -149,6 +177,7 @@ function getVideo(voiceChannel, message, url, playSongParams = true) {
                     else {
                         playlistArray[voiceChannel.id].push(url)
                         playlistInfos[voiceChannel.id].push({title : "Video title"})
+                        sendMusicEmbed(message, connectionsArray[voiceChannel.id])
                     }
                 }
             }
