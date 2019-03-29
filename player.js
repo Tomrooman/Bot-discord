@@ -42,7 +42,7 @@ function playSongs(message, url) {
 };
 
 function playSong(message, connection) {
-    sendMusicEmbed(message, connection, playlistInfos[connection.channel.id][0].title)
+    sendMusicEmbed(message, connection, playlistInfos[connection.channel.id][0].title, playlistInfos[connection.channel.id][0].id)
     connectionsArray[connection.channel.id] = connection
     streamsArray[connection.channel.id] = connectionsArray[connection.channel.id].playStream(ytdl(playlistArray[connection.channel.id][0], { filter: 'audioonly' }))
     streamsArray[connection.channel.id].setVolume(0.5)
@@ -67,10 +67,14 @@ function playSong(message, connection) {
     })
 }
 
-function sendMusicEmbed(message, connection, musicTitle, added = false) {
+function sendMusicEmbed(message, connection, musicTitle, musicId = false, added = false) {
     let title = "Music"
     let color = false
     let playArray = false
+    let musicLink = musicTitle
+    if (musicTitle !== 'Playlist songs') {
+        musicLink = `[${musicTitle}](https://www.youtube.com/watch?v=${musicId})`
+    }
     if (added) {
         title = "Added music"
         // #398240
@@ -96,7 +100,7 @@ function sendMusicEmbed(message, connection, musicTitle, added = false) {
             "fields": [
                 {
                     "name": "Title",
-                    "value": `${musicTitle}`
+                    "value": musicLink
                 },
                 {
                     "name": "Queued",
@@ -148,7 +152,7 @@ function addPlaylistItems(voiceChannel, message, url, response, playSongParams, 
     let data = response.data
     data.items.map(item => {
         playlistArray[voiceChannel.id].push(videoURL + item.snippet.resourceId.videoId)
-        playlistInfos[voiceChannel.id].push({ title: item.snippet.title })
+        playlistInfos[voiceChannel.id].push({ title: item.snippet.title, id: item.snippet.id })
     })
     if (!!data.nextPageToken) {
         getPlaylist(voiceChannel, message, url, playSongParams, data.nextPageToken, play, connection)
@@ -158,7 +162,7 @@ function addPlaylistItems(voiceChannel, message, url, response, playSongParams, 
             playSong(message, connection)
         }
         else {
-            sendMusicEmbed(message, voiceChannel, 'Playlist songs', true)
+            sendMusicEmbed(message, voiceChannel, 'Playlist songs', false, true)
         }
     }
 }
@@ -185,15 +189,15 @@ function getVideo(voiceChannel, message, url, playSongParams = true) {
                                 playlistInfos[voiceChannel.id] = []
                                 playlistArray[voiceChannel.id] = []
                                 playlistArray[voiceChannel.id].push(url)
-                                playlistInfos[voiceChannel.id].push({ title: response.data.items[0].snippet.title })
+                                playlistInfos[voiceChannel.id].push({ title: response.data.items[0].snippet.title, id: response.data.items[0].id })
                                 connectedGuild[message.guild.id] = voiceChannel.id
                                 playSong(message, connection)
                             })
                     }
                     else {
                         playlistArray[voiceChannel.id].push(url)
-                        playlistInfos[voiceChannel.id].push({ title: response.data.items[0].snippet.title })
-                        sendMusicEmbed(message, connectionsArray[voiceChannel.id], response.data.items[0].snippet.title, true)
+                        playlistInfos[voiceChannel.id].push({ title: response.data.items[0].snippet.title, id: response.data.items[0].id })
+                        sendMusicEmbed(message, connectionsArray[voiceChannel.id], response.data.items[0].snippet.title, response.data.items[0].id ,true)
                     }
                 }
             }
