@@ -67,29 +67,45 @@ function playSong(message, connection) {
     })
 }
 
-function sendMusicEmbed(message, connection) {
-    message.channel.send({"embed": {
-        "color": 2043396,
-        "footer": {
-          "icon_url": "https://cdn.discordapp.com/embed/avatars/0.png",
-          "text": "Syx bot"
-        },
-    
-        "author": {
-          "name": "Music",
-          "icon_url": "https://i2.wp.com/www.lesforetsduperche.fr/wp-content/uploads/2017/06/note-de-musique.png"
-        },
-        "fields": [
-          {
-            "name": "Title",
-            "value": playlistInfos[connection.channel.id][0].title
-          },
-          {
-            "name": "Queued",
-            "value": `${playlistArray[connection.channel.id].length - 1}`
-          }
-        ]
-      }})
+function sendMusicEmbed(message, connection, added = false) {
+    if (added) {
+        message.channel.send({
+            "embed": {
+                "color": 2043396,
+                "author": {
+                    "name": "Music added",
+                    "icon_url": "https://i2.wp.com/www.lesforetsduperche.fr/wp-content/uploads/2017/06/note-de-musique.png"
+                },
+                "fields": [
+                    {
+                        "name": "Queued",
+                        "value": `${playlistArray[conznection.channel.id].length - 1}`
+                    }
+                ]
+            }
+        })
+    }
+    else {
+        message.channel.send({
+            "embed": {
+                "color": 2043396,
+                "author": {
+                    "name": "Music",
+                    "icon_url": "https://i2.wp.com/www.lesforetsduperche.fr/wp-content/uploads/2017/06/note-de-musique.png"
+                },
+                "fields": [
+                    {
+                        "name": "Title",
+                        "value": playlistInfos[connection.channel.id][0].title
+                    },
+                    {
+                        "name": "Queued",
+                        "value": `${playlistArray[conznection.channel.id].length - 1}`
+                    }
+                ]
+            }
+        })
+    }
 }
 
 function getPlaylist(voiceChannel, message, url, playSongParams = true, pageToken = '', play = false, connection = false) {
@@ -132,7 +148,7 @@ function addPlaylistItems(voiceChannel, message, url, data, playSongParams, conn
     let videoURL = 'https://www.youtube.com/watch?v='
     data.items.map(item => {
         playlistArray[voiceChannel.id].push(videoURL + item.snippet.resourceId.videoId)
-        playlistInfos[voiceChannel.id].push({title : item.snippet.title})
+        playlistInfos[voiceChannel.id].push({ title: item.snippet.title })
     })
     if (!!data.nextPageToken) {
         getPlaylist(voiceChannel, message, url, playSongParams, data.nextPageToken, play, connection)
@@ -142,7 +158,7 @@ function addPlaylistItems(voiceChannel, message, url, data, playSongParams, conn
             playSong(message, connection)
         }
         else {
-            sendMusicEmbed(message, connection)
+            sendMusicEmbed(message, connection, true)
         }
     }
 }
@@ -169,15 +185,15 @@ function getVideo(voiceChannel, message, url, playSongParams = true) {
                                 playlistInfos[voiceChannel.id] = []
                                 playlistArray[voiceChannel.id] = []
                                 playlistArray[voiceChannel.id].push(url)
-                                playlistInfos[voiceChannel.id].push({title : response.data.items[0].snippet.title})
+                                playlistInfos[voiceChannel.id].push({ title: response.data.items[0].snippet.title })
                                 connectedGuild[message.guild.id] = voiceChannel.id
                                 playSong(message, connection)
                             })
                     }
                     else {
                         playlistArray[voiceChannel.id].push(url)
-                        playlistInfos[voiceChannel.id].push({title : "Video title"})
-                        sendMusicEmbed(message, connectionsArray[voiceChannel.id])
+                        playlistInfos[voiceChannel.id].push({ title: response.data.items[0].snippet.title })
+                        sendMusicEmbed(message, connectionsArray[voiceChannel.id], true)
                     }
                 }
             }
