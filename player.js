@@ -42,7 +42,7 @@ function playSongs(message, url) {
 };
 
 function playSong(message, connection) {
-    sendMusicEmbed(message, connection)
+    sendMusicEmbed(message, connection, playlistInfos[connection.channel.id][0].title)
     connectionsArray[connection.channel.id] = connection
     streamsArray[connection.channel.id] = connectionsArray[connection.channel.id].playStream(ytdl(playlistArray[connection.channel.id][0], { filter: 'audioonly' }))
     streamsArray[connection.channel.id].setVolume(0.5)
@@ -67,45 +67,44 @@ function playSong(message, connection) {
     })
 }
 
-function sendMusicEmbed(message, connection, added = false) {
+function sendMusicEmbed(message, connection, musicTitle, added = false) {
+    let title = "Music"
+    let color = false
+    let playArray = false
     if (added) {
-        message.channel.send({
-            "embed": {
-                "color": 2043396,
-                "author": {
-                    "name": "Music added",
-                    "icon_url": "https://i2.wp.com/www.lesforetsduperche.fr/wp-content/uploads/2017/06/note-de-musique.png"
-                },
-                "fields": [
-                    {
-                        "name": "Queued",
-                        "value": `${playlistArray[conznection.channel.id].length - 1}`
-                    }
-                ]
-            }
-        })
+        title = "Added music"
+        // #398240
+        color = 3768896
     }
     else {
-        message.channel.send({
-            "embed": {
-                "color": 2043396,
-                "author": {
-                    "name": "Music",
-                    "icon_url": "https://i2.wp.com/www.lesforetsduperche.fr/wp-content/uploads/2017/06/note-de-musique.png"
-                },
-                "fields": [
-                    {
-                        "name": "Title",
-                        "value": playlistInfos[connection.channel.id][0].title
-                    },
-                    {
-                        "name": "Queued",
-                        "value": `${playlistArray[conznection.channel.id].length - 1}`
-                    }
-                ]
-            }
-        })
+        // #354F94
+        color = 3493780
     }
+    if (!!connection.channel) {
+        playArray = playlistArray[connection.channel.id]
+    }
+    if (!!connection.id) {
+        playArray = playlistArray[connection.id]
+    }
+    message.channel.send({
+        "embed": {
+            "color": color,
+            "author": {
+                "name": title,
+                "icon_url": "https://i2.wp.com/www.lesforetsduperche.fr/wp-content/uploads/2017/06/note-de-musique.png"
+            },
+            "fields": [
+                {
+                    "name": "Title",
+                    "value": `${musicTitle}`
+                },
+                {
+                    "name": "Queued",
+                    "value": `${playArray.length - 1}`
+                }
+            ]
+        }
+    })
 }
 
 function getPlaylist(voiceChannel, message, url, playSongParams = true, pageToken = '', play = false, connection = false) {
@@ -132,11 +131,11 @@ function getPlaylist(voiceChannel, message, url, playSongParams = true, pageToke
                                 playlistArray[voiceChannel.id] = []
                                 playlistInfos[voiceChannel.id] = []
                                 connectedGuild[message.guild.id] = voiceChannel.id
-                                addPlaylistItems(voiceChannel, message, url, response.data, false, connection, 'play')
+                                addPlaylistItems(voiceChannel, message, url, response, false, connection, 'play')
                             })
                     }
                     else {
-                        addPlaylistItems(voiceChannel, message, url, response.data, false, connection, play)
+                        addPlaylistItems(voiceChannel, message, url, response, false, connection, play)
                     }
                 }
             }
@@ -144,8 +143,9 @@ function getPlaylist(voiceChannel, message, url, playSongParams = true, pageToke
     }
 }
 
-function addPlaylistItems(voiceChannel, message, url, data, playSongParams, connection, play = false) {
+function addPlaylistItems(voiceChannel, message, url, response, playSongParams, connection, play = false) {
     let videoURL = 'https://www.youtube.com/watch?v='
+    let data = response.data
     data.items.map(item => {
         playlistArray[voiceChannel.id].push(videoURL + item.snippet.resourceId.videoId)
         playlistInfos[voiceChannel.id].push({ title: item.snippet.title })
@@ -158,7 +158,7 @@ function addPlaylistItems(voiceChannel, message, url, data, playSongParams, conn
             playSong(message, connection)
         }
         else {
-            sendMusicEmbed(message, connection, true)
+            sendMusicEmbed(message, voiceChannel, 'Playlist songs', true)
         }
     }
 }
@@ -193,7 +193,7 @@ function getVideo(voiceChannel, message, url, playSongParams = true) {
                     else {
                         playlistArray[voiceChannel.id].push(url)
                         playlistInfos[voiceChannel.id].push({ title: response.data.items[0].snippet.title })
-                        sendMusicEmbed(message, connectionsArray[voiceChannel.id], true)
+                        sendMusicEmbed(message, connectionsArray[voiceChannel.id], response.data.items[0].snippet.title, true)
                     }
                 }
             }
