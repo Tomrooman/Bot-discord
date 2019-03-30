@@ -9,6 +9,7 @@ var pausedArray = []
 var playlistArray = []
 var playlistInfos = []
 var connectedGuild = []
+var radioPlayed = []
 
 function playSongs(message, url) {
     let voiceChannel = Helper.take_user_voiceChannel(message)
@@ -150,6 +151,11 @@ function getPlaylist(voiceChannel, message, url, playSongParams = true, pageToke
 function addPlaylistItems(voiceChannel, message, url, response, playSongParams, connection, play = false) {
     let videoURL = 'https://www.youtube.com/watch?v='
     let data = response.data
+    if (radioPlayed[voiceChannel.id] === 'played') {
+        playlistArray[voiceChannel.id] = []
+        playlistInfos[voiceChannel.id] = []
+        radioPlayed[voiceChannel.id] = "notPlay"
+    }
     data.items.map(item => {
         playlistArray[voiceChannel.id].push(videoURL + item.snippet.resourceId.videoId)
         playlistInfos[voiceChannel.id].push({ title: item.snippet.title, id: item.snippet.id })
@@ -163,6 +169,11 @@ function addPlaylistItems(voiceChannel, message, url, response, playSongParams, 
         }
         else {
             sendMusicEmbed(message, voiceChannel, 'Playlist songs', false, true)
+            if (!!radioPlayed[voiceChannel.id]) {
+                streamsArray[voiceChannel.id].destroy()
+                delete radioPlayed[voiceChannel.id]
+                playSong(message, connectionsArray[voiceChannel.id])
+            }
         }
     }
 }
@@ -195,9 +206,20 @@ function getVideo(voiceChannel, message, url, playSongParams = true) {
                             })
                     }
                     else {
-                        playlistArray[voiceChannel.id].push(url)
-                        playlistInfos[voiceChannel.id].push({ title: response.data.items[0].snippet.title, id: response.data.items[0].id })
-                        sendMusicEmbed(message, connectionsArray[voiceChannel.id], response.data.items[0].snippet.title, response.data.items[0].id ,true)
+                        if (!!radioPlayed[voiceChannel.id]) {
+                            streamsArray[voiceChannel.id].destroy()
+                            delete radioPlayed[voiceChannel.id]
+                            playlistArray[voiceChannel.id] = []
+                            playlistInfos[voiceChannel.id] = []
+                            playlistArray[voiceChannel.id].push(url)
+                            playlistInfos[voiceChannel.id].push({ title: response.data.items[0].snippet.title, id: response.data.items[0].id })
+                            playSong(message, connectionsArray[voiceChannel.id])
+                        }
+                        else {
+                            playlistArray[voiceChannel.id].push(url)
+                            playlistInfos[voiceChannel.id].push({ title: response.data.items[0].snippet.title, id: response.data.items[0].id })
+                            sendMusicEmbed(message, connectionsArray[voiceChannel.id], response.data.items[0].snippet.title, response.data.items[0].id, true)
+                        }
                     }
                 }
             }
@@ -205,6 +227,54 @@ function getVideo(voiceChannel, message, url, playSongParams = true) {
     }
     else {
         message.channel.send('URL invalide !')
+    }
+}
+
+function radioExist(words) {
+    if (words[1].toLowerCase() === "nrj" || words[1].toLowerCase() === 'subarashii') {
+        return true
+    }
+    return false
+}
+
+function radio(message, words) {
+    let voiceChannel = Helper.take_user_voiceChannel(message)
+    if (!!words[1] && radioExist(words)) {
+        let radioLink = false
+        if (words[1].toLowerCase() === "nrj") {
+            radioLink = "http://cdn.nrjaudio.fm/audio1/fr/40125/aac_64.mp3"
+        }
+        if (words[1].toLowerCase() === 'subarashii') {
+            radioLink = "http://listen.radionomy.com/subarashii.mp3"
+        }
+        if (voiceChannel) {
+            radioPlayed[voiceChannel.id] = 'played'
+            if (!!!connectedGuild[message.guild.id]) {
+                voiceChannel.join()
+                    .then(connection => {
+                        connectionsArray[connection.channel.id] = connection
+                        connectedGuild[message.guild.id] = voiceChannel.id
+                        streamsArray[connection.channel.id] = connectionsArray[connection.channel.id].playStream(radioLink)
+                        streamsArray[connection.channel.id].setVolume(0.5)
+                    })
+            }
+            else {
+                if (!!connectionsArray[voiceChannel.id] && connectedGuild[message.guild.id] === voiceChannel.id) {
+                    delete playlistArray[voiceChannel.id]
+                    delete playlistInfos[voiceChannel.id]
+                    streamsArray[voiceChannel.id].destroy()
+                    streamsArray[voiceChannel.id] = connectionsArray[voiceChannel.id].playStream(radioLink)
+                    streamsArray[voiceChannel.id].setVolume(0.5)
+
+                }
+            }
+        }
+        else {
+            message.channel.send("You must be connected in voice channel !")
+        }
+    }
+    else {
+        message.channel.send('Which radio should I play ?')
     }
 }
 
@@ -217,6 +287,7 @@ function quit(message) {
         delete playlistArray[userChannel.id]
         delete playlistInfos[userChannel.id]
         delete connectedGuild[message.guild.id]
+        delete radioPlayed[userChannel.id]
         if (!!pausedArray[userChannel.id]) {
             delete pausedArray[userChannel.id]
         }
@@ -260,3 +331,4 @@ exports.quit = quit
 exports.pause = pause
 exports.resume = resume
 exports.next = next
+exports.radio = radio

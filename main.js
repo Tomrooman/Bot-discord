@@ -25,6 +25,9 @@ exports.dispatcher = function (message) {
         if (words[0].substr(2, words[0].length - 2) === 'next') {
             Player.next(message)
         }
+        if (words[0].substr(2, words[0].length - 2) === 'radio') {
+            Player.radio(message, words)
+        }
         if (words[0].substr(2, words[0].length - 2) === 'remove') {
             if (words[1] && Number.isFinite(parseInt(words[1])) && parseInt(words[1]) > 0) {
                 Message.remove(message, parseInt(words[1]))
