@@ -1,6 +1,6 @@
-const Player  = require('./player.js')
+const Player = require('./player.js')
 const Message = require('./message.js')
-var test = "tomtom"
+const Level = require('./level.js')
 
 exports.dispatcher = function (message) {
     if (message.content.length > 2) {
@@ -36,10 +36,8 @@ exports.dispatcher = function (message) {
         if (words[0].substr(2, words[0].length - 2) === 'clear') {
             Message.remove(message, 'all')
         }
-        if (words[0].substr(2, words[0].length - 2) === 'change') {
-            console.log('test avant : ', test)
-            test = words[1]
-            console.log('test : ', test)
+        if (words[0].substr(2, words[0].length - 2) === 'rank') {
+            Level.rank(message)
         }
     }
     else {
