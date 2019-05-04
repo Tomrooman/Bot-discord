@@ -9,9 +9,6 @@ exports.dispatcher = function (message) {
             if (words[1] && (words[1].includes("http://") || words[1].includes("https://"))) {
                 Player.playSongs(message, words[1])
             }
-            else {
-                message.channel.send('URL invalide !')
-            }
         }
         if (words[0].substr(2, words[0].length - 2) === 'quit') {
             Player.quit(message)
