@@ -179,7 +179,14 @@ function addPlaylistItems(voiceChannel, message, url, response, playSongParams, 
 }
 
 function getVideo(voiceChannel, message, url, playSongParams = true) {
-    let videoId = url.substr(url.indexOf("watch?v=") + 8, url.indexOf('&list') - (url.indexOf("watch?v=") + 8))
+    let videoId = false
+    if (url.indexOf('&list') !== -1) {
+        videoId = url.substr(url.indexOf("watch?v=") + 8, url.indexOf('&list') - (url.indexOf("watch?v=") + 8))
+    }
+    else {
+        videoId = url.substr(url.indexOf("watch?v=") + 8)
+
+    }
     if (!!videoId) {
         let service = google.youtube('v3')
         service.videos.list({

@@ -1,6 +1,5 @@
 exports.remove = function (message, howMany) {
     let limit = {}
-    let messages = false
     if (howMany !== "all") {
         limit = {
             limit : parseInt(howMany) + 1

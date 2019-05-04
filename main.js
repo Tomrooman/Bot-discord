@@ -1,6 +1,5 @@
 const Player  = require('./player.js')
 const Message = require('./message.js')
-var test = "tomtom"
 
 exports.dispatcher = function (message) {
     if (message.content.length > 2) {
@@ -8,9 +7,6 @@ exports.dispatcher = function (message) {
         if (words[0].substr(2, words[0].length - 2) === 'play') {
             if (words[1] && (words[1].includes("http://") || words[1].includes("https://"))) {
                 Player.playSongs(message, words[1])
-            }
-            else {
-                message.channel.send('URL invalide !')
             }
         }
         if (words[0].substr(2, words[0].length - 2) === 'quit') {
@@ -35,11 +31,6 @@ exports.dispatcher = function (message) {
         }
         if (words[0].substr(2, words[0].length - 2) === 'clear') {
             Message.remove(message, 'all')
-        }
-        if (words[0].substr(2, words[0].length - 2) === 'change') {
-            console.log('test avant : ', test)
-            test = words[1]
-            console.log('test : ', test)
         }
     }
     else {
