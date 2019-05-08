@@ -32,6 +32,9 @@ exports.dispatcher = function (message) {
         if (words[0].substr(2, words[0].length - 2) === 'clear') {
             Message.remove(message, 'all')
         }
+        if (words[0].substr(2, words[0].length - 2) === 'test') {
+            Message.channel.send('Fonctionne')
+        }
     }
     else {
         message.channel.send('Ecrit une commande petit con !')
