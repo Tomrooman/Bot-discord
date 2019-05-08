@@ -33,7 +33,7 @@ exports.dispatcher = function (message) {
             Message.remove(message, 'all')
         }
         if (words[0].substr(2, words[0].length - 2) === 'test') {
-            message.channel.send('Fonctionne')
+            message.channel.send('Fonctionne !!!!')
         }
     }
     else {
