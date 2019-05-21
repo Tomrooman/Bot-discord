@@ -14,7 +14,7 @@ bot.on('ready', () => {
 })
 
 bot.on('message', (message) => {
-    if (!!!dbConnection && message.author.id !== "557589839587966977") {
+    if (!!!dbConnection && message.author.id !== config.clientId) {
         console.log('try to connect to database')
         let MongoClient = require('mongodb').MongoClient;
         var url = "mongodb://localhost:27017/bot-discord";
@@ -35,7 +35,7 @@ bot.on('message', (message) => {
         Main.dispatcher(message)
     }
     else {
-        if (!!dbConnection && message.author.id !== "557589839587966977") {
+        if (!!dbConnection && message.author.id !== config.clientId) {
             Level.addXp(message)
         }
     }
