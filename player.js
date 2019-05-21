@@ -2,6 +2,7 @@ const ytdl = require('ytdl-core')
 const Helper = require('./helper.js')
 const _ = require('lodash')
 const { google } = require('googleapis')
+const config = require('./config')
 
 var connectionsArray = []
 var streamsArray = []
@@ -117,7 +118,7 @@ function getPlaylist(voiceChannel, message, url, playSongParams = true, pageToke
     if (!!playlistId) {
         let service = google.youtube('v3')
         service.playlistItems.list({
-            key: "AIzaSyDDRQTDxXfvACI7AQwYrR25KqpR-7ZNNLE",
+            key: config.googleKey,
             playlistId: playlistId,
             maxResults: 50,
             pageToken: pageToken,
@@ -190,7 +191,7 @@ function getVideo(voiceChannel, message, url, playSongParams = true) {
     if (!!videoId) {
         let service = google.youtube('v3')
         service.videos.list({
-            key: "AIzaSyDDRQTDxXfvACI7AQwYrR25KqpR-7ZNNLE",
+            key: config.googleKey,
             id: videoId,
             part: "snippet, contentDetails"
         }, function (err, response) {

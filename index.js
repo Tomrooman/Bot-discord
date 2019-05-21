@@ -1,12 +1,12 @@
 const Discord = require('discord.js')
 const Main = require('./main.js');
 const bot = new Discord.Client()
+const config = require('./config.json')
 
 
-bot.login('NTU3NTg5ODM5NTg3OTY2OTc3.D3KgUA.Hstysro-edujF5PxjKCfvufpwbI')
+bot.login(config.token)
 
 bot.on('ready', () => {
-    //bot.user.setActivity('Stalyr le boss')
     console.log('----- Connected -----')
 })
 
