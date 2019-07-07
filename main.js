@@ -38,7 +38,7 @@ exports.dispatcher = function (message) {
         }
     }
     else {
-        message.channel.send('Ecrit une commande petit con !')
+        message.channel.send('You must write a command !')
     }
 
 };
