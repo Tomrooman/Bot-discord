@@ -1,8 +1,10 @@
 const Discord = require('discord.js')
-const Main = require('./main.js')
+const Controller = require('./controller.js')
 const Level = require('./level.js')
-const bot = new Discord.Client()
 const config = require('./config.json')
+const helper = require('./helper.js')
+
+const bot = new Discord.Client()
 
 global.dbConnection = false
 
@@ -11,31 +13,34 @@ bot.login(config.token)
 
 bot.on('ready', () => {
     console.log('----- Connected -----')
+
+    console.log('Connecting to database ...')
+    let MongoClient = require('mongodb').MongoClient
+    var url = "mongodb://localhost:27017/syxbot-database"
+
+    MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, function (err, db) {
+        if (err) throw err;
+        dbConnection = db.db('syxbot-database')
+        console.log("Connected to database !")
+    });
+
+    // Send a message when online
+    // bot.guilds.map(guild => {
+    //     if (guild.available) {
+    //         let channel = helper.getFirstAuthorizedChannel(guild)
+    //         channel.send('Je suis en ligne !')
+    //     }
+    // })
 })
 
 bot.on('message', (message) => {
-    if (!!!dbConnection && message.author.id !== config.clientId) {
-        console.log('try to connect to database')
-        let MongoClient = require('mongodb').MongoClient
-        var url = "mongodb://localhost:27017/bot-discord"
-
-        MongoClient.connect(url, { useNewUrlParser: true }, function (err, db) {
-            if (err) throw err;
-            dbConnection = db.db('bot-discord')
-            console.log("Connected to database !")
-            if (message.content.substr(0, 2) === '!!') {
-                Main.dispatcher(message)
-            }
-            else {
-                Level.addXp(message)
-            }
-        });
-    }
-    else if (message.content.substr(0, 2) === '!!') {
-        Main.dispatcher(message)
+    if (message.content.substr(0, 2) === '!!') {
+        //console.log('author id: ', message.author.id)
+        Controller.dispatcher(message)
     }
     else {
         if (!!dbConnection && message.author.id !== config.clientId) {
+            //console.log('author id: ', message.author.id)
             Level.addXp(message)
         }
     }

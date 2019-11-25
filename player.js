@@ -12,39 +12,59 @@ var playlistInfos = []
 var connectedGuild = []
 var radioPlayed = []
 
-function playSongs(message, url) {
+function playSongs(message, command, url) {
     let voiceChannel = Helper.take_user_voiceChannel(message)
     if (voiceChannel) {
         if (!!!connectedGuild[message.guild.id]) {
-            if (url.indexOf('playlist') !== -1) {
-                getPlaylist(voiceChannel, message, url)
+            if (command.startsWith("playlist", 2)) {
+                if (url.indexOf("list=") !== -1) {
+                    getPlaylist(voiceChannel, message, url)
+                }
+                else {
+                    message.reply("merci de renseigner une URL de playlist valide !")
+                }
             }
             else {
-                getVideo(voiceChannel, message, url)
+                if (url.indexOf('playlist') !== -1) {
+                    getPlaylist(voiceChannel, message, url)
+                }
+                else {
+                    getVideo(voiceChannel, message, url)
+                }
             }
         }
         else {
             if (connectedGuild[message.guild.id] === voiceChannel.id) {
-                if (url.indexOf('playlist') !== -1) {
-                    getPlaylist(voiceChannel, message, url, false)
+                if (command.startsWith("playlist", 2)) {
+                    if (url.indexOf("list=") !== -1) {
+                        getPlaylist(voiceChannel, message, url, false)
+                    }
+                    else {
+                        message.reply("merci de renseigner une URL de playlist valide !")
+                    }
                 }
                 else {
-                    getVideo(voiceChannel, message, url, false)
+                    if (url.indexOf('playlist') !== -1) {
+                        getPlaylist(voiceChannel, message, url, false)
+                    }
+                    else {
+                        getVideo(voiceChannel, message, url, false)
+                    }
                 }
             }
             else {
-                message.channel.send("Vous n'êtes pas dans le même canal que le bot !")
+                message.reply("Vous n'êtes pas dans le même canal que le bot !")
             }
         }
 
     }
     else {
-        message.reply('You need to join a voice channel first !');
+        message.reply('Vous devez être connecté dans un salon !');
     }
 };
 
 function playSong(message, connection) {
-    sendMusicEmbed(message, connection, playlistInfos[connection.channel.id][0].title, playlistInfos[connection.channel.id][0].id)
+    sendMusicEmbed(message, connection, playlistInfos[connection.channel.id][0].title, playlistInfos[connection.channel.id][0].id, [false, 1])
     connectionsArray[connection.channel.id] = connection
     streamsArray[connection.channel.id] = connectionsArray[connection.channel.id].playStream(ytdl(playlistArray[connection.channel.id][0], { filter: 'audioonly' }))
     streamsArray[connection.channel.id].setVolume(0.5)
@@ -56,7 +76,9 @@ function playSong(message, connection) {
                 playlistArray[connection.channel.id] = _.compact(playlistArray[connection.channel.id])
                 playlistInfos[connection.channel.id] = _.compact(playlistInfos[connection.channel.id])
                 if (!!!playlistArray[connection.channel.id][0]) {
-                    quit(message)
+                    setTimeout(() => {
+                        quit(message)
+                    }, 5000)
                 }
                 else {
                     playSong(message, connection)
@@ -69,16 +91,22 @@ function playSong(message, connection) {
     })
 }
 
-function sendMusicEmbed(message, connection, musicTitle, musicId = false, added = false) {
-    let title = "Music"
+function sendMusicEmbed(message, connection, musicTitle, musicId = false, added = [false, 1]) {
+    let title = "Musique"
     let color = false
     let playArray = false
     let musicLink = musicTitle
-    if (musicTitle !== 'Playlist songs') {
+    if (musicTitle !== 'Playlist') {
         musicLink = `[${musicTitle}](https://www.youtube.com/watch?v=${musicId})`
     }
-    if (added) {
-        title = "Added music"
+    if (added[0]) {
+        if (added[1] > 1) {
+            title = "Musiques ajoutées"
+        }
+        else {
+            title = "Musique ajoutée"
+        }
+
         // #398240
         color = 3768896
     }
@@ -101,11 +129,11 @@ function sendMusicEmbed(message, connection, musicTitle, musicId = false, added 
             },
             "fields": [
                 {
-                    "name": "Title",
+                    "name": "Titre",
                     "value": musicLink
                 },
                 {
-                    "name": "Queued",
+                    "name": "File d'attente",
                     "value": `${playArray.length - 1}`
                 }
             ]
@@ -114,7 +142,17 @@ function sendMusicEmbed(message, connection, musicTitle, musicId = false, added 
 }
 
 function getPlaylist(voiceChannel, message, url, playSongParams = true, pageToken = '', play = false, connection = false) {
-    let playlistId = url.substr(url.indexOf('list=') + 5, url.length - (url.indexOf('list=') + 5))
+    let endPlaylistId = url.indexOf('&', url.indexOf('&') + 1)
+    let playlistId = ''
+    if (endPlaylistId !== -1) {
+        let playlistLength = url.length - (url.indexOf("&") + 5)
+        playlistLength -= url.length - endPlaylistId
+        playlistLength -= 1;
+        playlistId = url.substr(url.indexOf('&list=') + 6, playlistLength)
+    }
+    else {
+        playlistId = url.substr(url.indexOf('?list=') + 6, url.length - (url.indexOf('?list=') + 6))
+    }
     if (!!playlistId) {
         let service = google.youtube('v3')
         service.playlistItems.list({
@@ -169,7 +207,7 @@ function addPlaylistItems(voiceChannel, message, url, response, playSongParams, 
             playSong(message, connection)
         }
         else {
-            sendMusicEmbed(message, voiceChannel, 'Playlist songs', false, true)
+            sendMusicEmbed(message, voiceChannel, 'Playlist', false, [true, data.items.length])
             if (!!radioPlayed[voiceChannel.id]) {
                 streamsArray[voiceChannel.id].destroy()
                 delete radioPlayed[voiceChannel.id]
@@ -226,7 +264,7 @@ function getVideo(voiceChannel, message, url, playSongParams = true) {
                         else {
                             playlistArray[voiceChannel.id].push(url)
                             playlistInfos[voiceChannel.id].push({ title: response.data.items[0].snippet.title, id: response.data.items[0].id })
-                            sendMusicEmbed(message, connectionsArray[voiceChannel.id], response.data.items[0].snippet.title, response.data.items[0].id, true)
+                            sendMusicEmbed(message, connectionsArray[voiceChannel.id], response.data.items[0].snippet.title, response.data.items[0].id, [true, 1])
                         }
                     }
                 }
@@ -300,8 +338,11 @@ function quit(message) {
             delete pausedArray[userChannel.id]
         }
     }
+    else if (!!!connectedGuild[message.guild.id]) {
+        message.channel.send("Je ne suis pas connecté dans un salon !")
+    }
     else {
-        message.channel.send("Vous n'êtes pas dans le même canal que le bot !")
+        message.channel.send("Vous n'êtes pas dans le même salon que le bot !")
     }
 }
 
