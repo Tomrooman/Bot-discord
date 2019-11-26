@@ -115,7 +115,7 @@ function sendMusicEmbed(message, connection, musicTitle, musicId, added = [false
             "color": color,
             "author": {
                 "name": title,
-                "icon_url": "https://i2.wp.com/www.lesforetsduperche.fr/wp-content/uploads/2017/06/note-de-musique.png"
+                "icon": "./../img/music_icon.png"
             },
             "thumbnail": {
                 "url": thumbnail
