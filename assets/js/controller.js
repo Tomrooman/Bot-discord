@@ -44,7 +44,6 @@ function dispatcher(message) {
         }
     }
     else {
-        //message.channel.send('You must write a command !')
         message.reply('Vous devez écrire une commande !')
     }
 
