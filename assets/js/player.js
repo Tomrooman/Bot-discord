@@ -115,7 +115,7 @@ function sendMusicEmbed(message, connection, musicTitle, musicId, added = [false
             "color": color,
             "author": {
                 "name": title,
-                "icon": "./../img/music_icon.png"
+                "icon_url": "https://syxbot.com/img/embed_music.png"
             },
             "thumbnail": {
                 "url": thumbnail

@@ -2,10 +2,10 @@ const Player = require('./player.js')
 const Message = require('./message.js')
 const Level = require('./level.js')
 
-function dispatcher(message) {
-    if (message.content.length > 2) {
+function dispatcher(message, prefixLength) {
+    if (message.content.length > prefixLength) {
         let words = message.content.split(' ')
-        if (words[0].startsWith('play', 2) || words[0].startsWith('playlist', 2)) {
+        if (words[0].startsWith('play', prefixLength) || words[0].startsWith('playlist', prefixLength)) {
             if (words[1] && (words[1].includes("http://") || words[1].includes("https://"))) {
                 Player.playSongs(message, words[0], words[1])
             }
@@ -13,30 +13,30 @@ function dispatcher(message) {
                 message.reply('Vous devez entrer une URL valide !')
             }
         }
-        else if (words[0].startsWith('quit', 2)) {
+        else if (words[0].startsWith('quit', prefixLength)) {
             Player.quit(message)
         }
-        else if (words[0].startsWith('pause', 2)) {
+        else if (words[0].startsWith('pause', prefixLength)) {
             Player.pause(message)
         }
-        else if (words[0].startsWith('resume', 2)) {
+        else if (words[0].startsWith('resume', prefixLength)) {
             Player.resume(message)
         }
-        else if (words[0].startsWith('next', 2)) {
+        else if (words[0].startsWith('next', prefixLength)) {
             Player.next(message)
         }
-        else if (words[0].startsWith('radio', 2)) {
+        else if (words[0].startsWith('radio', prefixLength)) {
             Player.radio(message, words)
         }
-        else if (words[0].startsWith('remove', 2)) {
+        else if (words[0].startsWith('remove', prefixLength)) {
             if (words[1] && Number.isFinite(parseInt(words[1])) && parseInt(words[1]) > 0) {
                 Message.remove(message, parseInt(words[1]))
             }
         }
-        else if (words[0].startsWith('clear', 2)) {
+        else if (words[0].startsWith('clear', prefixLength)) {
             Message.remove(message, 'all')
         }
-        else if (words[0].startsWith('rank', 2)) {
+        else if (words[0].startsWith('rank', prefixLength)) {
             Level.rank(message)
         }
         else {

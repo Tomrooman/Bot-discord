@@ -34,9 +34,9 @@ bot.on('ready', () => {
 })
 
 bot.on('message', (message) => {
-    if (message.content.substr(0, 2) === config.prefix) {
+    if (message.content.startsWith(config.prefix)) {
         //console.log('author id: ', message.author.id)
-        Controller.dispatcher(message)
+        Controller.dispatcher(message, config.prefix.length)
     }
     else {
         if (!!dbConnection && message.author.id !== config.clientId) {
