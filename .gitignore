@@ -2,3 +2,4 @@ node_modules
 private
 config.json
 yarn.lock
+package-lock.json

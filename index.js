@@ -12,7 +12,7 @@ global.dbConnection = false
 bot.login(config.token)
 
 bot.on('ready', () => {
-    console.log('----- Connected -----')
+    console.log('----- Connected ' + config.WHAT + ' -----')
 
     console.log('Connecting to database ...')
     let MongoClient = require('mongodb').MongoClient

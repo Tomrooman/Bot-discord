@@ -343,9 +343,15 @@ function radio(message, words) {
     }
 }
 
+function showQueuedSongs(message) {
+    if (Helper.verifyBotLocation(message, !!connectionsArray[userChannel.id], connectedGuild[message.guild.id])) {
+
+    }
+}
+
 function quit(message) {
     let userChannel = Helper.take_user_voiceChannel(message)
-    if (!!connectionsArray[userChannel.id] && connectedGuild[message.guild.id] === userChannel.id) {
+    if (Helper.verifyBotLocation(message, userChannel, !!connectionsArray[userChannel.id], connectedGuild[message.guild.id])) {
         connectionsArray[userChannel.id].channel.leave()
         delete connectionsArray[userChannel.id]
         delete streamsArray[userChannel.id]
@@ -356,12 +362,6 @@ function quit(message) {
         if (!!pausedArray[userChannel.id]) {
             delete pausedArray[userChannel.id]
         }
-    }
-    else if (!!!connectedGuild[message.guild.id]) {
-        message.channel.send("Je ne suis pas connecté dans un salon !")
-    }
-    else {
-        message.channel.send("Vous n'êtes pas dans le même salon que le bot !")
     }
 }
 
@@ -400,3 +400,4 @@ exports.pause = pause
 exports.resume = resume
 exports.next = next
 exports.radio = radio
+exports.showQueuedSongs = showQueuedSongs

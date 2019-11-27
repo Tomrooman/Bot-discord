@@ -29,5 +29,20 @@ function getFirstAuthorizedChannel(guild) {
         .first();
 }
 
+function verifyBotLocation(message, userChannel, userChannelConnection, connectedGuild) {
+    if (userChannelConnection && connectedGuild === userChannel.id) {
+        return true
+    }
+    else if (!!!connectedGuild) {
+        message.channel.send("Je ne suis pas connecté dans un salon !")
+        return false
+    }
+    else {
+        message.channel.send("Vous n'êtes pas dans le même salon que le bot !")
+        return false
+    }
+}
+
 exports.take_user_voiceChannel = take_user_voiceChannel
 exports.getFirstAuthorizedChannel = getFirstAuthorizedChannel
+exports.verifyBotLocation = verifyBotLocation

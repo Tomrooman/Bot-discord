@@ -25,6 +25,9 @@ function dispatcher(message, prefixLength) {
         else if (words[0].startsWith('next', prefixLength)) {
             Player.next(message)
         }
+        else if (words[0].startsWith('queued', prefixLength)) {
+            Player.showQueuedSongs(message)
+        }
         else if (words[0].startsWith('radio', prefixLength)) {
             Player.radio(message, words)
         }
