@@ -4,18 +4,18 @@ const _ = require('lodash')
 const { google } = require('googleapis')
 const config = require('./../../config.json')
 
-var connectionsArray = []
-var streamsArray = []
-var pausedArray = []
-var playlistArray = []
-var playlistInfos = []
-var connectedGuild = []
-var radioPlayed = []
+let connectionsArray = []
+let streamsArray = []
+let pausedArray = []
+let playlistArray = []
+let playlistInfos = []
+let connectedGuild = []
+let radioPlayed = []
 
 function playSongs(message, command, url) {
-    let voiceChannel = Helper.take_user_voiceChannel(message)
+    const voiceChannel = Helper.take_user_voiceChannel(message)
     if (voiceChannel) {
-        if (!!!connectedGuild[message.guild.id]) {
+        if (!connectedGuild[message.guild.id]) {
             playSongsAndConnectOrNotBot(voiceChannel, message, command, url)
         }
         else {
@@ -23,22 +23,22 @@ function playSongs(message, command, url) {
                 playSongsAndConnectOrNotBot(voiceChannel, message, command, url, false)
             }
             else {
-                message.reply("Vous n'êtes pas dans le même canal que le bot !")
+                message.reply('vous n\'êtes pas dans le même canal que le bot !')
             }
         }
     }
     else {
-        message.reply('Vous devez être connecté dans un salon !');
+        message.reply('vous devez être connecté dans un salon !');
     }
-};
+}
 
 function playSongsAndConnectOrNotBot(voiceChannel, message, command, url, playSongParams = true) {
-    if (command.startsWith("playlist", config.prefix.length)) {
-        if (url.indexOf("list=") !== -1) {
+    if (command.startsWith('playlist', config.prefix.length)) {
+        if (url.indexOf('list=') !== -1) {
             getPlaylist(voiceChannel, message, url, playSongParams)
         }
         else {
-            message.reply("merci de renseigner une URL de playlist valide !")
+            message.reply('merci de renseigner une URL de playlist valide !')
         }
     }
     else {
@@ -80,7 +80,7 @@ function playSong(message, connection) {
 }
 
 function sendMusicEmbed(message, connection, musicTitle, musicId, added = [false, 1]) {
-    let title = "Musique"
+    let title = 'Musique'
     let color = false
     let playArray = false
     let musicLink = musicTitle
@@ -90,10 +90,10 @@ function sendMusicEmbed(message, connection, musicTitle, musicId, added = [false
     }
     if (added[0]) {
         if (added[1] > 1) {
-            title = "Musiques ajoutées"
+            title = 'Musiques ajoutées'
         }
         else {
-            title = "Musique ajoutée"
+            title = 'Musique ajoutée'
             thumbnail = playlistInfos[connection.channel.id][0].thumbnail
         }
         // #398240 | Vert foncé
@@ -111,25 +111,25 @@ function sendMusicEmbed(message, connection, musicTitle, musicId, added = [false
         playArray = playlistArray[connection.id]
     }
     message.channel.send({
-        "embed": {
-            "color": color,
-            "author": {
-                "name": title,
-                "icon_url": "https://syxbot.com/img/embed_music.png"
+        'embed': {
+            'color': color,
+            'author': {
+                'name': title,
+                'icon_url': 'https://syxbot.com/img/embed_music.png'
             },
-            "thumbnail": {
-                "url": thumbnail
+            'thumbnail': {
+                'url': thumbnail
             },
-            "fields": [
+            'fields': [
                 {
-                    "name": "Titre",
-                    "value": musicLink,
-                    "inline": true
+                    'name': 'Titre',
+                    'value': musicLink,
+                    'inline': true
                 },
                 {
-                    "name": "File d'attente",
-                    "value": `${playArray.length - 1}`,
-                    "inline": true
+                    'name': 'File d\'attente',
+                    'value': `${playArray.length - 1}`,
+                    'inline': true
                 }
             ]
         }
@@ -140,7 +140,7 @@ function getPlaylist(voiceChannel, message, url, playSongParams = true, pageToke
     let endPlaylistId = url.indexOf('&', url.indexOf('&') + 1)
     let playlistId = ''
     if (endPlaylistId !== -1) {
-        let playlistLength = url.length - (url.indexOf("&") + 5)
+        let playlistLength = url.length - (url.indexOf('&') + 5)
         playlistLength -= url.length - endPlaylistId
         playlistLength -= 1;
         playlistId = url.substr(url.indexOf('&list=') + 6, playlistLength)
@@ -160,11 +160,11 @@ function callYoutubeApiAndAddItems(playlistId, voiceChannel, message, url, playS
         playlistId: playlistId,
         maxResults: 50,
         pageToken: pageToken,
-        part: "snippet, contentDetails"
+        part: 'snippet, contentDetails'
     }, function (err, response) {
         if (err) {
             console.log('The API returned an error: ' + err);
-            message.channel.send("Une erreur s'est produite !")
+            message.channel.send('Une erreur s\'est produite !')
             return false;
         }
         else {
@@ -192,7 +192,7 @@ function addPlaylistItems(voiceChannel, message, url, response, playSongParams, 
     if (radioPlayed[voiceChannel.id] === 'played') {
         playlistArray[voiceChannel.id] = []
         playlistInfos[voiceChannel.id] = []
-        radioPlayed[voiceChannel.id] = "notPlay"
+        radioPlayed[voiceChannel.id] = 'notPlay'
     }
     data.items.map(item => {
         playlistArray[voiceChannel.id].push(videoURL + item.snippet.resourceId.videoId)
@@ -223,10 +223,10 @@ function addPlaylistItems(voiceChannel, message, url, response, playSongParams, 
 function getVideo(voiceChannel, message, url, playSongParams = true) {
     let videoId = false
     if (url.indexOf('&list') !== -1) {
-        videoId = url.substr(url.indexOf("watch?v=") + 8, url.indexOf('&list') - (url.indexOf("watch?v=") + 8))
+        videoId = url.substr(url.indexOf('watch?v=') + 8, url.indexOf('&list') - (url.indexOf('watch?v=') + 8))
     }
     else {
-        videoId = url.substr(url.indexOf("watch?v=") + 8)
+        videoId = url.substr(url.indexOf('watch?v=') + 8)
 
     }
     if (!!videoId) {
@@ -234,11 +234,11 @@ function getVideo(voiceChannel, message, url, playSongParams = true) {
         service.videos.list({
             key: config.googleKey,
             id: videoId,
-            part: "snippet, contentDetails"
+            part: 'snippet, contentDetails'
         }, function (err, response) {
             if (err) {
                 console.log('The API returned an error: ' + err);
-                message.channel.send("Une erreur s'est produite !")
+                message.channel.send('Une erreur s\'est produite !')
                 return false;
             }
             else {
@@ -296,21 +296,21 @@ function setMusicArrayAndPlayMusic(voiceChannel, response, message, url, playSon
 }
 
 function radioExist(words) {
-    if (words[1].toLowerCase() === "nrj" || words[1].toLowerCase() === 'subarashii') {
+    if (words[1].toLowerCase() === 'nrj' || words[1].toLowerCase() === 'subarashii') {
         return true
     }
     return false
 }
 
 function radio(message, words) {
-    let voiceChannel = Helper.take_user_voiceChannel(message)
+    const voiceChannel = Helper.take_user_voiceChannel(message)
     if (!!words[1] && radioExist(words)) {
         let radioLink = false
-        if (words[1].toLowerCase() === "nrj") {
-            radioLink = "http://cdn.nrjaudio.fm/audio1/fr/40125/aac_64.mp3"
+        if (words[1].toLowerCase() === 'nrj') {
+            radioLink = 'http://cdn.nrjaudio.fm/audio1/fr/40125/aac_64.mp3'
         }
         if (words[1].toLowerCase() === 'subarashii') {
-            radioLink = "http://listen.radionomy.com/subarashii.mp3"
+            radioLink = 'http://listen.radionomy.com/subarashii.mp3'
         }
         if (voiceChannel) {
             radioPlayed[voiceChannel.id] = 'played'
@@ -335,11 +335,11 @@ function radio(message, words) {
             }
         }
         else {
-            message.channel.send("Vous devez être connecté dans un salon !")
+            message.channel.send('Vous devez être connecté dans un salon !')
         }
     }
     else {
-        message.channel.send("Choisir une radio c'est mieux !")
+        message.channel.send('Choisir une radio c\'est mieux !')
     }
 }
 
@@ -350,7 +350,7 @@ function showQueuedSongs(message) {
 }
 
 function quit(message) {
-    let userChannel = Helper.take_user_voiceChannel(message)
+    const userChannel = Helper.take_user_voiceChannel(message)
     if (Helper.verifyBotLocation(message, userChannel, !!connectionsArray[userChannel.id], connectedGuild[message.guild.id])) {
         connectionsArray[userChannel.id].channel.leave()
         delete connectionsArray[userChannel.id]
@@ -366,7 +366,7 @@ function quit(message) {
 }
 
 function pause(message) {
-    let userChannel = Helper.take_user_voiceChannel(message)
+    const userChannel = Helper.take_user_voiceChannel(message)
     if (!!streamsArray[userChannel.id] && connectedGuild[message.guild.id] === userChannel.id) {
         streamsArray[userChannel.id].pause()
         pausedArray[userChannel.id] = 'onPause'
@@ -374,7 +374,7 @@ function pause(message) {
 }
 
 function resume(message) {
-    let userChannel = Helper.take_user_voiceChannel(message)
+    const userChannel = Helper.take_user_voiceChannel(message)
     if (!!pausedArray[userChannel.id] && connectedGuild[message.guild.id] === userChannel.id) {
         streamsArray[userChannel.id].resume()
         delete pausedArray[userChannel.id]
@@ -382,14 +382,14 @@ function resume(message) {
 }
 
 function next(message) {
-    let userChannel = Helper.take_user_voiceChannel(message)
+    const userChannel = Helper.take_user_voiceChannel(message)
     if (!!streamsArray[userChannel.id] && connectedGuild[message.guild.id] === userChannel.id) {
         if (!!playlistArray[userChannel.id]) {
             streamsArray[userChannel.id].destroy()
         }
     }
     else {
-        message.channel.send("Vous n'êtes pas dans le même salon que le bot !")
+        message.channel.send('Vous n\'êtes pas dans le même salon que le bot !')
     }
 }
 

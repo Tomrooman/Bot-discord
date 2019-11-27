@@ -47,7 +47,7 @@ function dispatcher(message, prefixLength) {
         }
     }
     else {
-        message.reply('Vous devez écrire une commande !')
+        message.reply('vous devez écrire une commande !')
     }
 
 };
