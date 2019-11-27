@@ -33,7 +33,7 @@ function playSongs(message, command, url) {
 };
 
 function playSongsAndConnectOrNotBot(voiceChannel, message, command, url, playSongParams = true) {
-    if (command.startsWith("playlist", 2)) {
+    if (command.startsWith("playlist", config.prefix.length)) {
         if (url.indexOf("list=") !== -1) {
             getPlaylist(voiceChannel, message, url, playSongParams)
         }

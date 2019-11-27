@@ -5,7 +5,7 @@ const Level = require('./level.js')
 function dispatcher(message, prefixLength) {
     if (message.content.length > prefixLength) {
         let words = message.content.split(' ')
-        if (words[0].startsWith('play', prefixLength) || words[0].startsWith('playlist', prefixLength)) {
+        if (words[0].startsWith('play', prefixLength)) {
             if (words[1] && (words[1].includes("http://") || words[1].includes("https://"))) {
                 Player.playSongs(message, words[0], words[1])
             }
