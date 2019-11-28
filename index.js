@@ -3,12 +3,8 @@ const Controller = require('./assets/js/controller.js')
 const Level = require('./assets/js/level.js')
 const config = require('./config.json')
 // const helper = require('./assets/js/helper.js')
-const MongoClient = require('mongodb').MongoClient
-
+const mongoose = require('mongoose')
 const bot = new Discord.Client()
-
-global.dbConnection = false
-
 
 bot.login(config.token)
 
@@ -37,13 +33,6 @@ bot.on('message', (message) => {
 
 function connectToDatabase() {
     console.log('Connecting to database ...')
-    const url = 'mongodb://localhost:27017/syxbot-database'
-    MongoClient.connect(url, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    }, function (err, db) {
-        if (err) throw err;
-        global.dbConnection = db.db('syxbot-database')
-        console.log('Connected to database !')
-    });
+    mongoose.connect('mongodb://localhost/syxbot-database', { useNewUrlParser: true, useUnifiedTopology: true })
+    console.log('Connected to database')
 }
