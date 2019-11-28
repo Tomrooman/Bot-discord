@@ -5,7 +5,7 @@
     "main": "index.js",
     "scripts": {
         "eslint": "./node_modules/.bin/eslint ./",
-        "test": "mocha ./tests/index.test.js",
+        "test": "mocha ./tests/index.test.js --exit",
         "start": "nodemon index.js"
     },
     "private": true,
