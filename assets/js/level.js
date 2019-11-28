@@ -1,10 +1,9 @@
 // const { convertFile } = require('convert-svg-to-png')
 // const fs = require('fs')
 const alreadyFound = []
-const dbConnection = global.dbConnection
 
 function addXp(message) {
-    const usersCollection = dbConnection.collection('users')
+    const usersCollection = global.dbConnection.collection('users')
     if (!alreadyFound[message.guild.id] ||
         (alreadyFound[message.guild.id] && !alreadyFound[message.guild.id][message.author.id])) {
         console.log('Try to find user')
@@ -42,7 +41,7 @@ function addXp(message) {
 
 function updateXp(user) {
     console.log('update xp')
-    const usersCollection = dbConnection.collection('users')
+    const usersCollection = global.dbConnection.collection('users')
     usersCollection.updateOne({
         userId: user[0].userId,
         serverId: user[0].serverId
@@ -51,7 +50,7 @@ function updateXp(user) {
 }
 
 function rank(message) {
-    const usersCollection = dbConnection.collection('users')
+    const usersCollection = global.dbConnection.collection('users')
     usersCollection.find({
         userId: message.author.id,
         serverId: message.guild.id

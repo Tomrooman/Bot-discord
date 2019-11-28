@@ -14,20 +14,7 @@ bot.login(config.token)
 
 bot.on('ready', () => {
     console.log('----- Connected ' + config.WHAT + ' -----')
-
-    console.log('Connecting to database ...')
-
-    const url = 'mongodb://localhost:27017/syxbot-database'
-
-    MongoClient.connect(url, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    }, function (err, db) {
-        if (err) throw err;
-        global.dbConnection = db.db('syxbot-database')
-        console.log('Connected to database !')
-    });
-
+    connectToDatabase()
     // send message to all first available guild's channel
     // bot.guilds.map(guild => {
     //     if (guild.available) {
@@ -47,3 +34,16 @@ bot.on('message', (message) => {
         Level.addXp(message)
     }
 })
+
+function connectToDatabase() {
+    console.log('Connecting to database ...')
+    const url = 'mongodb://localhost:27017/syxbot-database'
+    MongoClient.connect(url, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    }, function (err, db) {
+        if (err) throw err;
+        global.dbConnection = db.db('syxbot-database')
+        console.log('Connected to database !')
+    });
+}
