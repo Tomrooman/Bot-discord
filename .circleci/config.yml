@@ -8,13 +8,13 @@ jobs: # a collection of steps
     steps: # a collection of executable commands
       - checkout # special step to check out source code to working directory
       - run:
-          name: update-npm
+          name: Update npm
           command: 'sudo npm install -g npm@latest'
       - restore_cache: # special step to restore the dependency cache
           # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
           key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
-          name: install-npm-wee
+          name: Install npm wee
           command: npm install
       - save_cache: # special step to save the dependency cache
           key: dependency-cache-{{ checksum "package-lock.json" }}
@@ -24,7 +24,7 @@ jobs: # a collection of steps
       #     name: test
       #     command: npm test
       - run: # run eslint tests
-          name: eslint
+          name: Eslint
           command: './node_modules/.bin/eslint ./'
       - run: # run coverage report
           name: code-coverage
