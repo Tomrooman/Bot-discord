@@ -58,7 +58,7 @@ function playSong(message, connection) {
     streamsArray[connection.channel.id].setVolume(0.5)
     streamsArray[connection.channel.id].on('end', () => {
         setTimeout(() => {
-            if (!!playlistArray[connection.channel.id]) {
+            if (playlistArray[connection.channel.id]) {
                 delete playlistArray[connection.channel.id][0]
                 delete playlistInfos[connection.channel.id][0]
                 playlistArray[connection.channel.id] = _.compact(playlistArray[connection.channel.id])
@@ -104,10 +104,10 @@ function sendMusicEmbed(message, connection, musicTitle, musicId, added = [false
         color = 3493780
         thumbnail = playlistInfos[connection.channel.id][0].thumbnail
     }
-    if (!!connection.channel) {
+    if (connection.channel) {
         playArray = playlistArray[connection.channel.id]
     }
-    if (!!connection.id) {
+    if (connection.id) {
         playArray = playlistArray[connection.id]
     }
     message.channel.send({
