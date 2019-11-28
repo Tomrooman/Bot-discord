@@ -63,7 +63,7 @@ function playSong(message, connection) {
                 delete playlistInfos[connection.channel.id][0]
                 playlistArray[connection.channel.id] = _.compact(playlistArray[connection.channel.id])
                 playlistInfos[connection.channel.id] = _.compact(playlistInfos[connection.channel.id])
-                if (!!!playlistArray[connection.channel.id][0]) {
+                if (!playlistArray[connection.channel.id][0]) {
                     setTimeout(() => {
                         quit(message)
                     }, 5000)
@@ -115,21 +115,21 @@ function sendMusicEmbed(message, connection, musicTitle, musicId, added = [false
             'color': color,
             'author': {
                 'name': title,
-                'icon_url': 'https://syxbot.com/img/embed_music.png'
+                'icon_url': 'https://syxbot.com/img/embed_music.png',
             },
             'thumbnail': {
-                'url': thumbnail
+                'url': thumbnail,
             },
             'fields': [
                 {
                     'name': 'Titre',
                     'value': musicLink,
-                    'inline': true
+                    'inline': true,
                 },
                 {
                     'name': 'File d\'attente',
                     'value': `${playArray.length - 1}`,
-                    'inline': true
+                    'inline': true,
                 }
             ]
         }
@@ -160,7 +160,7 @@ function callYoutubeApiAndAddItems(playlistId, voiceChannel, message, url, playS
         playlistId: playlistId,
         maxResults: 50,
         pageToken: pageToken,
-        part: 'snippet, contentDetails'
+        part: 'snippet, contentDetails',
     }, function (err, response) {
         if (err) {
             console.log('The API returned an error: ' + err);
