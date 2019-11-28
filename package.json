@@ -5,7 +5,7 @@
     "main": "index.js",
     "scripts": {
         "eslint": "./node_modules/.bin/eslint ./",
-        "test": "Utiliser mocha pour les tests && exit 1",
+        "test": "mocha ./tests/index.test.js",
         "start": "nodemon index.js"
     },
     "private": true,
@@ -23,6 +23,8 @@
         "ytdl-core": "1.0.1"
     },
     "devDependencies": {
-        "eslint": "^6.7.1"
+        "eslint": "^6.7.1",
+        "mocha": "^6.2.2",
+        "nyc": "^14.1.1"
     }
 }

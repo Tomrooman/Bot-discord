@@ -3,7 +3,7 @@ jobs: # a collection of steps
   build: # runs not using Workflows must have a `build` job as entry point
     working_directory: ~\Bot-discord # directory where steps will run
     docker: # run the steps with Docker
-      - image: circleci/node:10.15.1 # ...with this image as the primary container; this is where all `steps` will run
+      - image: circleci/node:12.13.1 # ...with this image as the primary container; this is where all `steps` will run
       - image: mongo:4.2.0 # and this image as the secondary service container
     steps: # a collection of executable commands
       - checkout # special step to check out source code to working directory
@@ -26,8 +26,11 @@ jobs: # a collection of steps
       - run: # run eslint tests
           name: Eslint
           command: './node_modules/.bin/eslint ./'
+      - run:
+          name: Mocha
+          command: './node_modules/mocha/bin/mocha ./tests/index.test.js'
       - run: # run coverage report
-          name: code-coverage
+          name: Code coverage
           command: './node_modules/.bin/nyc report --reporter=text-lcov'
       - store_artifacts: # special step to save test results as as artifact
           # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/ 
