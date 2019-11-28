@@ -2,7 +2,7 @@ function remove(message, howMany) {
     let limit = {}
     if (howMany !== 'all') {
         limit = {
-            limit: parseInt(howMany) + 1,
+            limit: parseInt(howMany) + 1
         }
     }
     message.channel.fetchMessages(limit)

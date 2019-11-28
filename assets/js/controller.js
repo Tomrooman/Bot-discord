@@ -4,9 +4,9 @@ const Level = require('./level.js')
 
 function dispatcher(message, prefixLength) {
     if (message.content.length > prefixLength) {
-        let words = message.content.split(' ')
+        const words = message.content.split(' ')
         if (words[0].startsWith('play', prefixLength)) {
-            if (words[1] && (words[1].includes("http://") || words[1].includes("https://"))) {
+            if (words[1] && (words[1].includes('http://') || words[1].includes('https://'))) {
                 Player.playSongs(message, words[0], words[1])
             }
             else {
@@ -43,13 +43,13 @@ function dispatcher(message, prefixLength) {
             Level.rank(message)
         }
         else {
-            message.reply("cette commande n'existe pas !")
+            message.reply('cette commande n\'existe pas !')
         }
     }
     else {
         message.reply('vous devez écrire une commande !')
     }
 
-};
+}
 
 exports.dispatcher = dispatcher

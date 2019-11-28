@@ -1,20 +1,21 @@
-const { convertFile } = require('convert-svg-to-png')
-const fs = require('fs')
-var alreadyFound = []
+// const { convertFile } = require('convert-svg-to-png')
+// const fs = require('fs')
+const alreadyFound = []
+const dbConnection = global.dbConnection
 
 function addXp(message) {
-    if (!!!alreadyFound[message.guild.id] ||
-        (!!alreadyFound[message.guild.id] && !!!alreadyFound[message.guild.id][message.author.id])) {
-        let usersCollection = dbConnection.collection('users')
+    const usersCollection = dbConnection.collection('users')
+    if (!alreadyFound[message.guild.id] ||
+        (alreadyFound[message.guild.id] && !alreadyFound[message.guild.id][message.author.id])) {
         console.log('Try to find user')
         usersCollection.find({
             userId: message.author.id,
             serverId: message.guild.id
         }).toArray(function (err, user) {
-            if (!!!alreadyFound[message.guild.id]) {
+            if (!alreadyFound[message.guild.id]) {
                 alreadyFound[message.guild.id] = []
             }
-            alreadyFound[message.guild.id][message.author.id] = "yes"
+            alreadyFound[message.guild.id][message.author.id] = 'yes'
             if (user.length === 0) {
                 console.log('insert user')
                 usersCollection.insertOne({
@@ -30,7 +31,6 @@ function addXp(message) {
         })
     }
     else {
-        let usersCollection = dbConnection.collection('users')
         usersCollection.find({
             userId: message.author.id,
             serverId: message.guild.id
@@ -42,18 +42,16 @@ function addXp(message) {
 
 function updateXp(user) {
     console.log('update xp')
-    let usersCollection = dbConnection.collection('users')
+    const usersCollection = dbConnection.collection('users')
     usersCollection.updateOne({
         userId: user[0].userId,
         serverId: user[0].serverId
-    },
-        { $set: { xp: user[0].xp + 5 } },
-        { upsert: true }
+    }, { $set: { xp: user[0].xp + 5 } }, { upsert: true }
     )
 }
 
 function rank(message) {
-    let usersCollection = dbConnection.collection('users')
+    const usersCollection = dbConnection.collection('users')
     usersCollection.find({
         userId: message.author.id,
         serverId: message.guild.id
@@ -74,10 +72,10 @@ function rank(message) {
             //         // fs.unlinkSync('./personnal/Bot_copy.png')
             //     })
             // })
-            message.reply("votre xp : " + users[0].xp)
+            message.reply('votre xp : ' + users[0].xp)
         }
         else {
-            message.reply("Vous n'avez pas encore envoyé de message !")
+            message.reply('Vous n\'avez pas encore envoyé de message !')
         }
     })
 }

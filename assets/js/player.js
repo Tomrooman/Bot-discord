@@ -4,13 +4,13 @@ const _ = require('lodash')
 const { google } = require('googleapis')
 const config = require('./../../config.json')
 
-let connectionsArray = []
-let streamsArray = []
-let pausedArray = []
-let playlistArray = []
-let playlistInfos = []
-let connectedGuild = []
-let radioPlayed = []
+const connectionsArray = []
+const streamsArray = []
+const pausedArray = []
+const playlistArray = []
+const playlistInfos = []
+const connectedGuild = []
+const radioPlayed = []
 
 function playSongs(message, command, url) {
     const voiceChannel = Helper.take_user_voiceChannel(message)
@@ -18,13 +18,11 @@ function playSongs(message, command, url) {
         if (!connectedGuild[message.guild.id]) {
             playSongsAndConnectOrNotBot(voiceChannel, message, command, url)
         }
+        else if (connectedGuild[message.guild.id] === voiceChannel.id) {
+            playSongsAndConnectOrNotBot(voiceChannel, message, command, url, false)
+        }
         else {
-            if (connectedGuild[message.guild.id] === voiceChannel.id) {
-                playSongsAndConnectOrNotBot(voiceChannel, message, command, url, false)
-            }
-            else {
-                message.reply('vous n\'êtes pas dans le même canal que le bot !')
-            }
+            message.reply('vous n\'êtes pas dans le même canal que le bot !')
         }
     }
     else {
@@ -41,13 +39,11 @@ function playSongsAndConnectOrNotBot(voiceChannel, message, command, url, playSo
             message.reply('merci de renseigner une URL de playlist valide !')
         }
     }
+    else if (url.indexOf('playlist') !== -1) {
+        getPlaylist(voiceChannel, message, url, playSongParams)
+    }
     else {
-        if (url.indexOf('playlist') !== -1) {
-            getPlaylist(voiceChannel, message, url, playSongParams)
-        }
-        else {
-            getVideo(voiceChannel, message, url, playSongParams)
-        }
+        getVideo(voiceChannel, message, url, playSongParams)
     }
 }
 
@@ -115,21 +111,21 @@ function sendMusicEmbed(message, connection, musicTitle, musicId, added = [false
             'color': color,
             'author': {
                 'name': title,
-                'icon_url': 'https://syxbot.com/img/embed_music.png',
+                'icon_url': 'https://syxbot.com/img/embed_music.png'
             },
             'thumbnail': {
-                'url': thumbnail,
+                'url': thumbnail
             },
             'fields': [
                 {
                     'name': 'Titre',
                     'value': musicLink,
-                    'inline': true,
+                    'inline': true
                 },
                 {
                     'name': 'File d\'attente',
                     'value': `${playArray.length - 1}`,
-                    'inline': true,
+                    'inline': true
                 }
             ]
         }
@@ -137,7 +133,7 @@ function sendMusicEmbed(message, connection, musicTitle, musicId, added = [false
 }
 
 function getPlaylist(voiceChannel, message, url, playSongParams = true, pageToken = '', play = false, connection = false) {
-    let endPlaylistId = url.indexOf('&', url.indexOf('&') + 1)
+    const endPlaylistId = url.indexOf('&', url.indexOf('&') + 1)
     let playlistId = ''
     if (endPlaylistId !== -1) {
         let playlistLength = url.length - (url.indexOf('&') + 5)
@@ -148,47 +144,45 @@ function getPlaylist(voiceChannel, message, url, playSongParams = true, pageToke
     else {
         playlistId = url.substr(url.indexOf('?list=') + 6, url.length - (url.indexOf('?list=') + 6))
     }
-    if (!!playlistId) {
+    if (playlistId) {
         callYoutubeApiAndAddItems(playlistId, voiceChannel, message, url, playSongParams, pageToken, play, connection)
     }
 }
 
 function callYoutubeApiAndAddItems(playlistId, voiceChannel, message, url, playSongParams, pageToken, play, connection) {
-    let service = google.youtube('v3')
+    const service = google.youtube('v3')
     service.playlistItems.list({
         key: config.googleKey,
         playlistId: playlistId,
         maxResults: 50,
         pageToken: pageToken,
-        part: 'snippet, contentDetails',
+        part: 'snippet, contentDetails'
     }, function (err, response) {
         if (err) {
             console.log('The API returned an error: ' + err);
             message.channel.send('Une erreur s\'est produite !')
             return false;
         }
-        else {
-            if (response.data.items.length) {
-                if (playSongParams) {
-                    voiceChannel.join()
-                        .then(connection => {
-                            playlistArray[voiceChannel.id] = []
-                            playlistInfos[voiceChannel.id] = []
-                            connectedGuild[message.guild.id] = voiceChannel.id
-                            addPlaylistItems(voiceChannel, message, url, response, false, connection, 'play')
-                        })
-                }
-                else {
-                    addPlaylistItems(voiceChannel, message, url, response, false, connection, play)
-                }
+        else if (response.data.items.length) {
+            if (playSongParams) {
+                voiceChannel.join()
+                    .then(conection => {
+                        playlistArray[voiceChannel.id] = []
+                        playlistInfos[voiceChannel.id] = []
+                        connectedGuild[message.guild.id] = voiceChannel.id
+                        addPlaylistItems(voiceChannel, message, url, response, false, conection, 'play')
+                    })
+            }
+            else {
+                addPlaylistItems(voiceChannel, message, url, response, false, connection, play)
             }
         }
     });
 }
 
 function addPlaylistItems(voiceChannel, message, url, response, playSongParams, connection, play = false) {
-    let videoURL = 'https://www.youtube.com/watch?v='
-    let data = response.data
+    const videoURL = 'https://www.youtube.com/watch?v='
+    const data = response.data
     if (radioPlayed[voiceChannel.id] === 'played') {
         playlistArray[voiceChannel.id] = []
         playlistInfos[voiceChannel.id] = []
@@ -202,23 +196,22 @@ function addPlaylistItems(voiceChannel, message, url, response, playSongParams, 
             thumbnail: item.snippet.thumbnails.default.url
         })
     })
-    if (!!data.nextPageToken) {
+    if (data.nextPageToken) {
         getPlaylist(voiceChannel, message, url, playSongParams, data.nextPageToken, play, connection)
     }
+    else if (play === 'play') {
+        playSong(message, connection)
+    }
     else {
-        if (play === 'play') {
-            playSong(message, connection)
-        }
-        else {
-            sendMusicEmbed(message, voiceChannel, 'Playlist', false, [true, data.items.length])
-            if (!!radioPlayed[voiceChannel.id]) {
-                streamsArray[voiceChannel.id].destroy()
-                delete radioPlayed[voiceChannel.id]
-                playSong(message, connectionsArray[voiceChannel.id])
-            }
+        sendMusicEmbed(message, voiceChannel, 'Playlist', false, [true, data.items.length])
+        if (radioPlayed[voiceChannel.id]) {
+            streamsArray[voiceChannel.id].destroy()
+            delete radioPlayed[voiceChannel.id]
+            playSong(message, connectionsArray[voiceChannel.id])
         }
     }
 }
+
 
 function getVideo(voiceChannel, message, url, playSongParams = true) {
     let videoId = false
@@ -229,8 +222,8 @@ function getVideo(voiceChannel, message, url, playSongParams = true) {
         videoId = url.substr(url.indexOf('watch?v=') + 8)
 
     }
-    if (!!videoId) {
-        let service = google.youtube('v3')
+    if (videoId) {
+        const service = google.youtube('v3')
         service.videos.list({
             key: config.googleKey,
             id: videoId,
@@ -241,10 +234,8 @@ function getVideo(voiceChannel, message, url, playSongParams = true) {
                 message.channel.send('Une erreur s\'est produite !')
                 return false;
             }
-            else {
-                if (response.data.items.length) {
-                    setMusicArrayAndPlayMusic(voiceChannel, response, message, url, playSongParams)
-                }
+            else if (response.data.items.length) {
+                setMusicArrayAndPlayMusic(voiceChannel, response, message, url, playSongParams)
             }
         });
     }
@@ -257,42 +248,34 @@ function setMusicArrayAndPlayMusic(voiceChannel, response, message, url, playSon
     if (playSongParams) {
         voiceChannel.join()
             .then(connection => {
-                playlistInfos[voiceChannel.id] = []
-                playlistArray[voiceChannel.id] = []
-                playlistArray[voiceChannel.id].push(url)
-                playlistInfos[voiceChannel.id].push({
-                    title: response.data.items[0].snippet.title,
-                    id: response.data.items[0].id,
-                    thumbnail: response.data.items[0].snippet.thumbnails.default.url
-                })
+                clearAndAddArrayInfos(voiceChannel, url, response)
                 connectedGuild[message.guild.id] = voiceChannel.id
                 playSong(message, connection)
             })
     }
-    else {
-        if (!!radioPlayed[voiceChannel.id]) {
-            streamsArray[voiceChannel.id].destroy()
-            delete radioPlayed[voiceChannel.id]
-            playlistArray[voiceChannel.id] = []
-            playlistInfos[voiceChannel.id] = []
-            playlistArray[voiceChannel.id].push(url)
-            playlistInfos[voiceChannel.id].push({
-                title: response.data.items[0].snippet.title,
-                id: response.data.items[0].id,
-                thumbnail: response.data.items[0].snippet.thumbnails.default.url
-            })
-            playSong(message, connectionsArray[voiceChannel.id])
-        }
-        else {
-            playlistArray[voiceChannel.id].push(url)
-            playlistInfos[voiceChannel.id].push({
-                title: response.data.items[0].snippet.title,
-                id: response.data.items[0].id,
-                thumbnail: response.data.items[0].snippet.thumbnails.default.url
-            })
-            sendMusicEmbed(message, connectionsArray[voiceChannel.id], response.data.items[0].snippet.title, response.data.items[0].id, [true, 1])
-        }
+    else if (radioPlayed[voiceChannel.id]) {
+        streamsArray[voiceChannel.id].destroy()
+        delete radioPlayed[voiceChannel.id]
+        clearAndAddArrayInfos(voiceChannel, url, response)
+        playSong(message, connectionsArray[voiceChannel.id])
     }
+    else {
+        clearAndAddArrayInfos(voiceChannel, url, response, false)
+        sendMusicEmbed(message, connectionsArray[voiceChannel.id], response.data.items[0].snippet.title, response.data.items[0].id, [true, 1])
+    }
+}
+
+function clearAndAddArrayInfos(voiceChannel, url, response, clear = true) {
+    if (clear) {
+        playlistArray[voiceChannel.id] = []
+        playlistInfos[voiceChannel.id] = []
+    }
+    playlistArray[voiceChannel.id].push(url)
+    playlistInfos[voiceChannel.id].push({
+        title: response.data.items[0].snippet.title,
+        id: response.data.items[0].id,
+        thumbnail: response.data.items[0].snippet.thumbnails.default.url
+    })
 }
 
 function radioExist(words) {
@@ -314,7 +297,7 @@ function radio(message, words) {
         }
         if (voiceChannel) {
             radioPlayed[voiceChannel.id] = 'played'
-            if (!!!connectedGuild[message.guild.id]) {
+            if (!connectedGuild[message.guild.id]) {
                 voiceChannel.join()
                     .then(connection => {
                         connectionsArray[connection.channel.id] = connection
@@ -323,15 +306,12 @@ function radio(message, words) {
                         streamsArray[connection.channel.id].setVolume(0.5)
                     })
             }
-            else {
-                if (!!connectionsArray[voiceChannel.id] && connectedGuild[message.guild.id] === voiceChannel.id) {
-                    delete playlistArray[voiceChannel.id]
-                    delete playlistInfos[voiceChannel.id]
-                    streamsArray[voiceChannel.id].destroy()
-                    streamsArray[voiceChannel.id] = connectionsArray[voiceChannel.id].playStream(radioLink)
-                    streamsArray[voiceChannel.id].setVolume(0.5)
-
-                }
+            else if (Helper.verifyBotLocation(message)) {
+                delete playlistArray[voiceChannel.id]
+                delete playlistInfos[voiceChannel.id]
+                streamsArray[voiceChannel.id].destroy()
+                streamsArray[voiceChannel.id] = connectionsArray[voiceChannel.id].playStream(radioLink)
+                streamsArray[voiceChannel.id].setVolume(0.5)
             }
         }
         else {
@@ -343,15 +323,19 @@ function radio(message, words) {
     }
 }
 
-function showQueuedSongs(message) {
-    if (Helper.verifyBotLocation(message, !!connectionsArray[userChannel.id], connectedGuild[message.guild.id])) {
+function getVerifyBotLocationInfos(userChannelId, guildId) {
+    return [connectionsArray[userChannelId], connectedGuild[guildId]]
+}
 
+function showQueuedSongs(message) {
+    if (Helper.verifyBotLocation(message)) {
+        console.log('Show queued song')
     }
 }
 
 function quit(message) {
     const userChannel = Helper.take_user_voiceChannel(message)
-    if (Helper.verifyBotLocation(message, userChannel, !!connectionsArray[userChannel.id], connectedGuild[message.guild.id])) {
+    if (Helper.verifyBotLocation(message)) {
         connectionsArray[userChannel.id].channel.leave()
         delete connectionsArray[userChannel.id]
         delete streamsArray[userChannel.id]
@@ -359,7 +343,7 @@ function quit(message) {
         delete playlistInfos[userChannel.id]
         delete connectedGuild[message.guild.id]
         delete radioPlayed[userChannel.id]
-        if (!!pausedArray[userChannel.id]) {
+        if (pausedArray[userChannel.id]) {
             delete pausedArray[userChannel.id]
         }
     }
@@ -367,7 +351,7 @@ function quit(message) {
 
 function pause(message) {
     const userChannel = Helper.take_user_voiceChannel(message)
-    if (!!streamsArray[userChannel.id] && connectedGuild[message.guild.id] === userChannel.id) {
+    if (Helper.verifyBotLocation(message)) {
         streamsArray[userChannel.id].pause()
         pausedArray[userChannel.id] = 'onPause'
     }
@@ -375,7 +359,7 @@ function pause(message) {
 
 function resume(message) {
     const userChannel = Helper.take_user_voiceChannel(message)
-    if (!!pausedArray[userChannel.id] && connectedGuild[message.guild.id] === userChannel.id) {
+    if (Helper.verifyBotLocation(message)) {
         streamsArray[userChannel.id].resume()
         delete pausedArray[userChannel.id]
     }
@@ -383,13 +367,10 @@ function resume(message) {
 
 function next(message) {
     const userChannel = Helper.take_user_voiceChannel(message)
-    if (!!streamsArray[userChannel.id] && connectedGuild[message.guild.id] === userChannel.id) {
-        if (!!playlistArray[userChannel.id]) {
+    if (Helper.verifyBotLocation(message)) {
+        if (playlistArray[userChannel.id]) {
             streamsArray[userChannel.id].destroy()
         }
-    }
-    else {
-        message.channel.send('Vous n\'êtes pas dans le même salon que le bot !')
     }
 }
 
@@ -401,3 +382,4 @@ exports.resume = resume
 exports.next = next
 exports.radio = radio
 exports.showQueuedSongs = showQueuedSongs
+exports.getVerifyBotLocationInfos = getVerifyBotLocationInfos

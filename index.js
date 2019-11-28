@@ -21,7 +21,7 @@ bot.on('ready', () => {
 
     MongoClient.connect(url, {
         useNewUrlParser: true,
-        useUnifiedTopology: true,
+        useUnifiedTopology: true
     }, function (err, db) {
         if (err) throw err;
         global.dbConnection = db.db('syxbot-database')
