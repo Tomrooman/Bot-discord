@@ -1,4 +1,3 @@
-const Index = require('./../index.js')
 const MongoClient = require('mongodb').MongoClient
 global.dbConnection = false
 
