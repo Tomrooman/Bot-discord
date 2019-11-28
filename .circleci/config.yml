@@ -31,7 +31,7 @@ jobs: # a collection of steps
           command: './node_modules/mocha/bin/mocha ./tests/index.test.js'
       - run: # run coverage report
           name: Code coverage
-          command: './node_modules/.bin/nyc ./node_modules/mocha/bin/mocha ./tests/index.test.js'
+          command: './node_modules/.bin/nyc --reporter=html mocha ./tests/index.test.js'
       - store_artifacts: # special step to save test results as as artifact
           # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/ 
           path: test-results.xml
