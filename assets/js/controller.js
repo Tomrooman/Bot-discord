@@ -3,51 +3,52 @@ const Message = require('./message.js')
 const Level = require('./level.js')
 
 function dispatcher(message, prefixLength) {
+    const words = message.content.substr(prefixLength, message.content.length - prefixLength).split(' ')
+    const command = words[0]
     if (message.content.length > prefixLength) {
-        const words = message.content.split(' ')
-        if (words[0].startsWith('play', prefixLength)) {
+        if (command === 'play' || command === 'playlist') {
             if (words[1] && (words[1].includes('http://') || words[1].includes('https://'))) {
                 Player.playSongs(message, words[0], words[1])
             }
+            else if (words[1] && words[1] === 'list') {
+                Player.showQueuedSongs(message)
+            }
             else {
-                message.reply('Vous devez entrer une URL valide !')
+                message.channel.send('Vous devez entrer une URL valide !')
             }
         }
-        else if (words[0].startsWith('quit', prefixLength)) {
+        else if (command === 'quit') {
             Player.quit(message)
         }
-        else if (words[0].startsWith('pause', prefixLength)) {
+        else if (command === 'pause') {
             Player.pause(message)
         }
-        else if (words[0].startsWith('resume', prefixLength)) {
+        else if (command === 'resume') {
             Player.resume(message)
         }
-        else if (words[0].startsWith('next', prefixLength)) {
+        else if (command === 'next') {
             Player.next(message)
         }
-        else if (words[0].startsWith('queued', prefixLength)) {
-            Player.showQueuedSongs(message)
-        }
-        else if (words[0].startsWith('radio', prefixLength)) {
+        else if (command === 'radio') {
             Player.radio(message, words)
         }
-        else if (words[0].startsWith('remove', prefixLength)) {
+        else if (command === 'remove') {
             if (words[1] && Number.isFinite(parseInt(words[1])) && parseInt(words[1]) > 0) {
                 Message.remove(message, parseInt(words[1]))
             }
         }
-        else if (words[0].startsWith('clear', prefixLength)) {
+        else if (command === 'clear') {
             Message.remove(message, 'all')
         }
-        else if (words[0].startsWith('rank', prefixLength)) {
+        else if (command === 'rank') {
             Level.rank(message)
         }
         else {
-            message.reply('cette commande n\'existe pas !')
+            message.channel.send('Cette commande n\'existe pas !')
         }
     }
     else {
-        message.reply('vous devez écrire une commande !')
+        message.channel.send('Vous n\'avez pas écrit de commande !')
     }
 
 }

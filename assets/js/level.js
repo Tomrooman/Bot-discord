@@ -52,10 +52,10 @@ function rank(message) {
                 //         // fs.unlinkSync('./personnal/Bot_copy.png')
                 //     })
                 // })
-                message.reply('grade : ' + user.grade + ' ---> xp : ' + user.xp)
+                message.channel.send('grade : ' + user.grade + ' ---> xp : ' + user.xp)
             }
             else {
-                message.reply('vous n\'avez pas encore envoyé de message !')
+                message.channel.send('Vous n\'avez pas encore envoyé de message !')
             }
         })
 }

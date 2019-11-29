@@ -22,21 +22,21 @@ function playSongs(message, command, url) {
             playSongsAndConnectOrNotBot(voiceChannel, message, command, url, false)
         }
         else {
-            message.reply('vous n\'êtes pas dans le même canal que le bot !')
+            message.channel.send('Vous n\'êtes pas dans le même canal que le bot !')
         }
     }
     else {
-        message.reply('vous devez être connecté dans un salon !');
+        message.channel.send('Vous devez être connecté dans un salon !');
     }
 }
 
 function playSongsAndConnectOrNotBot(voiceChannel, message, command, url, playSongParams = true) {
-    if (command.startsWith('playlist', config.prefix.length)) {
+    if (command === 'playlist') {
         if (url.indexOf('list=') !== -1) {
             getPlaylist(voiceChannel, message, url, playSongParams)
         }
         else {
-            message.reply('merci de renseigner une URL de playlist valide !')
+            message.channel.send('Merci de renseigner une URL de playlist valide !')
         }
     }
     else if (url.indexOf('playlist') !== -1) {
@@ -319,7 +319,7 @@ function radio(message, words) {
         }
     }
     else {
-        message.channel.send('Choisir une radio c\'est mieux !')
+        message.channel.send('Choisir une radio, c\'est mieux !')
     }
 }
 
@@ -328,8 +328,17 @@ function getVerifyBotLocationInfos(userChannelId, guildId) {
 }
 
 function showQueuedSongs(message) {
-    if (Helper.verifyBotLocation(message)) {
-        console.log('Show queued song')
+    const userChannel = Helper.take_user_voiceChannel(message)
+    if (playlistInfos[userChannel.id]) {
+        const songs = []
+        playlistInfos[userChannel.id].map((music, index) => {
+            console.log('Music title : ', music.title)
+            console.log('Index : ', index)
+            songs.push('```' + index + '```' + ' ' + music.title + '\n')
+        })
+    }
+    else {
+        message.channel.send('Aucune musique dans la file d\'attente')
     }
 }
 
