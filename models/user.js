@@ -7,8 +7,7 @@ const userSchema = new Schema({
     grade: Number,
     xp: Number
 }, {
-    versionKey: false,
-    id: false
+    versionKey: false
 });
 
 module.exports = userSchema;
