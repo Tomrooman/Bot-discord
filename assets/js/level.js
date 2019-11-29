@@ -2,41 +2,35 @@
 // const fs = require('fs')
 const mongoose = require('mongoose');
 const userSchema = mongoose.model('User', require('../../models/user.js'));
-const alreadyFound = []
 
 function addXp(message) {
-    if (!alreadyFound[message.guild.id] ||
-        (alreadyFound[message.guild.id] && !alreadyFound[message.guild.id][message.author.id])) {
-        console.log('Try to find user')
-        userSchema.findOne({ userId: message.author.id, serverId: message.guild.id })
-            .then(user => {
-                if (!alreadyFound[message.guild.id]) {
-                    alreadyFound[message.guild.id] = []
+    userSchema.findOne({
+        userId: message.author.id,
+        serverId: message.guild.id
+    })
+        .then(user => {
+            let grade = 0;
+            let xp = 5;
+            if (user) {
+                xp = user.xp + 5
+                if (xp === 50) {
+                    xp = 0;
+                    grade = user.grade + 1
                 }
-                alreadyFound[message.guild.id][message.author.id] = 'yes'
-                if (user) {
-                    user.xp = user.xp + 5
-                    user.save()
-                }
-                else {
-                    console.log('insert user')
-                    const newUser = new userSchema({
-                        userId: message.author.id,
-                        serverId: message.guild.id,
-                        grade: 0,
-                        xp: 5
-                    });
-                    newUser.save();
-                }
-            })
-    }
-    else {
-        userSchema.findOne({ userId: message.author.id, serverId: message.guild.id })
-            .then(user => {
-                user.xp = user.xp + 5
+                user.xp = xp
+                user.grade = grade
                 user.save()
-            })
-    }
+            }
+            else {
+                const newUser = new userSchema({
+                    userId: message.author.id,
+                    serverId: message.guild.id,
+                    grade: grade,
+                    xp: xp
+                })
+                newUser.save()
+            }
+        })
 }
 
 function rank(message) {
@@ -58,10 +52,10 @@ function rank(message) {
                 //         // fs.unlinkSync('./personnal/Bot_copy.png')
                 //     })
                 // })
-                message.reply('votre xp : ' + user.xp)
+                message.reply('grade : ' + user.grade + ' ---> xp : ' + user.xp)
             }
             else {
-                message.reply('Vous n\'avez pas encore envoyé de message !')
+                message.reply('vous n\'avez pas encore envoyé de message !')
             }
         })
 }

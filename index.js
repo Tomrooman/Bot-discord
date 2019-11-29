@@ -6,11 +6,10 @@ const config = require('./config.json')
 const mongoose = require('mongoose')
 const bot = new Discord.Client()
 
-bot.login(config.token)
+connectToDatabase()
 
 bot.on('ready', () => {
     console.log('----- Connected ' + config.WHAT + ' -----')
-    connectToDatabase()
     // send message to all first available guild's channel
     // bot.guilds.map(guild => {
     //     if (guild.available) {
@@ -22,17 +21,23 @@ bot.on('ready', () => {
 
 bot.on('message', (message) => {
     if (message.content.startsWith(config.prefix)) {
-        // console.log('author id: ', message.author.id)
         Controller.dispatcher(message, config.prefix.length)
     }
     else if (message.author.id !== config.clientId) {
-        // console.log('author id: ', message.author.id)
         Level.addXp(message)
     }
 })
 
 function connectToDatabase() {
     console.log('Connecting to database ...')
-    mongoose.connect('mongodb://localhost/syxbot-database', { useNewUrlParser: true, useUnifiedTopology: true })
-    console.log('Connected to database')
+    mongoose.connect('mongodb://localhost/syxbot-database', {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        autoIndex: false,
+        useFindAndModify: false
+    })
+    mongoose.connection.once('open', () => {
+        console.log('Connected to database')
+        bot.login(config.token)
+    })
 }

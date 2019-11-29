@@ -6,6 +6,9 @@ const userSchema = new Schema({
     serverId: String,
     grade: Number,
     xp: Number
+}, {
+    versionKey: false,
+    id: false
 });
 
 module.exports = userSchema;
