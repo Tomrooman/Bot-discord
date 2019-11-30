@@ -341,10 +341,10 @@ function showQueuedSongs(message) {
         setSongs(userChannel).map((list, index) => {
             if (index === 0) {
                 if (playlistInfos[userChannel.id].length >= 3) {
-                    message.channel.send(`> **Musiques en file d\'attente** \n > \n${list}`)
+                    message.channel.send(`> **Musiques en file d'attente** \n > \n${list}`)
                 }
                 else {
-                    message.channel.send(`> **La musique en file d\'attente** \n > \n${list}`)
+                    message.channel.send(`> **La musique en file d'attente** \n > \n${list}`)
                 }
             }
             else {
@@ -362,7 +362,7 @@ function setSongs(userChannel) {
     let songs = ''
     playlistInfos[userChannel.id].map((music, index) => {
         if (index !== 0) {
-            let newSong = '> **' + index + '**' + '. ' + music.title + '\n'
+            const newSong = '> **' + index + '**' + '. ' + music.title + '\n'
             if (songs.length + newSong.length >= 1950) {
                 songsArray.push(songs)
                 songs = newSong
