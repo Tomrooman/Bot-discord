@@ -1,6 +1,6 @@
 const Player = require('./player.js')
 const Message = require('./message.js')
-// const Level = require('./level.js')
+const Level = require('./level.js')
 
 function dispatcher(message, prefixLength) {
     const words = message.content.substr(prefixLength, message.content.length - prefixLength).split(' ')
@@ -40,9 +40,9 @@ function dispatcher(message, prefixLength) {
         else if (command === 'clear') {
             Message.remove(message, 'all')
         }
-        // else if (command === 'rank') {
-        //     Level.rank(message)
-        // }
+        else if (command === 'grade') {
+            Level.grade(message)
+        }
         else {
             message.channel.send('Cette commande n\'existe pas !')
         }
