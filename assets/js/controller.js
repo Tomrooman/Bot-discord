@@ -4,17 +4,14 @@ const Level = require('./level.js')
 
 function dispatcher(message, prefixLength) {
     const words = message.content.substr(prefixLength, message.content.length - prefixLength).split(' ')
-    const command = words[0]
+    const command = words[0].toLowerCase()
     if (message.content.length > prefixLength) {
-        if (command === 'play' || command === 'playlist') {
-            if (words[1] && (words[1].includes('http://') || words[1].includes('https://'))) {
-                Player.playSongs(message, words[0], words[1])
-            }
-            else if (words[1] && words[1] === 'list') {
+        if (command === 'play' || command === 'playlist' || command === 'p' || command === 'pl') {
+            if (words[1] === 'list') {
                 Player.showQueuedSongs(message)
             }
             else {
-                message.channel.send('Vous devez entrer une URL valide !')
+                Player.playSongs(message, command, words[1])
             }
         }
         else if (command === 'quit') {

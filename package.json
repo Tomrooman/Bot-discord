@@ -6,7 +6,8 @@
     "scripts": {
         "eslint": "./node_modules/.bin/eslint ./",
         "test": "mocha ./tests/index.test.js --exit",
-        "start": "nodemon index.js"
+        "start": "nodemon index.js",
+        "mongodb": "sudo service mongod start"
     },
     "private": true,
     "author": "Tom Rooman",

@@ -20,7 +20,7 @@ bot.on('ready', () => {
 })
 
 bot.on('message', (message) => {
-    if (message.content.startsWith(config.prefix)) {
+    if (message.content.toLowerCase().startsWith(config.prefix)) {
         Controller.dispatcher(message, config.prefix.length)
     }
     else if (message.author.id !== config.clientId) {

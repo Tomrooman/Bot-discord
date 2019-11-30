@@ -31,19 +31,26 @@ function playSongs(message, command, url) {
 }
 
 function playSongsAndConnectOrNotBot(voiceChannel, message, command, url, playSongParams = true) {
-    if (command === 'playlist') {
-        if (url.indexOf('list=') !== -1) {
-            getPlaylist(voiceChannel, message, url, playSongParams)
+    if (url && url.includes('.com') && url.includes('youtu') && (url.includes('http://') || url.includes('https://'))) {
+        if (command === 'playlist' || command === 'pl') {
+            if (url.indexOf('list=') !== -1) {
+                getPlaylist(voiceChannel, message, url, playSongParams)
+            }
+            else {
+                message.channel.send('Merci de renseigner une URL de playlist valide !')
+            }
         }
-        else {
-            message.channel.send('Merci de renseigner une URL de playlist valide !')
+        else if (command === 'play' || command === 'p') {
+            if (url.indexOf('playlist') !== -1) {
+                getPlaylist(voiceChannel, message, url, playSongParams)
+            }
+            else {
+                getVideo(voiceChannel, message, url, playSongParams)
+            }
         }
-    }
-    else if (url.indexOf('playlist') !== -1) {
-        getPlaylist(voiceChannel, message, url, playSongParams)
     }
     else {
-        getVideo(voiceChannel, message, url, playSongParams)
+        message.channel.send('Vous devez entrer une URL valide !')
     }
 }
 
@@ -329,17 +336,46 @@ function getVerifyBotLocationInfos(userChannelId, guildId) {
 
 function showQueuedSongs(message) {
     const userChannel = Helper.take_user_voiceChannel(message)
-    if (playlistInfos[userChannel.id]) {
-        const songs = []
-        playlistInfos[userChannel.id].map((music, index) => {
-            console.log('Music title : ', music.title)
-            console.log('Index : ', index)
-            songs.push('```' + index + '```' + ' ' + music.title + '\n')
+    if (playlistInfos[userChannel.id] && playlistInfos[userChannel.id].length >= 2) {
+        // Create songs array and send multiple message if needed (max message length to 2000)
+        setSongs(userChannel).map((list, index) => {
+            if (index === 0) {
+                if (playlistInfos[userChannel.id].length >= 3) {
+                    message.channel.send(`> **Musiques en file d\'attente** \n > \n${list}`)
+                }
+                else {
+                    message.channel.send(`> **La musique en file d\'attente** \n > \n${list}`)
+                }
+            }
+            else {
+                message.channel.send(`${list}`)
+            }
         })
     }
     else {
         message.channel.send('Aucune musique dans la file d\'attente')
     }
+}
+
+function setSongs(userChannel) {
+    const songsArray = []
+    let songs = ''
+    playlistInfos[userChannel.id].map((music, index) => {
+        if (index !== 0) {
+            let newSong = '> **' + index + '**' + '. ' + music.title + '\n'
+            if (songs.length + newSong.length >= 1950) {
+                songsArray.push(songs)
+                songs = newSong
+            }
+            else {
+                songs += newSong
+            }
+        }
+    })
+    if (songs.length) {
+        songsArray.push(songs)
+    }
+    return songsArray
 }
 
 function quit(message) {
