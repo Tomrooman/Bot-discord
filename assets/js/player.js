@@ -313,7 +313,7 @@ function radio(message, words) {
                         streamsArray[connection.channel.id].setVolume(0.5)
                     })
             }
-            else if (Helper.verifyBotLocation(message)) {
+            else if (Helper.verifyBotLocation(message, voiceChannel)) {
                 delete playlistArray[voiceChannel.id]
                 delete playlistInfos[voiceChannel.id]
                 streamsArray[voiceChannel.id].destroy()
@@ -332,6 +332,37 @@ function radio(message, words) {
 
 function getVerifyBotLocationInfos(userChannelId, guildId) {
     return [connectionsArray[userChannelId], connectedGuild[guildId]]
+}
+
+function getSongInPlaylist(message, number) {
+    const userChannel = Helper.take_user_voiceChannel(message)
+    if (Helper.verifyBotLocation(message, userChannel)) {
+        if (playlistInfos[userChannel.id].length) {
+            if (number > 0 && number <= playlistInfos[userChannel.id].length) {
+                // Add selected music at the top of the list
+                playlistInfos[userChannel.id].splice(1, 0, playlistInfos[userChannel.id][number])
+                playlistArray[userChannel.id].splice(1, 0, playlistArray[userChannel.id][number])
+                // Remove selected music from where we copy it (+1 because we add an item before)
+                delete playlistInfos[userChannel.id][number + 1]
+                delete playlistArray[userChannel.id][number + 1]
+                // Add the current music after the selected one
+                playlistInfos[userChannel.id].splice(2, 0, playlistInfos[userChannel.id][0])
+                playlistArray[userChannel.id].splice(2, 0, playlistArray[userChannel.id][0])
+                // Destroy stream that call end callback (next song)
+                streamsArray[userChannel.id].destroy()
+            }
+            else {
+                let howToSay = 'chiffre'
+                if (playlistInfos[userChannel.id].length >= 10) {
+                    howToSay = 'nombre'
+                }
+                message.channel.send(`Choisissez un ${howToSay} compris entre 1 et ${playlistInfos[userChannel.id].length}`)
+            }
+        }
+        else {
+            message.channel.send('Aucune musique dans la file d\'attente')
+        }
+    }
 }
 
 function showQueuedSongs(message) {
@@ -380,7 +411,7 @@ function setSongs(userChannel) {
 
 function quit(message) {
     const userChannel = Helper.take_user_voiceChannel(message)
-    if (Helper.verifyBotLocation(message)) {
+    if (Helper.verifyBotLocation(message, userChannel)) {
         connectionsArray[userChannel.id].channel.leave()
         delete connectionsArray[userChannel.id]
         delete streamsArray[userChannel.id]
@@ -396,7 +427,7 @@ function quit(message) {
 
 function pause(message) {
     const userChannel = Helper.take_user_voiceChannel(message)
-    if (Helper.verifyBotLocation(message)) {
+    if (Helper.verifyBotLocation(message, userChannel)) {
         streamsArray[userChannel.id].pause()
         pausedArray[userChannel.id] = 'onPause'
     }
@@ -404,7 +435,7 @@ function pause(message) {
 
 function resume(message) {
     const userChannel = Helper.take_user_voiceChannel(message)
-    if (Helper.verifyBotLocation(message)) {
+    if (Helper.verifyBotLocation(message, userChannel)) {
         streamsArray[userChannel.id].resume()
         delete pausedArray[userChannel.id]
     }
@@ -412,7 +443,7 @@ function resume(message) {
 
 function next(message) {
     const userChannel = Helper.take_user_voiceChannel(message)
-    if (Helper.verifyBotLocation(message)) {
+    if (Helper.verifyBotLocation(message, userChannel)) {
         if (playlistArray[userChannel.id]) {
             streamsArray[userChannel.id].destroy()
         }
@@ -428,3 +459,4 @@ exports.next = next
 exports.radio = radio
 exports.showQueuedSongs = showQueuedSongs
 exports.getVerifyBotLocationInfos = getVerifyBotLocationInfos
+exports.getSongInPlaylist = getSongInPlaylist

@@ -31,8 +31,7 @@ function getFirstAuthorizedChannel(guild) {
         .first();
 }
 
-function verifyBotLocation(message) {
-    const userChannel = take_user_voiceChannel(message)
+function verifyBotLocation(message, userChannel) {
     const locationInfos = Player.getVerifyBotLocationInfos(userChannel.id, message.guild.id)
     if (locationInfos[0] && locationInfos[1] === userChannel.id) {
         return true
