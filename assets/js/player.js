@@ -50,23 +50,23 @@ function playSongsAndConnectOrNotBot(voiceChannel, message, command, url, playSo
         }
     }
     else {
-        const service = google.youtube('v3')
-        service.videos.list({
-            key: config.googleKey,
-            v: 'stay wide awake',
-            part: 'snippet, contentDetails'
-        }, function (err, response) {
-            if (err) {
-                console.log('The API returned an error: ' + err);
-                message.channel.send('Une erreur s\'est produite !')
-                return false;
-            }
-            else if (response.data.items.length) {
-                console.log('response search : ', response.data)
-                // setMusicArrayAndPlayMusic(voiceChannel, response, message, url, playSongParams)
-            }
-        });
-        // message.channel.send('Vous devez entrer une URL valide !')
+        // const service = google.youtube('v3')
+        // service.videos.list({
+        //     key: config.googleKey,
+        //     v: 'stay wide awake',
+        //     part: 'snippet, contentDetails'
+        // }, function (err, response) {
+        //     if (err) {
+        //         console.log('The API returned an error: ' + err);
+        //         message.channel.send('Une erreur s\'est produite !')
+        //         return false;
+        //     }
+        //     else if (response.data.items.length) {
+        //         console.log('response search : ', response.data)
+        //         // setMusicArrayAndPlayMusic(voiceChannel, response, message, url, playSongParams)
+        //     }
+        // });
+        message.channel.send('Vous devez entrer une URL valide !')
     }
 }
 
