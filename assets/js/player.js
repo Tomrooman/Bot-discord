@@ -142,7 +142,7 @@ function playSong(message, connection) {
     sendMusicEmbed(message, connection, playlistInfos[connection.channel.id][0].title, playlistInfos[connection.channel.id][0].id, [false, 1])
     connectionsArray[connection.channel.id] = connection
     streamsArray[connection.channel.id] = connectionsArray[connection.channel.id].playStream(ytdl(playlistArray[connection.channel.id][0], { filter: 'audioonly' }))
-    streamsArray[connection.channel.id].setVolume(0.5)
+    streamsArray[connection.channel.id].setVolume(0.4)
     streamsArray[connection.channel.id].on('end', () => {
         setTimeout(() => {
             if (playlistArray[connection.channel.id]) {
@@ -235,13 +235,13 @@ function getPlaylist(voiceChannel, message, url, playSongParams = true, pageToke
     else {
         playlistId = url.substr(url.indexOf('?list=') + 6, url.length - (url.indexOf('?list=') + 6))
     }
-    if (playlistId) {
-        callYoutubeApiAndAddItems(playlistId, voiceChannel, message, url, playSongParams, pageToken, play, connection)
-    }
+    console.log('playlist id : ', playlistId)
+    callYoutubeApiAndAddItems(playlistId, voiceChannel, message, url, playSongParams, pageToken, play, connection)
 }
 
 function callYoutubeApiAndAddItems(playlistId, voiceChannel, message, url, playSongParams, pageToken, play, connection) {
     const service = google.youtube('v3')
+    console.log('call api')
     service.playlistItems.list({
         key: config.googleKey,
         playlistId: playlistId,
@@ -249,12 +249,14 @@ function callYoutubeApiAndAddItems(playlistId, voiceChannel, message, url, playS
         pageToken: pageToken,
         part: 'snippet, contentDetails'
     }, function (err, response) {
+        console.log('got result from api')
         if (err) {
             console.log('The API returned an error: ' + err);
             message.channel.send('Une erreur s\'est produite !')
             return false;
         }
         else if (response.data.items.length) {
+            console.log('play song params : ', playSongParams)
             if (playSongParams) {
                 voiceChannel.join()
                     .then(conection => {
@@ -394,7 +396,7 @@ function radio(message, words) {
                         connectionsArray[connection.channel.id] = connection
                         connectedGuild[message.guild.id] = voiceChannel.id
                         streamsArray[connection.channel.id] = connectionsArray[connection.channel.id].playStream(radioLink)
-                        streamsArray[connection.channel.id].setVolume(0.5)
+                        streamsArray[connection.channel.id].setVolume(0.4)
                     })
             }
             else if (Helper.verifyBotLocation(message, voiceChannel)) {
@@ -402,7 +404,7 @@ function radio(message, words) {
                 delete playlistInfos[voiceChannel.id]
                 streamsArray[voiceChannel.id].destroy()
                 streamsArray[voiceChannel.id] = connectionsArray[voiceChannel.id].playStream(radioLink)
-                streamsArray[voiceChannel.id].setVolume(0.5)
+                streamsArray[voiceChannel.id].setVolume(0.4)
             }
         }
         else {
@@ -440,7 +442,7 @@ function getSongInPlaylist(message, number) {
                 if (playlistInfos[userChannel.id].length >= 10) {
                     howToSay = 'nombre'
                 }
-                message.channel.send(`Choisissez un ${howToSay} compris entre 1 et ${playlistInfos[userChannel.id].length}`)
+                message.channel.send(`Choisissez un ${howToSay} compris entre 1 et ${playlistInfos[userChannel.id].length} - 1`)
             }
         }
         else {
