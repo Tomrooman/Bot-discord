@@ -153,7 +153,7 @@ function playSong(message, connection) {
                 if (!playlistArray[connection.channel.id][0]) {
                     setTimeout(() => {
                         quit(message)
-                    }, 5000)
+                    }, 300000)
                 }
                 else {
                     playSong(message, connection)
