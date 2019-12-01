@@ -61,12 +61,13 @@ function playSongsAndConnectOrNotBot(voiceChannel, message, command, words, play
     }
 }
 
-function searchYoutubeVideosByTitle(message, title, voiceChannel) {
+function searchYoutubeVideosByTitle(message, title, voiceChannel, pageToken = '') {
     const service = google.youtube('v3')
     service.search.list({
         key: config.googleKey,
         q: title,
-        part: 'snippet'
+        part: 'snippet',
+        pageToken: pageToken
     }, function (err, response) {
         if (err) {
             console.log('The API returned an error: ' + err);
@@ -75,7 +76,7 @@ function searchYoutubeVideosByTitle(message, title, voiceChannel) {
         }
         else if (response.data.items.length) {
             delete searchArray[voiceChannel.id]
-            createSearchArray(message, voiceChannel, response.data.items)
+            createSearchArray(message, voiceChannel, response.data.items, response.data.nextPageToken, title)
         }
         else {
             message.channel.send(`Aucun résultat pour la recherche : ${title}`)
@@ -102,18 +103,27 @@ function toggleLoop(message) {
     }
 }
 
-function createSearchArray(message, voiceChannel, items) {
+function createSearchArray(message, voiceChannel, items, nextPageToken, title) {
     const videoURL = 'https://www.youtube.com/watch?v='
     let resultChoices = ''
     searchArray[voiceChannel.id] = []
+    let nb = searchArray[voiceChannel.id].length;
     items.map((item, index) => {
-        resultChoices += '> **' + (index + 1) + '**. ' + item.snippet.title + '\n'
-        searchArray[voiceChannel.id].push({
-            url: videoURL + item.id.videoId,
-            title: item.snippet.title
-        })
+        if (item.id.videoId) {
+            nb++;
+            resultChoices += '> **' + nb + '**. ' + item.snippet.title + '\n'
+            searchArray[voiceChannel.id].push({
+                url: videoURL + item.id.videoId,
+                title: item.snippet.title
+            })
+        }
+        if (index === items.length - 1 && nb < 5) {
+            searchYoutubeVideosByTitle(message, title, voiceChannel, nextPageToken)
+        }
+        if (index === items.length - 1 && nb === 5) {
+            message.channel.send(`> **Selectionnez une musique parmi les ${items.length} ci-dessous.** \n > **Ex: ${config.prefix}search ${items.length}** \n > \n ${resultChoices}`)
+        }
     })
-    message.channel.send(`> **Selectionnez une musique parmi les ${items.length} ci-dessous.** \n > **Ex: ${config.prefix}search ${items.length}** \n > \n ${resultChoices}`)
 }
 
 function selectSongInSearchList(message, number) {
