@@ -227,45 +227,37 @@ function getPlaylist(voiceChannel, message, url, playSongParams = true, pageToke
     const endPlaylistId = url.indexOf('&', url.indexOf('&') + 1)
     let playlistId = ''
     if (endPlaylistId !== -1) {
-        console.log('first cond')
         let playlistLength = url.length - (url.indexOf('&') + 5)
         playlistLength -= url.length - endPlaylistId
         playlistLength -= 1;
         playlistId = url.substr(url.indexOf('&list=') + 6, playlistLength)
     }
     else {
-        console.log('seocnd cond')
         if (url.indexOf('?list=') !== -1) {
             playlistId = url.substr(url.indexOf('?list=') + 6, url.length - (url.indexOf('?list=') + 6))
         }
         else {
-            console.log('here')
             playlistId = url.substr(url.indexOf('&list=') + 6, url.length - (url.indexOf('&list=') + 6))
         }
     }
-    console.log('playlist id in get : ', playlistId)
     callYoutubeApiAndAddItems(playlistId, voiceChannel, message, url, playSongParams, pageToken, play, connection)
 }
 
 function callYoutubeApiAndAddItems(playlistId, voiceChannel, message, url, playSongParams, pageToken, play, connection) {
     const service = google.youtube('v3')
-    console.log('playlist id in call api : ', playlistId)
-    console.log('call api')
-    service.playlistItems.list({
+    service.playlists.list({
         key: config.googleKey,
-        playlistId: playlistId,
+        id: playlistId,
         maxResults: 50,
         pageToken: pageToken,
         part: 'snippet, contentDetails'
     }, function (err, response) {
-        console.log('got result from api')
         if (err) {
             console.log('The API returned an error: ' + err);
             message.channel.send('Une erreur s\'est produite !')
             return false;
         }
         else if (response.data.items.length) {
-            console.log('play song params : ', playSongParams)
             if (playSongParams) {
                 voiceChannel.join()
                     .then(conection => {
@@ -278,6 +270,9 @@ function callYoutubeApiAndAddItems(playlistId, voiceChannel, message, url, playS
             else {
                 addPlaylistItems(voiceChannel, message, url, response, false, connection, play)
             }
+        }
+        else {
+            message.channel.send('Playlist vide !')
         }
     });
 }
