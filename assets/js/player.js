@@ -11,15 +11,16 @@ const playlistArray = []
 const playlistInfos = []
 const connectedGuild = []
 const radioPlayed = []
+const searchArray = []
 
-function playSongs(message, command, url) {
+function playSongs(message, command, words) {
     const voiceChannel = Helper.take_user_voiceChannel(message)
     if (voiceChannel) {
         if (!connectedGuild[message.guild.id]) {
-            playSongsAndConnectOrNotBot(voiceChannel, message, command, url)
+            playSongsAndConnectOrNotBot(voiceChannel, message, command, words)
         }
         else if (connectedGuild[message.guild.id] === voiceChannel.id) {
-            playSongsAndConnectOrNotBot(voiceChannel, message, command, url, false)
+            playSongsAndConnectOrNotBot(voiceChannel, message, command, words, false)
         }
         else {
             message.channel.send('Vous n\'êtes pas dans le même canal que le bot !')
@@ -30,7 +31,8 @@ function playSongs(message, command, url) {
     }
 }
 
-function playSongsAndConnectOrNotBot(voiceChannel, message, command, url, playSongParams = true) {
+function playSongsAndConnectOrNotBot(voiceChannel, message, command, words, playSongParams = true) {
+    const url = words[1]
     if (url && url.includes('youtu') && (url.includes('http://') || url.includes('https://'))) {
         if (command === 'playlist' || command === 'pl') {
             if (url.indexOf('list=') !== -1) {
@@ -50,23 +52,89 @@ function playSongsAndConnectOrNotBot(voiceChannel, message, command, url, playSo
         }
     }
     else {
-        // const service = google.youtube('v3')
-        // service.videos.list({
-        //     key: config.googleKey,
-        //     v: 'stay wide awake',
-        //     part: 'snippet, contentDetails'
-        // }, function (err, response) {
-        //     if (err) {
-        //         console.log('The API returned an error: ' + err);
-        //         message.channel.send('Une erreur s\'est produite !')
-        //         return false;
-        //     }
-        //     else if (response.data.items.length) {
-        //         console.log('response search : ', response.data)
-        //         // setMusicArrayAndPlayMusic(voiceChannel, response, message, url, playSongParams)
-        //     }
-        // });
-        message.channel.send('Vous devez entrer une URL valide !')
+        delete words[0];
+        const title = words.join(' ')
+        searchYoutubeVideosByTitle(message, title, voiceChannel)
+    }
+}
+
+function searchYoutubeVideosByTitle(message, title, voiceChannel) {
+    const service = google.youtube('v3')
+    service.search.list({
+        key: config.googleKey,
+        q: title,
+        part: 'snippet'
+    }, function (err, response) {
+        if (err) {
+            console.log('The API returned an error: ' + err);
+            message.channel.send('Une erreur s\'est produite !')
+            return false;
+        }
+        else if (response.data.items.length) {
+            delete searchArray[voiceChannel.id]
+            createSearchArray(message, voiceChannel, response.data.items)
+        }
+        else {
+            message.channel.send(`Aucun résultat pour la recherche : ${title}`)
+        }
+    });
+}
+
+function createSearchArray(message, voiceChannel, items) {
+    const videoURL = 'https://www.youtube.com/watch?v='
+    let resultChoices = ''
+    searchArray[voiceChannel.id] = []
+    items.map((item, index) => {
+        resultChoices += '> **' + (index + 1) + '**. ' + item.snippet.title + '\n'
+        searchArray[voiceChannel.id].push({
+            url: videoURL + item.id.videoId,
+            title: item.snippet.title
+        })
+    })
+    message.channel.send(`> **Selectionnez une musique parmi les ${items.length} ci-dessous.** \n > **Ex: ${config.prefix}search ${items.length}** \n > \n ${resultChoices}`)
+}
+
+function selectSongInSearchList(message, number) {
+    const userChannel = Helper.take_user_voiceChannel(message)
+    if (userChannel) {
+        if (Number.isFinite(parseInt(number))) {
+            if (searchArray[userChannel.id] && searchArray[userChannel.id].length) {
+                if (number >= 1 && number <= searchArray[userChannel.id].length) {
+                    playSongs(message, 'play', ['useless', searchArray[userChannel.id][number - 1].url])
+                }
+                else {
+                    message.channel.send(`Choisissez un chiffre compris entre 1 et ${searchArray[userChannel.id].length}`)
+                }
+            }
+            else {
+                message.channel.send('Aucune musique enregistrée dans la recherche')
+            }
+        }
+        else {
+            message.channel.send('Vous devez écrire un chiffre après le mot search !')
+        }
+    }
+    else {
+        message.channel.send('Vous devez être connecté dans un salon !')
+    }
+}
+
+function getSongInSearchList(message) {
+    const userChannel = Helper.take_user_voiceChannel(message)
+    if (userChannel) {
+        if (searchArray[userChannel.id] && searchArray[userChannel.id].length) {
+            let resultChoices = ''
+            searchArray[userChannel.id].map((song, index) => {
+                resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n'
+            })
+            message.channel.send(`> **Selectionnez une musique parmi les ${searchArray[userChannel.id].length} ci-dessous.** \n > **Ex: ${config.prefix}search ${searchArray[userChannel.id].length}** \n > \n ${resultChoices}`)
+        }
+        else {
+            message.channel.send('Aucune musique enregistrée dans la recherche')
+        }
+    }
+    else {
+        message.channel.send('Vous devez être connecté dans un salon !')
     }
 }
 
@@ -386,7 +454,7 @@ function showQueuedSongs(message) {
     if (Helper.verifyBotLocation(message, userChannel)) {
         if (playlistInfos[userChannel.id] && playlistInfos[userChannel.id].length >= 2) {
             // Create songs array and send multiple message if needed (max message length to 2000)
-            setSongs(userChannel).map((list, index) => {
+            createSongsString(userChannel).map((list, index) => {
                 if (index === 0) {
                     if (playlistInfos[userChannel.id].length >= 3) {
                         message.channel.send(`> **Musiques en file d'attente** \n > \n${list}`)
@@ -406,12 +474,12 @@ function showQueuedSongs(message) {
     }
 }
 
-function setSongs(userChannel) {
+function createSongsString(userChannel) {
     const songsArray = []
     let songs = ''
     playlistInfos[userChannel.id].map((music, index) => {
         if (index !== 0) {
-            const newSong = '> **' + index + '**' + '. ' + music.title + '\n'
+            const newSong = '> **' + index + '**. ' + music.title + '\n'
             if (songs.length + newSong.length >= 1950) {
                 songsArray.push(songs)
                 songs = newSong
@@ -478,3 +546,5 @@ exports.radio = radio
 exports.showQueuedSongs = showQueuedSongs
 exports.getVerifyBotLocationInfos = getVerifyBotLocationInfos
 exports.getSongInPlaylist = getSongInPlaylist
+exports.selectSongInSearchList = selectSongInSearchList
+exports.getSongInSearchList = getSongInSearchList

@@ -11,11 +11,19 @@ function dispatcher(message, prefixLength) {
                 Player.showQueuedSongs(message)
             }
             else {
-                Player.playSongs(message, command, words[1])
+                Player.playSongs(message, command, words)
             }
         }
         else if (Number.isFinite(parseInt(command))) {
             Player.getSongInPlaylist(message, parseInt(command))
+        }
+        else if (command === 'search') {
+            if (Number.isFinite(parseInt(words[1]))) {
+                Player.selectSongInSearchList(message, parseInt(words[1]))
+            }
+            else {
+                Player.getSongInSearchList(message)
+            }
         }
         else if (command === 'quit') {
             Player.quit(message)
