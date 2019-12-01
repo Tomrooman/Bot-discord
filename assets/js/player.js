@@ -50,6 +50,24 @@ function playSongsAndConnectOrNotBot(voiceChannel, message, command, url, playSo
         }
     }
     else {
+        // const service = google.youtube('v3')
+        // service.videos.list({
+        //     key: config.googleKey,
+        //     snippet: {
+        //         title: "Eminem stai wide awake"
+        //     },
+        //     part: 'snippet, contentDetails'
+        // }, function (err, response) {
+        //     if (err) {
+        //         console.log('The API returned an error: ' + err);
+        //         message.channel.send('Une erreur s\'est produite !')
+        //         return false;
+        //     }
+        //     else if (response.data.items.length) {
+        //         console.log('response search : ', response.data)
+        //         // setMusicArrayAndPlayMusic(voiceChannel, response, message, url, playSongParams)
+        //     }
+        // });
         message.channel.send('Vous devez entrer une URL valide !')
     }
 }
@@ -367,24 +385,26 @@ function getSongInPlaylist(message, number) {
 
 function showQueuedSongs(message) {
     const userChannel = Helper.take_user_voiceChannel(message)
-    if (playlistInfos[userChannel.id] && playlistInfos[userChannel.id].length >= 2) {
-        // Create songs array and send multiple message if needed (max message length to 2000)
-        setSongs(userChannel).map((list, index) => {
-            if (index === 0) {
-                if (playlistInfos[userChannel.id].length >= 3) {
-                    message.channel.send(`> **Musiques en file d'attente** \n > \n${list}`)
+    if (Helper.verifyBotLocation(message, userChannel)) {
+        if (playlistInfos[userChannel.id] && playlistInfos[userChannel.id].length >= 2) {
+            // Create songs array and send multiple message if needed (max message length to 2000)
+            setSongs(userChannel).map((list, index) => {
+                if (index === 0) {
+                    if (playlistInfos[userChannel.id].length >= 3) {
+                        message.channel.send(`> **Musiques en file d'attente** \n > \n${list}`)
+                    }
+                    else {
+                        message.channel.send(`> **La musique en file d'attente** \n > \n${list}`)
+                    }
                 }
                 else {
-                    message.channel.send(`> **La musique en file d'attente** \n > \n${list}`)
+                    message.channel.send(`${list}`)
                 }
-            }
-            else {
-                message.channel.send(`${list}`)
-            }
-        })
-    }
-    else {
-        message.channel.send('Aucune musique dans la file d\'attente')
+            })
+        }
+        else {
+            message.channel.send('Aucune musique dans la file d\'attente')
+        }
     }
 }
 
