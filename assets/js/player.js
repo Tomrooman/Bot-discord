@@ -12,11 +12,14 @@ const playlistInfos = []
 const connectedGuild = []
 const radioPlayed = []
 const searchArray = []
+const loopArray = []
+const waitArray = []
 
 function playSongs(message, command, words) {
     const voiceChannel = Helper.take_user_voiceChannel(message)
     if (voiceChannel) {
-        if (!connectedGuild[message.guild.id]) {
+        if (!connectedGuild[message.guild.id] || waitArray[voiceChannel.id]) {
+            delete waitArray[voiceChannel.id]
             playSongsAndConnectOrNotBot(voiceChannel, message, command, words)
         }
         else if (connectedGuild[message.guild.id] === voiceChannel.id) {
@@ -78,6 +81,25 @@ function searchYoutubeVideosByTitle(message, title, voiceChannel) {
             message.channel.send(`Aucun résultat pour la recherche : ${title}`)
         }
     });
+}
+
+function toggleLoop(message) {
+    const userChannel = Helper.take_user_voiceChannel(message)
+    if (Helper.verifyBotLocation(message, userChannel)) {
+        if (playlistArray[userChannel.id] && playlistArray[userChannel.id].length) {
+            if (!loopArray[userChannel.id]) {
+                loopArray[userChannel.id] = true
+                message.channel.send('Boucle activée !')
+            }
+            else {
+                delete loopArray[userChannel.id]
+                message.channel.send('Boucle désactivée !')
+            }
+        }
+        else {
+            message.channel.send('Vous n\'écoutez pas de musique !')
+        }
+    }
 }
 
 function createSearchArray(message, voiceChannel, items) {
@@ -146,14 +168,19 @@ function playSong(message, connection) {
     streamsArray[connection.channel.id].on('end', () => {
         setTimeout(() => {
             if (playlistArray[connection.channel.id]) {
-                delete playlistArray[connection.channel.id][0]
-                delete playlistInfos[connection.channel.id][0]
-                playlistArray[connection.channel.id] = _.compact(playlistArray[connection.channel.id])
-                playlistInfos[connection.channel.id] = _.compact(playlistInfos[connection.channel.id])
+                if (!loopArray[connection.channel.id]) {
+                    delete playlistArray[connection.channel.id][0]
+                    delete playlistInfos[connection.channel.id][0]
+                    playlistArray[connection.channel.id] = _.compact(playlistArray[connection.channel.id])
+                    playlistInfos[connection.channel.id] = _.compact(playlistInfos[connection.channel.id])
+                }
                 if (!playlistArray[connection.channel.id][0]) {
-                    setTimeout(() => {
-                        quit(message)
-                    }, 300000)
+                    // setTimeout(() => {
+                    //     quit(message)
+                    // }, 300000)
+                    // streamsArray[userChannel.id].destroy()
+                    waitArray[connection.channel.id] = true
+                    message.channel.send('Plus de musique en file d\'attente')
                 }
                 else {
                     playSong(message, connection)
@@ -391,6 +418,7 @@ function radio(message, words) {
             radioLink = 'http://listen.radionomy.com/subarashii.mp3'
         }
         if (voiceChannel) {
+            delete loopArray[voiceChannel.id]
             radioPlayed[voiceChannel.id] = 'played'
             if (!connectedGuild[message.guild.id]) {
                 voiceChannel.join()
@@ -509,9 +537,9 @@ function quit(message) {
         delete playlistInfos[userChannel.id]
         delete connectedGuild[message.guild.id]
         delete radioPlayed[userChannel.id]
-        if (pausedArray[userChannel.id]) {
-            delete pausedArray[userChannel.id]
-        }
+        delete loopArray[userChannel.id]
+        delete pausedArray[userChannel.id]
+        delete waitArray[userChannel.id]
     }
 }
 
@@ -535,6 +563,7 @@ function next(message) {
     const userChannel = Helper.take_user_voiceChannel(message)
     if (Helper.verifyBotLocation(message, userChannel)) {
         if (playlistArray[userChannel.id]) {
+            delete loopArray[userChannel.id]
             streamsArray[userChannel.id].destroy()
         }
     }
@@ -552,3 +581,4 @@ exports.getVerifyBotLocationInfos = getVerifyBotLocationInfos
 exports.getSongInPlaylist = getSongInPlaylist
 exports.selectSongInSearchList = selectSongInSearchList
 exports.getSongInSearchList = getSongInSearchList
+exports.toggleLoop = toggleLoop

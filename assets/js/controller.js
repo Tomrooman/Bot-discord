@@ -25,6 +25,9 @@ function dispatcher(message, prefixLength) {
                 Player.getSongInSearchList(message)
             }
         }
+        else if (command === 'loop') {
+            Player.toggleLoop(message)
+        }
         else if (command === 'quit') {
             Player.quit(message)
         }
