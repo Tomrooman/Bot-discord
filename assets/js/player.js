@@ -232,13 +232,11 @@ function getPlaylist(voiceChannel, message, url, playSongParams = true, pageToke
         playlistLength -= 1;
         playlistId = url.substr(url.indexOf('&list=') + 6, playlistLength)
     }
+    else if (url.indexOf('?list=') !== -1) {
+        playlistId = url.substr(url.indexOf('?list=') + 6, url.length - (url.indexOf('?list=') + 6))
+    }
     else {
-        if (url.indexOf('?list=') !== -1) {
-            playlistId = url.substr(url.indexOf('?list=') + 6, url.length - (url.indexOf('?list=') + 6))
-        }
-        else {
-            playlistId = url.substr(url.indexOf('&list=') + 6, url.length - (url.indexOf('&list=') + 6))
-        }
+        playlistId = url.substr(url.indexOf('&list=') + 6, url.length - (url.indexOf('&list=') + 6))
     }
     callYoutubeApiAndAddItems(playlistId, voiceChannel, message, url, playSongParams, pageToken, play, connection)
 }
