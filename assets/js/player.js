@@ -184,6 +184,7 @@ function playSong(message, connection) {
                     // }, 300000)
                     // streamsArray[userChannel.id].destroy()
                     waitArray[connection.channel.id] = true
+                    delete loopArray[connection.channel.id]
                     message.channel.send('Plus de musique en file d\'attente')
                 }
                 else {
@@ -274,9 +275,6 @@ function getPlaylist(voiceChannel, message, url, playSongParams = true, pageToke
 
 function callYoutubeApiAndAddItems(playlistId, voiceChannel, message, url, playSongParams, pageToken, play, connection) {
     const service = google.youtube('v3')
-    console.log('')
-    console.log('url : ', url)
-    console.log('playlist id : ', playlistId)
     service.playlistItems.list({
         key: config.googleKey,
         playlistId: playlistId,
