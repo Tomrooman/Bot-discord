@@ -273,6 +273,9 @@ function getPlaylist(voiceChannel, message, url, playSongParams = true, pageToke
 
 function callYoutubeApiAndAddItems(playlistId, voiceChannel, message, url, playSongParams, pageToken, play, connection) {
     const service = google.youtube('v3')
+    console.log('')
+    console.log('url : ', url)
+    console.log('playlist id : ', playlistId)
     service.playlistItems.list({
         key: config.googleKey,
         playlistId: playlistId,
@@ -281,7 +284,7 @@ function callYoutubeApiAndAddItems(playlistId, voiceChannel, message, url, playS
         part: 'snippet'
     }, function (err, response) {
         if (err) {
-            console.log('The API returned an error: ' + err);
+            console.log('ERROR: ' + err.code);
             if (err.code === 404) {
                 message.channel.send('Fonctionnalité temporairement indisponible')
             }
@@ -305,7 +308,7 @@ function callYoutubeApiAndAddItems(playlistId, voiceChannel, message, url, playS
             }
         }
         else {
-            message.channel.send('Playlist vide !')
+            message.channel.send('Fonctionnalité temporairement indisponible')
         }
     });
 }
