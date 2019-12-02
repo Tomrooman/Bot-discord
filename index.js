@@ -21,7 +21,7 @@ bot.on('ready', () => {
 
 bot.on('message', (message) => {
     if (message.content.toLowerCase().startsWith(config.prefix)) {
-        Controller.dispatcher(message, config.prefix.length)
+        Controller.dispatcher(message, config.prefix)
     }
     else if (message.author.id !== config.clientId) {
         Level.addXp(message)

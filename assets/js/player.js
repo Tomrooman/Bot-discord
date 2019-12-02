@@ -106,6 +106,7 @@ function toggleLoop(message) {
 function createSearchArray(message, voiceChannel, items) {
     const videoURL = 'https://www.youtube.com/watch?v='
     let resultChoices = ''
+    let nb = 0;
     searchArray[voiceChannel.id] = []
     items.map((item, index) => {
         if (item.id.videoId) {
@@ -420,36 +421,42 @@ function radioExist(words) {
 
 function radio(message, words) {
     const voiceChannel = Helper.take_user_voiceChannel(message)
-    if (!!words[1] && radioExist(words)) {
-        let radioLink = false
-        if (words[1].toLowerCase() === 'nrj') {
-            radioLink = 'http://cdn.nrjaudio.fm/audio1/fr/40125/aac_64.mp3'
-        }
-        if (words[1].toLowerCase() === 'subarashii') {
-            radioLink = 'http://listen.radionomy.com/subarashii.mp3'
-        }
-        if (voiceChannel) {
-            delete loopArray[voiceChannel.id]
-            radioPlayed[voiceChannel.id] = 'played'
-            if (!connectedGuild[message.guild.id]) {
-                voiceChannel.join()
-                    .then(connection => {
-                        connectionsArray[connection.channel.id] = connection
-                        connectedGuild[message.guild.id] = voiceChannel.id
-                        streamsArray[connection.channel.id] = connectionsArray[connection.channel.id].playStream(radioLink)
-                        streamsArray[connection.channel.id].setVolume(0.4)
-                    })
+    if (!!words[1]) {
+        if (radioExist(words)) {
+            let radioLink = false
+            if (words[1].toLowerCase() === 'nrj') {
+                radioLink = 'http://cdn.nrjaudio.fm/audio1/fr/40125/aac_64.mp3'
             }
-            else if (Helper.verifyBotLocation(message, voiceChannel)) {
-                delete playlistArray[voiceChannel.id]
-                delete playlistInfos[voiceChannel.id]
-                streamsArray[voiceChannel.id].destroy()
-                streamsArray[voiceChannel.id] = connectionsArray[voiceChannel.id].playStream(radioLink)
-                streamsArray[voiceChannel.id].setVolume(0.4)
+            if (words[1].toLowerCase() === 'subarashii') {
+                radioLink = 'http://listen.radionomy.com/subarashii.mp3'
             }
+            if (voiceChannel) {
+                delete loopArray[voiceChannel.id]
+                radioPlayed[voiceChannel.id] = 'played'
+                if (!connectedGuild[message.guild.id]) {
+                    voiceChannel.join()
+                        .then(connection => {
+                            connectionsArray[connection.channel.id] = connection
+                            connectedGuild[message.guild.id] = voiceChannel.id
+                            streamsArray[connection.channel.id] = connectionsArray[connection.channel.id].playStream(radioLink)
+                            streamsArray[connection.channel.id].setVolume(0.4)
+                        })
+                }
+                else if (Helper.verifyBotLocation(message, voiceChannel)) {
+                    delete playlistArray[voiceChannel.id]
+                    delete playlistInfos[voiceChannel.id]
+                    streamsArray[voiceChannel.id].destroy()
+                    streamsArray[voiceChannel.id] = connectionsArray[voiceChannel.id].playStream(radioLink)
+                    streamsArray[voiceChannel.id].setVolume(0.4)
+                }
+            }
+            else {
+                message.channel.send('Vous devez être connecté dans un salon !')
+            }
+
         }
         else {
-            message.channel.send('Vous devez être connecté dans un salon !')
+            message.channel.send('Cette radio n\'existe pas !')
         }
     }
     else {
@@ -576,6 +583,7 @@ function next(message) {
         if (playlistArray[userChannel.id]) {
             delete loopArray[userChannel.id]
             streamsArray[userChannel.id].destroy()
+            loopArray[userChannel.id] = true
         }
     }
 }
