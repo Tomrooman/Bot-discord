@@ -125,7 +125,6 @@ function selectSongInSearchList(message, number) {
         if (Number.isFinite(parseInt(number))) {
             if (searchArray[userChannel.id] && searchArray[userChannel.id].length) {
                 if (number >= 1 && number <= searchArray[userChannel.id].length) {
-                    console.log('search array : ', searchArray[userChannel.id][number - 1])
                     playSongs(message, 'play', ['useless', searchArray[userChannel.id][number - 1].url])
                 }
                 else {
@@ -283,7 +282,12 @@ function callYoutubeApiAndAddItems(playlistId, voiceChannel, message, url, playS
     }, function (err, response) {
         if (err) {
             console.log('The API returned an error: ' + err);
-            message.channel.send('Une erreur s\'est produite !')
+            if (err.code === 404) {
+                message.channel.send('Fonctionnalité temporairement indisponible')
+            }
+            else {
+                message.channel.send('Une erreur s\'est produite !')
+            }
             return false;
         }
         else if (response.data.items.length) {
