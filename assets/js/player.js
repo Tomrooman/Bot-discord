@@ -61,13 +61,13 @@ function playSongsAndConnectOrNotBot(voiceChannel, message, command, words, play
     }
 }
 
-function searchYoutubeVideosByTitle(message, title, voiceChannel, pageToken = '') {
+function searchYoutubeVideosByTitle(message, title, voiceChannel) {
     const service = google.youtube('v3')
     service.search.list({
         key: config.googleKey,
         q: title,
         part: 'snippet',
-        pageToken: pageToken
+        type: 'video'
     }, function (err, response) {
         if (err) {
             console.log('The API returned an error: ' + err);
@@ -76,7 +76,7 @@ function searchYoutubeVideosByTitle(message, title, voiceChannel, pageToken = ''
         }
         else if (response.data.items.length) {
             delete searchArray[voiceChannel.id]
-            createSearchArray(message, voiceChannel, response.data.items, response.data.nextPageToken, title)
+            createSearchArray(message, voiceChannel, response.data.items)
         }
         else {
             message.channel.send(`Aucun résultat pour la recherche : ${title}`)
@@ -103,27 +103,20 @@ function toggleLoop(message) {
     }
 }
 
-function createSearchArray(message, voiceChannel, items, nextPageToken, title) {
+function createSearchArray(message, voiceChannel, items) {
     const videoURL = 'https://www.youtube.com/watch?v='
     let resultChoices = ''
     searchArray[voiceChannel.id] = []
-    let nb = searchArray[voiceChannel.id].length;
     items.map((item, index) => {
         if (item.id.videoId) {
-            nb++;
-            resultChoices += '> **' + nb + '**. ' + item.snippet.title + '\n'
+            resultChoices += '> **' + (index + 1) + '**. ' + item.snippet.title + '\n'
             searchArray[voiceChannel.id].push({
                 url: videoURL + item.id.videoId,
                 title: item.snippet.title
             })
         }
-        if (index === items.length - 1 && nb < 5) {
-            searchYoutubeVideosByTitle(message, title, voiceChannel, nextPageToken)
-        }
-        if (index === items.length - 1 && nb === 5) {
-            message.channel.send(`> **Selectionnez une musique parmi les ${items.length} ci-dessous.** \n > **Ex: ${config.prefix}search ${items.length}** \n > \n ${resultChoices}`)
-        }
     })
+    message.channel.send(`> **Selectionnez une musique parmi les ${items.length} ci-dessous.** \n > **Ex: ${config.prefix}search ${items.length}** \n > \n ${resultChoices}`)
 }
 
 function selectSongInSearchList(message, number) {
@@ -280,9 +273,9 @@ function getPlaylist(voiceChannel, message, url, playSongParams = true, pageToke
 
 function callYoutubeApiAndAddItems(playlistId, voiceChannel, message, url, playSongParams, pageToken, play, connection) {
     const service = google.youtube('v3')
-    service.playlists.list({
+    service.playlistItems.list({
         key: config.googleKey,
-        id: playlistId,
+        playlistId: playlistId,
         maxResults: 50,
         pageToken: pageToken,
         part: 'snippet, contentDetails'
