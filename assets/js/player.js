@@ -279,7 +279,7 @@ function callYoutubeApiAndAddItems(playlistId, voiceChannel, message, url, playS
         playlistId: playlistId,
         maxResults: 50,
         pageToken: pageToken,
-        part: 'snippet, contentDetails'
+        part: 'snippet'
     }, function (err, response) {
         if (err) {
             console.log('The API returned an error: ' + err);
@@ -353,7 +353,7 @@ function getVideo(voiceChannel, message, url, playSongParams = true) {
         service.videos.list({
             key: config.googleKey,
             id: videoId,
-            part: 'snippet, contentDetails'
+            part: 'snippet'
         }, function (err, response) {
             if (err) {
                 console.log('The API returned an error: ' + err);
