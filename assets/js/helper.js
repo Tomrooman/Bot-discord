@@ -79,7 +79,7 @@ function availableCommand() {
                 'Sélectionne une musique dans la file d\'attente ```' + config.prefix + 'p CHOIX``````Ex: ' + config.prefix + 'play 4``` \n',
                 'Recherche une musique par titre ```' + config.prefix + 'play TITRE``````Ex: ' + config.prefix + 'play Eminem rap god``` \n',
                 'Affiche la liste des musiques dans les résultats de la recherche ```' + config.prefix + 'search``` \n',
-                'Sélectionne une musique dans les résultats de la recherche ```' + config.prefix + 'search CHOIX``````Ex: ' + config.prefix + 'search 4```',
+                'Sélectionne une musique dans les résultats de la recherche ```' + config.prefix + 'search CHOIX``````Ex: ' + config.prefix + 'search 4```'
             ]
         },
         {
@@ -93,7 +93,7 @@ function availableCommand() {
                 'Sélectionne une musique dans la file d\'attente ```' + config.prefix + 'p CHOIX``````Ex: ' + config.prefix + 'p 4``` \n',
                 'Recherche une musique par titre ```' + config.prefix + 'p TITRE``````Ex: ' + config.prefix + 'p Eminem rap god``` \n',
                 'Affiche la liste des musiques dans les résultats de la recherche ```' + config.prefix + 'search``` \n',
-                'Sélectionne une musique dans les résultats de la recherche ```' + config.prefix + 'search CHOIX``````Ex: ' + config.prefix + 'search 4```',
+                'Sélectionne une musique dans les résultats de la recherche ```' + config.prefix + 'search CHOIX``````Ex: ' + config.prefix + 'search 4```'
             ]
         },
         {
@@ -107,7 +107,7 @@ function availableCommand() {
                 'Sélectionne une musique dans la file d\'attente ```' + config.prefix + 'playlist CHOIX``````Ex: ' + config.prefix + 'playlist 4``` \n',
                 'Recherche une playlist par titre ```' + config.prefix + 'playlist TITRE``````Ex: ' + config.prefix + 'playlist Hip hop``` \n',
                 'Affiche la liste des playlists dans les résultats de la recherche ```' + config.prefix + 'search``` \n',
-                'Sélectionne une playlist dans les résultats de la recherche ```' + config.prefix + 'search CHOIX``````Ex: ' + config.prefix + 'search 4```',
+                'Sélectionne une playlist dans les résultats de la recherche ```' + config.prefix + 'search CHOIX``````Ex: ' + config.prefix + 'search 4```'
             ]
         },
         {
@@ -121,7 +121,7 @@ function availableCommand() {
                 'Sélectionne une musique dans la file d\'attente ```' + config.prefix + 'pl CHOIX``````Ex: ' + config.prefix + 'pl 4``` \n',
                 'Recherche une playlist par titre ```' + config.prefix + 'pl TITRE``````Ex: ' + config.prefix + 'pl Hip hop``` \n',
                 'Affiche la liste des playlists dans les résultats de la recherche ```' + config.prefix + 'search``` \n',
-                'Sélectionne une playlist dans les résultats de la recherche ```' + config.prefix + 'search CHOIX``````Ex: ' + config.prefix + 'search 4```',
+                'Sélectionne une playlist dans les résultats de la recherche ```' + config.prefix + 'search CHOIX``````Ex: ' + config.prefix + 'search 4```'
             ]
         },
         {
@@ -221,7 +221,7 @@ function availableCommand() {
 }
 
 function getCommandInfos(message, command) {
-    let commandObj = availableCommand().filter(c => c.name === command)
+    const commandObj = availableCommand().filter(c => c.name === command)
     let joinedInfos = ''
     commandObj[0].infos.map(info => {
         joinedInfos += info

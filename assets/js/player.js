@@ -106,7 +106,6 @@ function toggleLoop(message) {
 function createSearchArray(message, voiceChannel, items) {
     const videoURL = 'https://www.youtube.com/watch?v='
     let resultChoices = ''
-    let nb = 0;
     searchArray[voiceChannel.id] = []
     items.map((item, index) => {
         if (item.id.videoId) {
@@ -419,7 +418,7 @@ function radioExist(words) {
 
 function radio(message, words) {
     const voiceChannel = Helper.take_user_voiceChannel(message)
-    if (!!words[1]) {
+    if (words[1]) {
         if (radioExist(words)) {
             let radioLink = false
             if (words[1].toLowerCase() === 'nrj') {
