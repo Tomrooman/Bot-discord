@@ -125,6 +125,7 @@ function selectSongInSearchList(message, number) {
         if (Number.isFinite(parseInt(number))) {
             if (searchArray[userChannel.id] && searchArray[userChannel.id].length) {
                 if (number >= 1 && number <= searchArray[userChannel.id].length) {
+                    console.log('search array : ', searchArray[userChannel.id][number - 1])
                     playSongs(message, 'play', ['useless', searchArray[userChannel.id][number - 1].url])
                 }
                 else {
