@@ -14,6 +14,7 @@ const radioPlayed = []
 const searchArray = []
 const loopArray = []
 const waitArray = []
+const nextSetLoop = []
 
 function playSongs(message, command, words) {
     const voiceChannel = Helper.take_user_voiceChannel(message)
@@ -187,6 +188,10 @@ function playSong(message, connection) {
                     message.channel.send('Plus de musique en file d\'attente')
                 }
                 else {
+                    if (nextSetLoop[connection.channel.id]) {
+                        loopArray[connection.channel.id] = true
+                        delete nextSetLoop[connection.channel.id]
+                    }
                     playSong(message, connection)
                 }
             }
@@ -579,8 +584,8 @@ function next(message) {
     if (Helper.verifyBotLocation(message, userChannel)) {
         if (playlistArray[userChannel.id]) {
             delete loopArray[userChannel.id]
+            nextSetLoop[userChannel.id] = true
             streamsArray[userChannel.id].destroy()
-            loopArray[userChannel.id] = true
         }
     }
 }
