@@ -252,13 +252,13 @@ function playSong(message, connection, retry = false) {
         isPlaying[connection.channel.id] = true
     }
     const startDate = moment().valueOf() / 1000
+    connectionsArray[connection.channel.id] = connection
+    const stream = ytdl(playlistArray[connection.channel.id][0], { filter: 'audio', liveBuffer: 10000 })
+    streamsArray[connection.channel.id] = connectionsArray[connection.channel.id].playStream(stream)
+    streamsArray[connection.channel.id].setVolume(0.4)
     if (!retry) {
         sendMusicEmbed(message, connection, playlistInfos[connection.channel.id][0].title, playlistInfos[connection.channel.id][0].id, [false, 1])
     }
-    connectionsArray[connection.channel.id] = connection
-    const stream = ytdl(playlistArray[connection.channel.id][0], { filter: 'audio' })
-    streamsArray[connection.channel.id] = connectionsArray[connection.channel.id].playStream(stream)
-    streamsArray[connection.channel.id].setVolume(0.4)
     streamsArray[connection.channel.id].on('end', () => {
         setTimeout(() => {
             setArrays(message, connection, startDate)

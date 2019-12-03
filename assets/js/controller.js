@@ -2,6 +2,7 @@ const Player = require('./player.js')
 const Message = require('./message.js')
 const Level = require('./level.js')
 const Helper = require('./helper.js')
+const Custom = require('./custom.js')
 
 function dispatcher(message, prefix) {
     const words = message.content.substr(prefix.length, message.content.length - prefix.length).split(' ')
@@ -71,6 +72,9 @@ function dispatcher(message, prefix) {
             else {
                 Helper.showCommandlist(message)
             }
+        }
+        else if (command === 'pioupiou') {
+            Custom.pioupiou(message)
         }
         else {
             message.channel.send('Cette commande n\'existe pas ! \n Tapez **' + prefix + 'help** pour afficher la liste des commandes.')
