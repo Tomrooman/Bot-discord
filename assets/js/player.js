@@ -443,10 +443,14 @@ function addPlaylistItems(voiceChannel, message, url, response, playSongParams, 
     }
     data.items.map(item => {
         playlistArray[voiceChannel.id].push(videoURL + item.snippet.resourceId.videoId)
+        let thumbnailURL = ''
+        if (item.snippet.thumbnails) {
+            thumbnailURL = item.snippet.thumbnails.default.url
+        }
         playlistInfos[voiceChannel.id].push({
             title: item.snippet.title,
             id: item.snippet.resourceId.videoId,
-            thumbnail: item.snippet.thumbnails.default.url
+            thumbnail: thumbnailURL
         })
     })
     if (data.nextPageToken) {
