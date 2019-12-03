@@ -18,6 +18,7 @@ const loopArray = []
 const waitArray = []
 const nextSetLoop = []
 const isPlaying = []
+const radioAvailable = ['nrj', 'subarashii']
 
 function playSongs(message, command, words) {
     const voiceChannel = Helper.take_user_voiceChannel(message)
@@ -332,6 +333,7 @@ function sendMusicEmbed(message, connection, musicTitle, musicId, added = [false
     }
     message.channel.send({
         'embed': {
+            'footer': '"' + config.prefix + 'p list" pour afficher la file d\'attente',
             'color': color,
             'author': {
                 'name': title,
@@ -539,55 +541,75 @@ function clearAndAddArrayInfos(voiceChannel, url, response, clear = true) {
     })
 }
 
-function radioExist(words) {
-    if (words[1].toLowerCase() === 'nrj' || words[1].toLowerCase() === 'subarashii') {
-        return true
+function radioExist(radioCheck) {
+    let checkExist = false
+    radioAvailable.map(r => {
+        if (r === radioCheck) {
+            checkExist = true
+        }
+    })
+    return checkExist
+}
+
+function getRadioLink(radioForLink) {
+    if (radioForLink === 'nrj') {
+        return 'http://cdn.nrjaudio.fm/audio1/fr/40125/aac_64.mp3'
     }
-    return false
+    else if (radioForLink === 'subarashii') {
+        return 'http://listen.radionomy.com/subarashii.mp3'
+    }
+}
+
+function showRadioList(message) {
+    let stringRadioList = ''
+    radioAvailable.map(r => {
+        stringRadioList += '> - **' + r + '**\n'
+    })
+    message.channel.send('> Écrivez le nom de la radio que vous voulez écouter.\n > Ex: ' + config.prefix + 'radio nrj\n > \n ' + stringRadioList)
 }
 
 function radio(message, words) {
     const voiceChannel = Helper.take_user_voiceChannel(message)
     if (words[1]) {
-        if (radioExist(words)) {
-            let radioLink = false
-            if (words[1].toLowerCase() === 'nrj') {
-                radioLink = 'http://cdn.nrjaudio.fm/audio1/fr/40125/aac_64.mp3'
-            }
-            if (words[1].toLowerCase() === 'subarashii') {
-                radioLink = 'http://listen.radionomy.com/subarashii.mp3'
-            }
-            if (voiceChannel) {
-                delete loopArray[voiceChannel.id]
-                radioPlayed[voiceChannel.id] = 'played'
-                if (!connectedGuild[message.guild.id]) {
-                    voiceChannel.join()
-                        .then(connection => {
-                            connectionsArray[connection.channel.id] = connection
-                            connectedGuild[message.guild.id] = voiceChannel.id
-                            streamsArray[connection.channel.id] = connectionsArray[connection.channel.id].playStream(radioLink)
-                            streamsArray[connection.channel.id].setVolume(0.4)
-                        })
-                }
-                else if (Helper.verifyBotLocation(message, voiceChannel)) {
-                    delete playlistArray[voiceChannel.id]
-                    delete playlistInfos[voiceChannel.id]
-                    streamsArray[voiceChannel.id].destroy()
-                    streamsArray[voiceChannel.id] = connectionsArray[voiceChannel.id].playStream(radioLink)
-                    streamsArray[voiceChannel.id].setVolume(0.4)
-                }
-            }
-            else {
-                message.channel.send('Vous devez être connecté dans un salon !')
-            }
-
+        if (words[1].toLowerCase() === 'list') {
+            showRadioList(message)
+        }
+        else if (radioExist(words[1].toLowerCase())) {
+            connectRadio(voiceChannel, message, words)
         }
         else {
-            message.channel.send('Cette radio n\'existe pas !')
+            message.channel.send('**Cette radio n\'existe pas !** \n Tapez **' + config.prefix + 'radio list** pour obtenir la liste des radios disponibles.')
         }
     }
     else {
         message.channel.send('Choisir une radio, c\'est mieux !')
+    }
+}
+
+function connectRadio(voiceChannel, message, words) {
+    const radioLink = getRadioLink(words[1].toLowerCase())
+    if (voiceChannel) {
+        delete loopArray[voiceChannel.id]
+        radioPlayed[voiceChannel.id] = 'played'
+        if (!connectedGuild[message.guild.id]) {
+            voiceChannel.join()
+                .then(connection => {
+                    connectionsArray[connection.channel.id] = connection
+                    connectedGuild[message.guild.id] = voiceChannel.id
+                    streamsArray[connection.channel.id] = connectionsArray[connection.channel.id].playStream(radioLink)
+                    streamsArray[connection.channel.id].setVolume(0.4)
+                })
+        }
+        else if (Helper.verifyBotLocation(message, voiceChannel)) {
+            delete playlistArray[voiceChannel.id]
+            delete playlistInfos[voiceChannel.id]
+            streamsArray[voiceChannel.id].destroy()
+            streamsArray[voiceChannel.id] = connectionsArray[voiceChannel.id].playStream(radioLink)
+            streamsArray[voiceChannel.id].setVolume(0.4)
+        }
+    }
+    else {
+        message.channel.send('Vous devez être connecté dans un salon !')
     }
 }
 
