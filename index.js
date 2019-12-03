@@ -63,3 +63,7 @@ function disconnectBotFromOldChannel() {
     })
     console.log('Disconnected from all channels !')
 }
+
+process.openStdin().addListener('data', data => {
+    console.log('Ta écrit : ', data.toString().trim())
+})

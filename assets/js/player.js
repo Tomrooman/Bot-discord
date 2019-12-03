@@ -3,6 +3,7 @@ const Helper = require('./helper.js')
 const _ = require('lodash')
 const { google } = require('googleapis')
 const config = require('./../../config.json')
+const moment = require('moment')
 
 const connectionsArray = []
 const streamsArray = []
@@ -12,9 +13,11 @@ const playlistInfos = []
 const connectedGuild = []
 const radioPlayed = []
 const searchArray = []
+const searchPlaylistArray = []
 const loopArray = []
 const waitArray = []
 const nextSetLoop = []
+const isPlaying = []
 
 function playSongs(message, command, words) {
     const voiceChannel = Helper.take_user_voiceChannel(message)
@@ -58,9 +61,7 @@ function playSongsAndConnectOrNotBot(voiceChannel, message, command, words, play
         delete words[0];
         const title = words.join(' ')
         if (command === 'playlist' || command === 'pl') {
-            console.log('Ici cree fonction pour avoir la playlist avec titre')
-            // Cree 2 tableau dans le searchArray, et affiche les 2 dans la fonction pour les afficher
-            // searchYoutubePlaylistsByTitle(message, title, voiceChannel)
+            searchYoutubeVideosByTitle(message, title, voiceChannel, 'playlist')
         }
         else if (command === 'play' || command === 'p') {
             searchYoutubeVideosByTitle(message, title, voiceChannel)
@@ -68,13 +69,13 @@ function playSongsAndConnectOrNotBot(voiceChannel, message, command, words, play
     }
 }
 
-function searchYoutubeVideosByTitle(message, title, voiceChannel) {
+function searchYoutubeVideosByTitle(message, title, voiceChannel, type = 'video') {
     const service = google.youtube('v3')
     service.search.list({
         key: config.googleKey,
         q: title,
         part: 'snippet',
-        type: 'video'
+        type: type
     }, function (err, response) {
         if (err) {
             console.log('The API returned an error: ' + err);
@@ -82,8 +83,13 @@ function searchYoutubeVideosByTitle(message, title, voiceChannel) {
             return false;
         }
         else if (response.data.items.length) {
-            delete searchArray[voiceChannel.id]
-            createSearchArray(message, voiceChannel, response.data.items)
+            if (type === 'video') {
+                delete searchArray[voiceChannel.id]
+            }
+            else {
+                delete searchPlaylistArray[voiceChannel.id]
+            }
+            createSearchArray(message, voiceChannel, response.data.items, type)
         }
         else {
             message.channel.send(`Aucun résultat pour la recherche : ${title}`)
@@ -110,36 +116,77 @@ function toggleLoop(message) {
     }
 }
 
-function createSearchArray(message, voiceChannel, items) {
+function createSearchArray(message, voiceChannel, items, type = 'video') {
     const videoURL = 'https://www.youtube.com/watch?v='
+    const playlistURL = 'https://www.youtube.com/playlist?list='
     let resultChoices = ''
-    searchArray[voiceChannel.id] = []
+    if (type === 'video') {
+        searchArray[voiceChannel.id] = []
+    }
+    else {
+        searchPlaylistArray[voiceChannel.id] = []
+    }
     items.map((item, index) => {
-        if (item.id.videoId) {
-            resultChoices += '> **' + (index + 1) + '**. ' + item.snippet.title + '\n'
+        resultChoices += '> **' + (index + 1) + '**. ' + item.snippet.title + '\n'
+        if (type === 'video' && item.id.videoId) {
             searchArray[voiceChannel.id].push({
                 url: videoURL + item.id.videoId,
                 title: item.snippet.title
             })
         }
+        else if (type === 'playlist') {
+            searchPlaylistArray[voiceChannel.id].push({
+                url: playlistURL + item.id.playlistId,
+                title: item.snippet.title
+            })
+        }
     })
-    message.channel.send(`> **Selectionnez une musique parmi les ${items.length} ci-dessous.** \n > **Ex: ${config.prefix}search ${items.length}** \n > \n ${resultChoices}`)
+    if (type === 'video') {
+        message.channel.send(`> **Selectionnez une musique parmi les ${items.length} ci-dessous.** \n > **Ex: ${config.prefix}search p ${items.length}** \n > \n ${resultChoices}`)
+    }
+    else {
+        message.channel.send(`> **Selectionnez une playlist parmi les ${items.length} ci-dessous.** \n > **Ex: ${config.prefix}search pl ${items.length}** \n > \n ${resultChoices}`)
+    }
 }
 
-function selectSongInSearchList(message, number) {
+function selectSongOrPlaylistInSearchList(message, words) {
+    if (words[1] === 'p' || words[1] === 'play') {
+        if (words[2]) {
+            selectSongInSearchList(message, parseInt(words[2]))
+        }
+        else {
+            message.channel.send('Veuillez écrire le numéro de la musique sélectionnée !')
+        }
+    }
+    else if (words[1] === 'pl' || words[1] === 'playlist') {
+        if (words[2]) {
+            selectSongInSearchList(message, parseInt(words[2]), 'playlist')
+        }
+        else {
+            message.channel.send('Veuillez écrire le numéro de la playlist sélectionnée !')
+        }
+    }
+    else {
+        message.channel.send('Vous devez écrire le type de sélection.```Ex: ' + config.prefix + 'search p 3```')
+    }
+}
+
+function selectSongInSearchList(message, number, type = 'musique') {
     const userChannel = Helper.take_user_voiceChannel(message)
     if (userChannel) {
         if (Number.isFinite(parseInt(number))) {
-            if (searchArray[userChannel.id] && searchArray[userChannel.id].length) {
-                if (number >= 1 && number <= searchArray[userChannel.id].length) {
-                    playSongs(message, 'play', ['useless', searchArray[userChannel.id][number - 1].url])
+            const choiceArray = type === 'musique' ? searchArray[userChannel.id] : searchPlaylistArray[userChannel.id]
+            if (choiceArray && choiceArray.length) {
+                if (number >= 1 && number <= choiceArray.length) {
+                    const command = type === 'musique' ? 'play' : 'playlist'
+                    playSongs(message, command, ['useless', choiceArray[number - 1].url])
                 }
                 else {
-                    message.channel.send(`Choisissez un chiffre compris entre 1 et ${searchArray[userChannel.id].length}`)
+                    message.channel.send(`Choisissez un chiffre compris entre 1 et ${choiceArray.length}`)
                 }
             }
             else {
-                message.channel.send('Aucune musique enregistrée dans la recherche')
+                message.channel.send(`Aucune ${type} enregistrée dans la recherche`)
             }
         }
         else {
@@ -154,12 +201,10 @@ function selectSongInSearchList(message, number) {
 function getSongInSearchList(message) {
     const userChannel = Helper.take_user_voiceChannel(message)
     if (userChannel) {
-        if (searchArray[userChannel.id] && searchArray[userChannel.id].length) {
-            let resultChoices = ''
-            searchArray[userChannel.id].map((song, index) => {
-                resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n'
-            })
-            message.channel.send(`> **Selectionnez une musique parmi les ${searchArray[userChannel.id].length} ci-dessous.** \n > **Ex: ${config.prefix}search ${searchArray[userChannel.id].length}** \n > \n ${resultChoices}`)
+        const musicExist = searchArray[userChannel.id] && searchArray[userChannel.id].length
+        const playlistExist = searchPlaylistArray[userChannel.id] && searchPlaylistArray[userChannel.id].length
+        if (musicExist || playlistExist) {
+            makeAndSendSearchListArray(message, userChannel, musicExist, playlistExist)
         }
         else {
             message.channel.send('Aucune musique enregistrée dans la recherche')
@@ -170,43 +215,81 @@ function getSongInSearchList(message) {
     }
 }
 
-function playSong(message, connection, count = 0) {
-    sendMusicEmbed(message, connection, playlistInfos[connection.channel.id][0].title, playlistInfos[connection.channel.id][0].id, [false, 1])
+function makeAndSendSearchListArray(message, userChannel, musicExist, playlistExist) {
+    let resultChoices = ''
+    if (musicExist && playlistExist) {
+        resultChoices += '> **Musiques** \n'
+        searchArray[userChannel.id].map((song, index) => {
+            resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n'
+        })
+        resultChoices += '> \n'
+        resultChoices += '> **Playlists** \n'
+        searchPlaylistArray[userChannel.id].map((song, index) => {
+            resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n'
+        })
+        const countChoices = searchPlaylistArray[userChannel.id].length + searchArray[userChannel.id].length
+        message.channel.send(`> **Faites un choix parmi les ${countChoices} ci-dessous.** \n > **Ex: ${config.prefix}search p ${searchArray[userChannel.id].length}** \n > **Ex: ${config.prefix}search pl ${searchPlaylistArray[userChannel.id].length}** \n > \n ${resultChoices}`)
+    }
+    else if (musicExist && !playlistExist) {
+        resultChoices += '> **Musiques** \n'
+        searchArray[userChannel.id].map((song, index) => {
+            resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n'
+        })
+        message.channel.send(`> **Selectionnez une musique parmi les ${searchArray[userChannel.id].length} ci-dessous.** \n > **Ex: ${config.prefix}search p ${searchArray[userChannel.id].length}** \n > \n ${resultChoices}`)
+    }
+    else {
+        resultChoices += '> **Playlists** \n'
+        searchPlaylistArray[userChannel.id].map((song, index) => {
+            resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n'
+        })
+        message.channel.send(`> **Selectionnez une playlist parmi les ${searchPlaylistArray[userChannel.id].length} ci-dessous.** \n > **Ex: ${config.prefix}search pl ${searchPlaylistArray[userChannel.id].length}** \n > \n ${resultChoices}`)
+    }
+}
+
+function playSong(message, connection, retry = false) {
+    if (connection) {
+        isPlaying[connection.channel.id] = true
+    }
+    const startDate = moment().valueOf() / 1000
+    if (!retry) {
+        sendMusicEmbed(message, connection, playlistInfos[connection.channel.id][0].title, playlistInfos[connection.channel.id][0].id, [false, 1])
+    }
     connectionsArray[connection.channel.id] = connection
-    let countt = count
     const stream = ytdl(playlistArray[connection.channel.id][0], { filter: 'audio' })
     streamsArray[connection.channel.id] = connectionsArray[connection.channel.id].playStream(stream)
     streamsArray[connection.channel.id].setVolume(0.4)
-    streamsArray[connection.channel.id].on('end', (reason) => {
-        if (reason && reason.indexOf('destroyed due to error') !== -1) {
-            countt++;
-            message.channel.send('Erreur du chargement de la video ' + countt + '/3')
-            if (countt < 3) {
-                playSong(message, connection, countt)
-            }
-        }
-        else {
-            setTimeout(() => {
-                setArrays(message, connection)
-            }, 500)
-        }
+    streamsArray[connection.channel.id].on('end', () => {
+        setTimeout(() => {
+            setArrays(message, connection, startDate)
+        }, 1000)
     })
 }
 
-function setArrays(message, connection) {
+function setArrays(message, connection, startDate) {
+    const endDate = moment().valueOf() / 1000
+    const secondsDiff = Math.floor(endDate - startDate)
+    delete isPlaying[connection.channel.id]
+    // If still connected but the end callback is call to early (after few seconds of playing)
+    if (connectedGuild[connection.channel.id] && secondsDiff < 4) {
+        console.log('Retry song')
+        playSong(message, connectionsArray[connection.channel.id], true)
+    }
     if (playlistArray[connection.channel.id]) {
+        // If loop is desactivate
         if (!loopArray[connection.channel.id]) {
             delete playlistArray[connection.channel.id][0]
             delete playlistInfos[connection.channel.id][0]
             playlistArray[connection.channel.id] = _.compact(playlistArray[connection.channel.id])
             playlistInfos[connection.channel.id] = _.compact(playlistInfos[connection.channel.id])
         }
+        // If playlist is empty
         if (!playlistArray[connection.channel.id][0]) {
             waitArray[connection.channel.id] = true
             delete loopArray[connection.channel.id]
             message.channel.send('Plus de musique en file d\'attente')
         }
         else {
+            // If loop is activate and command 'next' is called
             if (nextSetLoop[connection.channel.id]) {
                 loopArray[connection.channel.id] = true
                 delete nextSetLoop[connection.channel.id]
@@ -302,13 +385,10 @@ function callYoutubeApiAndAddItems(playlistId, voiceChannel, message, url, playS
     }, function (err, response) {
         if (err) {
             console.log('ERROR: ' + err.code);
-            if (err.code === 404) {
-                message.channel.send('Fonctionnalité temporairement indisponible')
-            }
-            else {
+            if (err.code !== 404) {
                 message.channel.send('Une erreur s\'est produite !')
+                return false;
             }
-            return false;
         }
         else if (response.data.items.length) {
             if (playSongParams) {
@@ -325,9 +405,32 @@ function callYoutubeApiAndAddItems(playlistId, voiceChannel, message, url, playS
             }
         }
         else {
-            message.channel.send('Fonctionnalité temporairement indisponible')
+            checkIfMustPlay(message, voiceChannel, connection, pageToken)
         }
     });
+}
+
+function checkIfMustPlay(message, voiceChannel, connection, pageToken) {
+    // If response is empty but there are song in queued so send the added message
+    if (pageToken && playlistArray[voiceChannel.id] && playlistArray[voiceChannel.id].length) {
+        sendMusicEmbed(message, voiceChannel, 'Playlist', false, [true, 2])
+        // If bot is not currently playing so play the song
+        if (!isPlaying[voiceChannel.id]) {
+            if (!connection) {
+                const newConnect = Helper.take_user_voiceChannel(message)
+                newConnect.join()
+                    .then(connect => {
+                        playSong(message, connect)
+                    })
+            }
+            else {
+                playSong(message, connection)
+            }
+        }
+    }
+    else {
+        message.channel.send('Fonctionnalité temporairement indisponible')
+    }
 }
 
 function addPlaylistItems(voiceChannel, message, url, response, playSongParams, connection, play = false) {
@@ -578,6 +681,7 @@ function quit(message) {
         delete loopArray[userChannel.id]
         delete pausedArray[userChannel.id]
         delete waitArray[userChannel.id]
+        delete isPlaying[userChannel.id]
     }
 }
 
@@ -623,3 +727,4 @@ exports.getSongInPlaylist = getSongInPlaylist
 exports.selectSongInSearchList = selectSongInSearchList
 exports.getSongInSearchList = getSongInSearchList
 exports.toggleLoop = toggleLoop
+exports.selectSongOrPlaylistInSearchList = selectSongOrPlaylistInSearchList

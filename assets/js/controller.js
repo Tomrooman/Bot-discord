@@ -19,8 +19,8 @@ function dispatcher(message, prefix) {
             }
         }
         else if (command === 'search') {
-            if (Number.isFinite(parseInt(words[1]))) {
-                Player.selectSongInSearchList(message, parseInt(words[1]))
+            if (words[1]) {
+                Player.selectSongOrPlaylistInSearchList(message, words)
             }
             else {
                 Player.getSongInSearchList(message)
