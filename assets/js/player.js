@@ -19,8 +19,7 @@ const nextSetLoop = []
 function playSongs(message, command, words) {
     const voiceChannel = Helper.take_user_voiceChannel(message)
     if (voiceChannel) {
-        if (!connectedGuild[message.guild.id] || waitArray[voiceChannel.id]) {
-            delete waitArray[voiceChannel.id]
+        if (!connectedGuild[message.guild.id]) {
             playSongsAndConnectOrNotBot(voiceChannel, message, command, words)
         }
         else if (connectedGuild[message.guild.id] === voiceChannel.id) {
@@ -58,7 +57,14 @@ function playSongsAndConnectOrNotBot(voiceChannel, message, command, words, play
     else {
         delete words[0];
         const title = words.join(' ')
-        searchYoutubeVideosByTitle(message, title, voiceChannel)
+        if (command === 'playlist' || command === 'pl') {
+            console.log('Ici cree fonction pour avoir la playlist avec titre')
+            // Cree 2 tableau dans le searchArray, et affiche les 2 dans la fonction pour les afficher
+            // searchYoutubePlaylistsByTitle(message, title, voiceChannel)
+        }
+        else if (command === 'play' || command === 'p') {
+            searchYoutubeVideosByTitle(message, title, voiceChannel)
+        }
     }
 }
 
@@ -164,42 +170,52 @@ function getSongInSearchList(message) {
     }
 }
 
-function playSong(message, connection) {
+function playSong(message, connection, count = 0) {
     sendMusicEmbed(message, connection, playlistInfos[connection.channel.id][0].title, playlistInfos[connection.channel.id][0].id, [false, 1])
+    // delete connectionsArray[connection.channel.id]
+    delete streamsArray[connection.channel.id]
     connectionsArray[connection.channel.id] = connection
-    streamsArray[connection.channel.id] = connectionsArray[connection.channel.id].playStream(ytdl(playlistArray[connection.channel.id][0], { filter: 'audioonly' }))
+    let countt = count
+    const stream = ytdl(playlistArray[connection.channel.id][0], {})
+    streamsArray[connection.channel.id] = connectionsArray[connection.channel.id].playStream(stream, { filter: 'audio' })
     streamsArray[connection.channel.id].setVolume(0.4)
-    streamsArray[connection.channel.id].on('end', () => {
-        setTimeout(() => {
-            if (playlistArray[connection.channel.id]) {
-                if (!loopArray[connection.channel.id]) {
-                    delete playlistArray[connection.channel.id][0]
-                    delete playlistInfos[connection.channel.id][0]
-                    playlistArray[connection.channel.id] = _.compact(playlistArray[connection.channel.id])
-                    playlistInfos[connection.channel.id] = _.compact(playlistInfos[connection.channel.id])
-                }
-                if (!playlistArray[connection.channel.id][0]) {
-                    // setTimeout(() => {
-                    //     quit(message)
-                    // }, 300000)
-                    // streamsArray[userChannel.id].destroy()
-                    waitArray[connection.channel.id] = true
-                    delete loopArray[connection.channel.id]
-                    message.channel.send('Plus de musique en file d\'attente')
-                }
-                else {
-                    if (nextSetLoop[connection.channel.id]) {
-                        loopArray[connection.channel.id] = true
-                        delete nextSetLoop[connection.channel.id]
-                    }
-                    playSong(message, connection)
-                }
+    streamsArray[connection.channel.id].on('end', (reason) => {
+        if (reason && reason.indexOf('destroyed due to error') !== -1) {
+            countt++;
+            message.channel.send('Erreur du chargement de la video ' + countt + '/3')
+            if (countt < 3) {
+                playSong(message, connection, countt)
             }
-        }, 1000)
+        }
+        else {
+            setTimeout(() => {
+                setArrays(message, connection)
+            }, 500)
+        }
     })
-    streamsArray[connection.channel.id].on('error', (err) => {
-        console.log(`Erreur : ${err}`)
-    })
+}
+
+function setArrays(message, connection) {
+    if (playlistArray[connection.channel.id]) {
+        if (!loopArray[connection.channel.id]) {
+            delete playlistArray[connection.channel.id][0]
+            delete playlistInfos[connection.channel.id][0]
+            playlistArray[connection.channel.id] = _.compact(playlistArray[connection.channel.id])
+            playlistInfos[connection.channel.id] = _.compact(playlistInfos[connection.channel.id])
+        }
+        if (!playlistArray[connection.channel.id][0]) {
+            waitArray[connection.channel.id] = true
+            delete loopArray[connection.channel.id]
+            message.channel.send('Plus de musique en file d\'attente')
+        }
+        else {
+            if (nextSetLoop[connection.channel.id]) {
+                loopArray[connection.channel.id] = true
+                delete nextSetLoop[connection.channel.id]
+            }
+            playSong(message, connection)
+        }
+    }
 }
 
 function sendMusicEmbed(message, connection, musicTitle, musicId, added = [false, 1]) {
@@ -345,6 +361,9 @@ function addPlaylistItems(voiceChannel, message, url, response, playSongParams, 
             delete radioPlayed[voiceChannel.id]
             playSong(message, connectionsArray[voiceChannel.id])
         }
+        else if (waitArray[voiceChannel.id]) {
+            playSong(message, connectionsArray[voiceChannel.id])
+        }
     }
 }
 
@@ -381,7 +400,8 @@ function getVideo(voiceChannel, message, url, playSongParams = true) {
 }
 
 function setMusicArrayAndPlayMusic(voiceChannel, response, message, url, playSongParams) {
-    if (playSongParams) {
+    if (playSongParams || waitArray[voiceChannel.id]) {
+        delete waitArray[voiceChannel.id]
         voiceChannel.join()
             .then(connection => {
                 clearAndAddArrayInfos(voiceChannel, url, response)
@@ -583,8 +603,10 @@ function next(message) {
     const userChannel = Helper.take_user_voiceChannel(message)
     if (Helper.verifyBotLocation(message, userChannel)) {
         if (playlistArray[userChannel.id]) {
-            delete loopArray[userChannel.id]
-            nextSetLoop[userChannel.id] = true
+            if (loopArray[userChannel.id]) {
+                delete loopArray[userChannel.id]
+                nextSetLoop[userChannel.id] = true
+            }
             streamsArray[userChannel.id].destroy()
         }
     }

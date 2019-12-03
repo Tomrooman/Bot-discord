@@ -9,6 +9,7 @@ const bot = new Discord.Client()
 connectToDatabase()
 
 bot.on('ready', () => {
+    disconnectBotFromOldChannel()
     console.log('----- Connected ' + config.WHAT + ' -----')
     // send message to all first available guild's channel
     // bot.guilds.map(guild => {
@@ -37,7 +38,28 @@ function connectToDatabase() {
         useFindAndModify: false
     })
     mongoose.connection.once('open', () => {
-        console.log('Connected to database')
+        console.log('Connected to database !')
         bot.login(config.token)
     })
+}
+
+function disconnectBotFromOldChannel() {
+    console.log('Disconnecting from all channels ...')
+    bot.guilds.map(g => {
+        g.channels.map(channel => {
+            if (channel.type === 'voice') {
+                if (channel.members) {
+                    channel.members.map(member => {
+                        if (member.user.bot) {
+                            channel.join()
+                                .then(connection => {
+                                    connection.channel.leave()
+                                })
+                        }
+                    })
+                }
+            }
+        })
+    })
+    console.log('Disconnected from all channels !')
 }
