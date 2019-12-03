@@ -267,6 +267,7 @@ function playSong(message, connection, retry = false) {
 }
 
 function setArrays(message, connection, startDate) {
+    // const userChannel = Helper.take_user_voiceChannel(message)
     const endDate = moment().valueOf() / 1000
     const secondsDiff = Math.floor(endDate - startDate)
     delete isPlaying[connection.channel.id]
@@ -295,6 +296,11 @@ function setArrays(message, connection, startDate) {
                 loopArray[connection.channel.id] = true
                 delete nextSetLoop[connection.channel.id]
             }
+            // A TESTER TESTER TESTER TESTER TESTER TESTER TESTER
+            // userChannel.join()
+            // .then(connection => {
+            //     playSong(message, connection)
+            // })
             playSong(message, connection)
         }
     }
