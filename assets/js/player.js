@@ -172,12 +172,10 @@ function getSongInSearchList(message) {
 
 function playSong(message, connection, count = 0) {
     sendMusicEmbed(message, connection, playlistInfos[connection.channel.id][0].title, playlistInfos[connection.channel.id][0].id, [false, 1])
-    // delete connectionsArray[connection.channel.id]
-    delete streamsArray[connection.channel.id]
     connectionsArray[connection.channel.id] = connection
     let countt = count
-    const stream = ytdl(playlistArray[connection.channel.id][0], {})
-    streamsArray[connection.channel.id] = connectionsArray[connection.channel.id].playStream(stream, { filter: 'audio' })
+    const stream = ytdl(playlistArray[connection.channel.id][0], { filter: 'audio' })
+    streamsArray[connection.channel.id] = connectionsArray[connection.channel.id].playStream(stream)
     streamsArray[connection.channel.id].setVolume(0.4)
     streamsArray[connection.channel.id].on('end', (reason) => {
         if (reason && reason.indexOf('destroyed due to error') !== -1) {
