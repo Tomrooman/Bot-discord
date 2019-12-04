@@ -20,7 +20,6 @@
         "convert-svg-to-png": "^0.5.0",
         "discord.js": "github:discordjs/discord.js",
         "lodash": "^4.17.15",
-        "moment": "2.24.0",
         "mongoose": "^5.7.12",
         "node-opus": "^0.3.3",
         "pm2": "^4.2.0",

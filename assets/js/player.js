@@ -4,7 +4,6 @@ const ytsr = require('ytsr')
 const Helper = require('./helper.js')
 const _ = require('lodash')
 const config = require('./../../config.json')
-const moment = require('moment')
 
 const connectionsArray = []
 const streamsArray = []
@@ -307,11 +306,9 @@ function makeAndSendSearchListArray(message, userChannel, musicExist, playlistEx
     }
 }
 
-function playSong(message, connection, retry = false) {
+function playSong(message, connection) {
     const userChannel = Helper.take_user_voiceChannel(message)
-    if (!retry) {
-        sendMusicEmbed(message, playlistInfos[userChannel.id][0].title, playlistInfos[userChannel.id][0].id, [false, 1])
-    }
+    sendMusicEmbed(message, playlistInfos[userChannel.id][0].title, playlistInfos[userChannel.id][0].id, [false, 1])
     isPlaying[userChannel.id] = true
     delete tryToNext[userChannel.id]
     connectionsArray[userChannel.id] = connection
@@ -330,18 +327,11 @@ function playSong(message, connection, retry = false) {
     })
 }
 
-function setArrays(message, startDate = moment().valueOf() / 1000) {
+function setArrays(message) {
     // const userChannel = Helper.take_user_voiceChannel(message)
     const userChannel = Helper.take_user_voiceChannel(message)
-    const endDate = moment().valueOf() / 1000
-    const secondsDiff = Math.floor(endDate - startDate)
     delete isPlaying[userChannel.id]
     // If still connected but the end callback is call to early (after few seconds of playing)
-    if (connectedGuild[userChannel.id] && secondsDiff < 4 && !tryToNext[userChannel.id]) {
-        console.log('Retry song')
-        streamsArray[userChannel.id].destroy()
-        playSong(message, connectionsArray[userChannel.id], true)
-    }
     if (playlistArray[userChannel.id]) {
         // If loop is desactivate
         if (!loopArray[userChannel.id]) {

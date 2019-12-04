@@ -2,7 +2,7 @@ const Discord = require('discord.js')
 const Controller = require('./assets/js/controller.js')
 const Level = require('./assets/js/level.js')
 const config = require('./config.json')
-const Helper = require('./assets/js/helper.js')
+// const Helper = require('./assets/js/helper.js')
 const mongoose = require('mongoose')
 const bot = new Discord.Client()
 
@@ -41,7 +41,7 @@ bot.on('message', (message) => {
 //         console.log('playlist')
 //     }
 //     console.log('user channel : ', userChannel)
-//     //console.log('User : ', user)
+//     // console.log('User : ', user)
 // })
 
 function connectToDatabase() {
