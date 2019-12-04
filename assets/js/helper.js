@@ -204,7 +204,10 @@ function availableCommand() {
             exemple: '```' + config.prefix + 'search``` \n',
             infos: [
                 'Affiche la liste des résultats d\'une recherche ```' + config.prefix + 'search```\n',
-                'Sélectionne une musique dans la liste des résultats d\'une recherche ```' + config.prefix + 'search CHOIX``````Ex: ' + config.prefix + 'search 3```'
+                'Affiche les musiques dans la liste des résultats d\'une recherche ```' + config.prefix + 'search p```\n',
+                'Sélectionne une musique dans la liste des résultats d\'une recherche ```' + config.prefix + 'search p CHOIX``````Ex: ' + config.prefix + 'search p 3```\n',
+                'Affiche les playlists dans la liste des résultats d\'une recherche ```' + config.prefix + 'search pl```\n',
+                'Sélectionne une playlist dans la liste des résultats d\'une recherche ```' + config.prefix + 'search pl CHOIX``````Ex: ' + config.prefix + 'search pl 1```'
             ]
         },
         {

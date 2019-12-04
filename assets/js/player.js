@@ -1,7 +1,8 @@
 const ytdl = require('ytdl-core')
+const ytpl = require('ytpl')
+const ytsr = require('ytsr')
 const Helper = require('./helper.js')
 const _ = require('lodash')
-const { google } = require('googleapis')
 const config = require('./../../config.json')
 const moment = require('moment')
 
@@ -18,6 +19,7 @@ const loopArray = []
 const waitArray = []
 const nextSetLoop = []
 const isPlaying = []
+const tryToNext = []
 const radioAvailable = ['nrj', 'subarashii']
 
 function playSongs(message, command, words) {
@@ -39,63 +41,92 @@ function playSongs(message, command, words) {
 }
 
 function playSongsAndConnectOrNotBot(voiceChannel, message, command, words, playSongParams = true) {
-    const url = words[1]
-    if (url && url.includes('youtu') && (url.includes('http://') || url.includes('https://'))) {
+    if (words[1] && words[1].includes('youtu') && (words[1].includes('http://') || words[1].includes('https://'))) {
         if (command === 'playlist' || command === 'pl') {
-            if (url.indexOf('list=') !== -1) {
-                getPlaylist(voiceChannel, message, url, playSongParams)
+            if (ytpl.validateURL(words[1])) {
+                getPlaylist(voiceChannel, message, words, playSongParams)
             }
             else {
                 message.channel.send('Merci de renseigner une URL de playlist valide !')
             }
         }
         else if (command === 'play' || command === 'p') {
-            if (url.indexOf('playlist') !== -1) {
-                getPlaylist(voiceChannel, message, url, playSongParams)
+            if (ytdl.validateURL(words[1])) {
+                getVideo(voiceChannel, message, words, playSongParams)
             }
             else {
-                getVideo(voiceChannel, message, url, playSongParams)
+                message.channel.send('Ce n\'est pas une URL de vidéo valide !')
             }
         }
     }
-    else {
+    else if (words[1]) {
         delete words[0];
         const title = words.join(' ')
         if (command === 'playlist' || command === 'pl') {
-            searchYoutubeVideosByTitle(message, title, voiceChannel, 'playlist')
+            youtubeResearch(message, title, voiceChannel, 'playlist')
+            // searchYoutubeVideosByTitle(message, title, voiceChannel, 'playlist')
         }
         else if (command === 'play' || command === 'p') {
-            searchYoutubeVideosByTitle(message, title, voiceChannel)
+            youtubeResearch(message, title, voiceChannel, 'video')
+            // searchYoutubeVideosByTitle(message, title, voiceChannel)
         }
+    }
+    else {
+        message.channel.send('Vous n\'avez pas écrit de recherche !')
     }
 }
 
-function searchYoutubeVideosByTitle(message, title, voiceChannel, type = 'video') {
-    const service = google.youtube('v3')
-    service.search.list({
-        key: config.googleKey,
-        q: title,
-        part: 'snippet',
-        type: type
-    }, function (err, response) {
-        if (err) {
-            console.log('The API returned an error: ' + err);
-            message.channel.send('Une erreur s\'est produite !')
-            return false;
-        }
-        else if (response.data.items.length) {
-            if (type === 'video') {
-                delete searchArray[voiceChannel.id]
+function youtubeResearch(message, string, voiceChannel, type, nextPage = false) {
+    const options = {
+        limit: 50
+    }
+    if (nextPage) {
+        options.nextpageRef = nextPage
+    }
+    if (type === 'video' && !nextPage) {
+        delete searchArray[voiceChannel.id]
+        searchArray[voiceChannel.id] = []
+    }
+    else if (type === 'playlist' && !nextPage) {
+        delete searchPlaylistArray[voiceChannel.id]
+        searchPlaylistArray[voiceChannel.id] = []
+    }
+    ytsr(string, options, (err, searchresults) => {
+        if (searchresults) {
+            const buildedArray = makeSearchArray(voiceChannel, searchresults, type)
+            if (buildedArray.length < 5 && searchresults.nextpageRef) {
+                message.channel.send('> ' + buildedArray.length + '/5 trouvé')
+                youtubeResearch(message, null, voiceChannel, type, searchresults.nextpageRef)
             }
-            else {
-                delete searchPlaylistArray[voiceChannel.id]
+            else if (buildedArray.length === 5 || !searchresults.nextpageRef) {
+                // If i've got 5 item or no nextpageRef so send the list
+                sendSearchResultsAsString(message, voiceChannel, type)
             }
-            createSearchArray(message, voiceChannel, response.data.items, type)
         }
         else {
-            message.channel.send(`Aucun résultat pour la recherche : ${title}`)
+            console.log('Erreur')
         }
-    });
+    })
+}
+
+function makeSearchArray(voiceChannel, searchresults, type) {
+    const filteredResult = searchresults.items.filter(i => i.type === type)
+    console.log('filtered  result: ', filteredResult)
+    filteredResult.map(result => {
+        const resultObj = {
+            url: result.link,
+            title: result.title
+        }
+        if (type === 'video' && searchArray[voiceChannel.id].length < 5) {
+            searchArray[voiceChannel.id].push(resultObj)
+        }
+        else if (type === 'playlist' && searchPlaylistArray[voiceChannel.id].length < 5) {
+            resultObj.plLength = result.length
+            searchPlaylistArray[voiceChannel.id].push(resultObj)
+        }
+    })
+    const array = type == 'video' ? searchArray[voiceChannel.id] : searchPlaylistArray[voiceChannel.id]
+    return array
 }
 
 function toggleLoop(message) {
@@ -117,58 +148,56 @@ function toggleLoop(message) {
     }
 }
 
-function createSearchArray(message, voiceChannel, items, type = 'video') {
-    const videoURL = 'https://www.youtube.com/watch?v='
-    const playlistURL = 'https://www.youtube.com/playlist?list='
+function sendSearchResultsAsString(message, voiceChannel, type) {
+    const selectedArray = type === 'video' ? searchArray[voiceChannel.id] : searchPlaylistArray[voiceChannel.id]
     let resultChoices = ''
-    if (type === 'video') {
-        searchArray[voiceChannel.id] = []
-    }
-    else {
-        searchPlaylistArray[voiceChannel.id] = []
-    }
-    items.map((item, index) => {
-        resultChoices += '> **' + (index + 1) + '**. ' + item.snippet.title + '\n'
-        if (type === 'video' && item.id.videoId) {
-            searchArray[voiceChannel.id].push({
-                url: videoURL + item.id.videoId,
-                title: item.snippet.title
-            })
+    selectedArray.map((item, index) => {
+        if (item.plLength) {
+            resultChoices += '> **' + (index + 1) + '**. ' + item.title + ' (' + item.plLength + ')\n'
         }
-        else if (type === 'playlist') {
-            searchPlaylistArray[voiceChannel.id].push({
-                url: playlistURL + item.id.playlistId,
-                title: item.snippet.title
-            })
+        else {
+            resultChoices += '> **' + (index + 1) + '**. ' + item.title + '\n'
         }
+
     })
     if (type === 'video') {
-        message.channel.send(`> **Selectionnez une musique parmi les ${items.length} ci-dessous.** \n > **Ex: ${config.prefix}search p ${items.length}** \n > \n ${resultChoices}`)
+        message.channel.send(`> **Selectionnez une musique parmi les ${selectedArray.length} ci-dessous.** \n > **Ex: ${config.prefix}search p ${selectedArray.length}** \n > \n ${resultChoices}`)
     }
     else {
-        message.channel.send(`> **Selectionnez une playlist parmi les ${items.length} ci-dessous.** \n > **Ex: ${config.prefix}search pl ${items.length}** \n > \n ${resultChoices}`)
+        message.channel.send(`> **Selectionnez une playlist parmi les ${selectedArray.length} ci-dessous.** \n > **Ex: ${config.prefix}search pl ${selectedArray.length}** \n > \n ${resultChoices}`)
     }
 }
 
 function selectSongOrPlaylistInSearchList(message, words) {
+    const userChannel = Helper.take_user_voiceChannel(message)
     if (words[1] === 'p' || words[1] === 'play') {
         if (words[2]) {
             selectSongInSearchList(message, parseInt(words[2]))
         }
+        else if (userChannel) {
+            if (Helper.verifyBotLocation(message, userChannel)) {
+                sendSearchResultsAsString(message, userChannel, 'video')
+            }
+        }
         else {
-            message.channel.send('Veuillez écrire le numéro de la musique sélectionnée !')
+            message.channel.send('Vous devez être connecté dans un salon !')
         }
     }
     else if (words[1] === 'pl' || words[1] === 'playlist') {
         if (words[2]) {
             selectSongInSearchList(message, parseInt(words[2]), 'playlist')
         }
+        else if (userChannel) {
+            if (Helper.verifyBotLocation(message, userChannel)) {
+                sendSearchResultsAsString(message, userChannel, 'playlist')
+            }
+        }
         else {
-            message.channel.send('Veuillez écrire le numéro de la playlist sélectionnée !')
+            message.channel.send('Vous devez être connecté dans un salon !')
         }
     }
     else {
-        message.channel.send('Vous devez écrire le type de sélection.```Ex: ' + config.prefix + 'search p 3```')
+        message.channel.send('Vous devez écrire le type de sélection.```Ex: ' + config.prefix + 'search p```')
     }
 }
 
@@ -248,80 +277,80 @@ function makeAndSendSearchListArray(message, userChannel, musicExist, playlistEx
 }
 
 function playSong(message, connection, retry = false) {
-    if (connection) {
-        isPlaying[connection.channel.id] = true
-    }
-    const startDate = moment().valueOf() / 1000
-    connectionsArray[connection.channel.id] = connection
-    const stream = ytdl(playlistArray[connection.channel.id][0], { filter: 'audio', liveBuffer: 10000 })
-    streamsArray[connection.channel.id] = connectionsArray[connection.channel.id].playStream(stream)
-    streamsArray[connection.channel.id].setVolume(0.4)
+    const userChannel = Helper.take_user_voiceChannel(message)
+    isPlaying[userChannel.id] = true
+    delete tryToNext[userChannel.id]
+    connectionsArray[userChannel.id] = connection
+    const stream = ytdl(playlistArray[userChannel.id][0], { filter: 'audio', liveBuffer: 10000 })
+    streamsArray[userChannel.id] = connection.play(stream)
+    streamsArray[userChannel.id].setVolume(0.4)
     if (!retry) {
-        sendMusicEmbed(message, connection, playlistInfos[connection.channel.id][0].title, playlistInfos[connection.channel.id][0].id, [false, 1])
+        sendMusicEmbed(message, playlistInfos[userChannel.id][0].title, playlistInfos[userChannel.id][0].id, [false, 1])
     }
-    streamsArray[connection.channel.id].on('end', () => {
+    streamsArray[userChannel.id].on('finish', () => {
         setTimeout(() => {
-            setArrays(message, connection, startDate)
+            setArrays(message)
         }, 1000)
     })
 }
 
-function setArrays(message, connection, startDate) {
+function setArrays(message, startDate = moment().valueOf() / 1000) {
     // const userChannel = Helper.take_user_voiceChannel(message)
+    const userChannel = Helper.take_user_voiceChannel(message)
     const endDate = moment().valueOf() / 1000
     const secondsDiff = Math.floor(endDate - startDate)
-    delete isPlaying[connection.channel.id]
+    delete isPlaying[userChannel.id]
     // If still connected but the end callback is call to early (after few seconds of playing)
-    if (connectedGuild[connection.channel.id] && secondsDiff < 4) {
+    if (connectedGuild[userChannel.id] && secondsDiff < 4 && !tryToNext[userChannel.id]) {
         console.log('Retry song')
-        playSong(message, connectionsArray[connection.channel.id], true)
+        streamsArray[userChannel.id].destroy()
+        playSong(message, connectionsArray[userChannel.id], true)
     }
-    if (playlistArray[connection.channel.id]) {
+    if (playlistArray[userChannel.id]) {
         // If loop is desactivate
-        if (!loopArray[connection.channel.id]) {
-            delete playlistArray[connection.channel.id][0]
-            delete playlistInfos[connection.channel.id][0]
-            playlistArray[connection.channel.id] = _.compact(playlistArray[connection.channel.id])
-            playlistInfos[connection.channel.id] = _.compact(playlistInfos[connection.channel.id])
+        if (!loopArray[userChannel.id]) {
+            delete playlistArray[userChannel.id][0]
+            delete playlistInfos[userChannel.id][0]
+            playlistArray[userChannel.id] = _.compact(playlistArray[userChannel.id])
+            playlistInfos[userChannel.id] = _.compact(playlistInfos[userChannel.id])
         }
         // If playlist is empty
-        if (!playlistArray[connection.channel.id][0]) {
-            waitArray[connection.channel.id] = true
-            delete loopArray[connection.channel.id]
+        if (!playlistArray[userChannel.id][0]) {
+            waitArray[userChannel.id] = true
+            delete loopArray[userChannel.id]
             message.channel.send('Plus de musique en file d\'attente')
         }
         else {
             // If loop is activate and command 'next' is called
-            if (nextSetLoop[connection.channel.id]) {
-                loopArray[connection.channel.id] = true
-                delete nextSetLoop[connection.channel.id]
+            if (nextSetLoop[userChannel.id]) {
+                loopArray[userChannel.id] = true
+                delete nextSetLoop[userChannel.id]
             }
-            // A TESTER TESTER TESTER TESTER TESTER TESTER TESTER
-            // userChannel.join()
-            // .then(connection => {
-            //     playSong(message, connection)
-            // })
-            playSong(message, connection)
+            streamsArray[userChannel.id].destroy()
+            playSong(message, connectionsArray[userChannel.id])
         }
     }
 }
 
-function sendMusicEmbed(message, connection, musicTitle, musicId, added = [false, 1]) {
+function sendMusicEmbed(message, musicTitle, musicId, added = [false, 1], type = 'video') {
+    const userChannel = Helper.take_user_voiceChannel(message)
     let title = 'Musique'
     let color = false
-    let playArray = false
     let musicLink = musicTitle
     let thumbnail = ''
-    if (musicTitle !== 'Playlist') {
+    if (type === 'video') {
         musicLink = `[${musicTitle}](https://www.youtube.com/watch?v=${musicId})`
+    }
+    else {
+        musicLink = `[${musicTitle}](https://www.youtube.com/playlist?list=${musicId})`
     }
     if (added[0]) {
         if (added[1] > 1) {
-            title = 'Musiques ajoutées'
+            title = 'Playlist ajoutée'
         }
         else {
             title = 'Musique ajoutée'
-            thumbnail = playlistInfos[connection.channel.id][0].thumbnail
+            // thumbnail = playlistInfos[userChannel.id][0].thumbnail
         }
         // #398240 | Vert foncé
         color = 3768896
@@ -329,17 +358,14 @@ function sendMusicEmbed(message, connection, musicTitle, musicId, added = [false
     else {
         // #354F94 | Bleu foncé
         color = 3493780
-        thumbnail = playlistInfos[connection.channel.id][0].thumbnail
+        // thumbnail = playlistInfos[userChannel.id][0].thumbnail
     }
-    if (connection.channel) {
-        playArray = playlistArray[connection.channel.id]
-    }
-    if (connection.id) {
-        playArray = playlistArray[connection.id]
-    }
+    thumbnail = playlistInfos[userChannel.id][0].thumbnail
     message.channel.send({
         'embed': {
-            'footer': '"' + config.prefix + 'p list" pour afficher la file d\'attente',
+            'footer': {
+                'text': '"' + config.prefix + 'p list" pour afficher la file d\'attente'
+            },
             'color': color,
             'author': {
                 'name': title,
@@ -356,7 +382,7 @@ function sendMusicEmbed(message, connection, musicTitle, musicId, added = [false
                 },
                 {
                     'name': 'File d\'attente',
-                    'value': `${playArray.length - 1}`,
+                    'value': `${playlistArray[userChannel.id].length - 1}`,
                     'inline': true
                 }
             ]
@@ -364,111 +390,45 @@ function sendMusicEmbed(message, connection, musicTitle, musicId, added = [false
     })
 }
 
-function getPlaylist(voiceChannel, message, url, playSongParams = true, pageToken = '', play = false, connection = false) {
-    const endPlaylistId = url.indexOf('&', url.indexOf('&') + 1)
-    let playlistId = ''
-    if (endPlaylistId !== -1) {
-        let playlistLength = url.length - (url.indexOf('&') + 5)
-        playlistLength -= url.length - endPlaylistId
-        playlistLength -= 1;
-        playlistId = url.substr(url.indexOf('&list=') + 6, playlistLength)
-    }
-    else if (url.indexOf('?list=') !== -1) {
-        playlistId = url.substr(url.indexOf('?list=') + 6, url.length - (url.indexOf('?list=') + 6))
-    }
-    else {
-        playlistId = url.substr(url.indexOf('&list=') + 6, url.length - (url.indexOf('&list=') + 6))
-    }
-    callYoutubeApiAndAddItems(playlistId, voiceChannel, message, url, playSongParams, pageToken, play, connection)
-}
-
-function callYoutubeApiAndAddItems(playlistId, voiceChannel, message, url, playSongParams, pageToken, play, connection) {
-    const service = google.youtube('v3')
-    service.playlistItems.list({
-        key: config.googleKey,
-        playlistId: playlistId,
-        maxResults: 50,
-        pageToken: pageToken,
-        part: 'snippet'
-    }, function (err, response) {
-        if (err) {
-            console.log('ERROR: ' + err.code);
-            if (err.code !== 404) {
-                message.channel.send('Une erreur s\'est produite !')
-                return false;
-            }
-        }
-        else if (response.data.items.length) {
+function getPlaylist(voiceChannel, message, words, playSongParams, connection = false) {
+    ytpl(words[1], { limit: 0 }, (err, playlist) => {
+        if (playlist) {
             if (playSongParams) {
                 voiceChannel.join()
                     .then(conection => {
                         playlistArray[voiceChannel.id] = []
                         playlistInfos[voiceChannel.id] = []
                         connectedGuild[message.guild.id] = voiceChannel.id
-                        addPlaylistItems(voiceChannel, message, url, response, false, conection, 'play')
+                        addPlaylistItems(voiceChannel, message, playlist, conection, playSongParams)
                     })
             }
             else {
-                addPlaylistItems(voiceChannel, message, url, response, false, connection, play)
+                addPlaylistItems(voiceChannel, message, playlist, connection, playSongParams)
             }
         }
         else {
-            checkIfMustPlay(message, voiceChannel, connection, pageToken)
+            message.channel.send('Une erreur s\'est produite #2')
         }
-    });
+    })
 }
 
-function checkIfMustPlay(message, voiceChannel, connection, pageToken) {
-    // If response is empty but there are song in queued so send the added message
-    if (pageToken && playlistArray[voiceChannel.id] && playlistArray[voiceChannel.id].length) {
-        sendMusicEmbed(message, voiceChannel, 'Playlist', false, [true, 2])
-        // If bot is not currently playing so play the song
-        if (!isPlaying[voiceChannel.id]) {
-            if (!connection) {
-                const newConnect = Helper.take_user_voiceChannel(message)
-                newConnect.join()
-                    .then(connect => {
-                        playSong(message, connect)
-                    })
-            }
-            else {
-                playSong(message, connection)
-            }
-        }
+function addPlaylistItems(voiceChannel, message, playlist, connection, play) {
+    let playlistTitle = 'Playlist'
+    if (playlist.title) {
+        playlistTitle = playlist.title
     }
-    else {
-        message.channel.send('Fonctionnalité temporairement indisponible')
-    }
-}
-
-function addPlaylistItems(voiceChannel, message, url, response, playSongParams, connection, play = false) {
-    const videoURL = 'https://www.youtube.com/watch?v='
-    const data = response.data
     if (radioPlayed[voiceChannel.id] === 'played') {
         playlistArray[voiceChannel.id] = []
         playlistInfos[voiceChannel.id] = []
         radioPlayed[voiceChannel.id] = 'notPlay'
     }
-    data.items.map(item => {
-        playlistArray[voiceChannel.id].push(videoURL + item.snippet.resourceId.videoId)
-        let thumbnailURL = ''
-        if (item.snippet.thumbnails) {
-            thumbnailURL = item.snippet.thumbnails.default.url
-        }
-        playlistInfos[voiceChannel.id].push({
-            title: item.snippet.title,
-            id: item.snippet.resourceId.videoId,
-            thumbnail: thumbnailURL
-        })
-    })
-    if (data.nextPageToken) {
-        getPlaylist(voiceChannel, message, url, playSongParams, data.nextPageToken, play, connection)
-    }
-    else if (play === 'play') {
+    pushPlaylistItems(voiceChannel, playlist)
+    if (play) {
+        sendMusicEmbed(message, playlistTitle, false, [true, playlist.items.length], 'playlist')
         playSong(message, connection)
     }
     else {
-        sendMusicEmbed(message, voiceChannel, 'Playlist', false, [true, data.items.length])
+        sendMusicEmbed(message, playlistTitle, false, [true, playlist.items.length], 'playlist')
         if (radioPlayed[voiceChannel.id]) {
             streamsArray[voiceChannel.id].destroy()
             delete radioPlayed[voiceChannel.id]
@@ -480,44 +440,40 @@ function addPlaylistItems(voiceChannel, message, url, response, playSongParams, 
     }
 }
 
-
-function getVideo(voiceChannel, message, url, playSongParams = true) {
-    let videoId = false
-    if (url.indexOf('&list') !== -1) {
-        videoId = url.substr(url.indexOf('watch?v=') + 8, url.indexOf('&list') - (url.indexOf('watch?v=') + 8))
-    }
-    else {
-        videoId = url.substr(url.indexOf('watch?v=') + 8)
-
-    }
-    if (videoId) {
-        const service = google.youtube('v3')
-        service.videos.list({
-            key: config.googleKey,
-            id: videoId,
-            part: 'snippet'
-        }, function (err, response) {
-            if (err) {
-                console.log('The API returned an error: ' + err);
-                message.channel.send('Une erreur s\'est produite !')
-                return false;
-            }
-            else if (response.data.items.length) {
-                setMusicArrayAndPlayMusic(voiceChannel, response, message, url, playSongParams)
-            }
-        });
-    }
-    else {
-        message.channel.send('URL invalide !')
-    }
+function pushPlaylistItems(voiceChannel, playlist) {
+    const videoURL = 'https://www.youtube.com/watch?v='
+    playlist.items.map(video => {
+        playlistArray[voiceChannel.id].push(videoURL + video.id)
+        let thumbnailURL = ''
+        if (video.thumbnail) {
+            thumbnailURL = video.thumbnail
+        }
+        playlistInfos[voiceChannel.id].push({
+            title: video.title,
+            id: video.id,
+            thumbnail: thumbnailURL,
+            duration: video.duration
+        })
+    })
 }
 
-function setMusicArrayAndPlayMusic(voiceChannel, response, message, url, playSongParams) {
+function getVideo(voiceChannel, message, words, playSongParams = true) {
+    ytdl.getBasicInfo(words[1], (err, infos) => {
+        if (infos) {
+            setMusicArrayAndPlayMusic(voiceChannel, infos, message, playSongParams)
+        }
+        else {
+            message.channel.send('Une erreur s\'est produite')
+        }
+    })
+}
+
+function setMusicArrayAndPlayMusic(voiceChannel, infos, message, playSongParams) {
     if (playSongParams || waitArray[voiceChannel.id]) {
         delete waitArray[voiceChannel.id]
         voiceChannel.join()
             .then(connection => {
-                clearAndAddArrayInfos(voiceChannel, url, response)
+                clearAndAddArrayInfos(voiceChannel, infos)
                 connectedGuild[message.guild.id] = voiceChannel.id
                 playSong(message, connection)
             })
@@ -525,25 +481,26 @@ function setMusicArrayAndPlayMusic(voiceChannel, response, message, url, playSon
     else if (radioPlayed[voiceChannel.id]) {
         streamsArray[voiceChannel.id].destroy()
         delete radioPlayed[voiceChannel.id]
-        clearAndAddArrayInfos(voiceChannel, url, response)
+        clearAndAddArrayInfos(voiceChannel, infos)
         playSong(message, connectionsArray[voiceChannel.id])
     }
     else {
-        clearAndAddArrayInfos(voiceChannel, url, response, false)
-        sendMusicEmbed(message, connectionsArray[voiceChannel.id], response.data.items[0].snippet.title, response.data.items[0].id, [true, 1])
+        clearAndAddArrayInfos(voiceChannel, infos, false)
+        sendMusicEmbed(message, infos.title, infos.video_id, [true, 1])
     }
 }
 
-function clearAndAddArrayInfos(voiceChannel, url, response, clear = true) {
+function clearAndAddArrayInfos(voiceChannel, infos, clear = true) {
     if (clear) {
         playlistArray[voiceChannel.id] = []
         playlistInfos[voiceChannel.id] = []
     }
-    playlistArray[voiceChannel.id].push(url)
+    playlistArray[voiceChannel.id].push(infos.video_url)
     playlistInfos[voiceChannel.id].push({
-        title: response.data.items[0].snippet.title,
-        id: response.data.items[0].id,
-        thumbnail: response.data.items[0].snippet.thumbnails.default.url
+        title: infos.title,
+        id: infos.video_id,
+        thumbnail: infos.player_response.videoDetails.thumbnail.thumbnails[0].url,
+        duration: infos.player_response.videoDetails.lengthSeconds
     })
 }
 
@@ -595,6 +552,7 @@ function radio(message, words) {
 function connectRadio(voiceChannel, message, words) {
     const radioLink = getRadioLink(words[1].toLowerCase())
     if (voiceChannel) {
+        delete tryToNext[voiceChannel.id]
         delete loopArray[voiceChannel.id]
         radioPlayed[voiceChannel.id] = 'played'
         if (!connectedGuild[message.guild.id]) {
@@ -602,7 +560,7 @@ function connectRadio(voiceChannel, message, words) {
                 .then(connection => {
                     connectionsArray[connection.channel.id] = connection
                     connectedGuild[message.guild.id] = voiceChannel.id
-                    streamsArray[connection.channel.id] = connectionsArray[connection.channel.id].playStream(radioLink)
+                    streamsArray[connection.channel.id] = connectionsArray[connection.channel.id].play(radioLink)
                     streamsArray[connection.channel.id].setVolume(0.4)
                 })
         }
@@ -610,7 +568,7 @@ function connectRadio(voiceChannel, message, words) {
             delete playlistArray[voiceChannel.id]
             delete playlistInfos[voiceChannel.id]
             streamsArray[voiceChannel.id].destroy()
-            streamsArray[voiceChannel.id] = connectionsArray[voiceChannel.id].playStream(radioLink)
+            streamsArray[voiceChannel.id] = connectionsArray[voiceChannel.id].play(radioLink)
             streamsArray[voiceChannel.id].setVolume(0.4)
         }
     }
@@ -714,13 +672,14 @@ function quit(message) {
         delete pausedArray[userChannel.id]
         delete waitArray[userChannel.id]
         delete isPlaying[userChannel.id]
+        delete tryToNext[userChannel.id]
     }
 }
 
 function pause(message) {
     const userChannel = Helper.take_user_voiceChannel(message)
     if (Helper.verifyBotLocation(message, userChannel)) {
-        streamsArray[userChannel.id].pause()
+        streamsArray[userChannel.id].pause(true)
         pausedArray[userChannel.id] = 'onPause'
     }
 }
@@ -737,11 +696,13 @@ function next(message) {
     const userChannel = Helper.take_user_voiceChannel(message)
     if (Helper.verifyBotLocation(message, userChannel)) {
         if (playlistArray[userChannel.id]) {
+            tryToNext[userChannel.id] = true
             if (loopArray[userChannel.id]) {
                 delete loopArray[userChannel.id]
                 nextSetLoop[userChannel.id] = true
             }
             streamsArray[userChannel.id].destroy()
+            setArrays(message, connectionsArray[userChannel.id])
         }
     }
 }

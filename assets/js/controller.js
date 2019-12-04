@@ -83,7 +83,6 @@ function dispatcher(message, prefix) {
     else {
         message.channel.send('Vous n\'avez pas écrit de commande !')
     }
-
 }
 
 exports.dispatcher = dispatcher
