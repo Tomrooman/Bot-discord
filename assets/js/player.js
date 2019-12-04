@@ -111,7 +111,6 @@ function youtubeResearch(message, string, voiceChannel, type, nextPage = false) 
 
 function makeSearchArray(voiceChannel, searchresults, type) {
     const filteredResult = searchresults.items.filter(i => i.type === type)
-    console.log('filtered  result: ', filteredResult)
     filteredResult.map(result => {
         const resultObj = {
             url: result.link,
