@@ -188,10 +188,10 @@ function sendSearchResultsAsString(message, voiceChannel, type) {
 
     })
     if (type === 'video') {
-        message.channel.send(`> **Selectionnez une musique parmi les ${selectedArray.length} ci-dessous.** \n > **Ex: ${config.prefix}search p ${selectedArray.length}** \n > \n ${resultChoices}`)
+        message.channel.send(`> **Selectionnez une musique parmi les ${selectedArray.length} ci-dessous.** \n > **Ex: ${config.prefix}search p 2** \n > \n ${resultChoices}`)
     }
     else {
-        message.channel.send(`> **Selectionnez une playlist parmi les ${selectedArray.length} ci-dessous.** \n > **Ex: ${config.prefix}search pl ${selectedArray.length}** \n > \n ${resultChoices}`)
+        message.channel.send(`> **Selectionnez une playlist parmi les ${selectedArray.length} ci-dessous.** \n > **Ex: ${config.prefix}search pl 1** \n > \n ${resultChoices}`)
     }
 }
 
@@ -318,11 +318,11 @@ function playSong(message, connection, retry = false) {
     const stream = ytdl(playlistArray[userChannel.id][0], { filter: 'audio', liveBuffer: 10000 })
     streamsArray[userChannel.id] = connection.play(stream)
     streamsArray[userChannel.id].setVolume(0.4)
-    // streamsArray[userChannel.id].on('error', err => {
-    //     console.log('\nError')
-    //     console.log('Musique : ', playlistInfos[userChannel.id][0].title)
-    //     console.log('Erreur : ', err)
-    // })
+    streamsArray[userChannel.id].on('error', err => {
+        console.log('\nError')
+        console.log('Musique : ', playlistInfos[userChannel.id][0].title)
+        console.log('Erreur : ', err)
+    })
     streamsArray[userChannel.id].on('finish', () => {
         setTimeout(() => {
             setArrays(message)

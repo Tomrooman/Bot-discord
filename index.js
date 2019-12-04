@@ -2,7 +2,7 @@ const Discord = require('discord.js')
 const Controller = require('./assets/js/controller.js')
 const Level = require('./assets/js/level.js')
 const config = require('./config.json')
-// const helper = require('./assets/js/helper.js')
+const Helper = require('./assets/js/helper.js')
 const mongoose = require('mongoose')
 const bot = new Discord.Client()
 
@@ -14,7 +14,7 @@ bot.on('ready', () => {
     // send message to all first available guild's channel
     // bot.guilds.map(guild => {
     //     if (guild.available) {
-    //         let channel = helper.getFirstAuthorizedChannel(guild)
+    //         let channel = Helper.getFirstAuthorizedChannel(guild)
     //         channel.send('Je suis en ligne !')
     //     }
     // })
@@ -28,6 +28,21 @@ bot.on('message', (message) => {
         Level.addXp(message)
     }
 })
+
+// bot.on('messageReactionAdd', (reaction, user) => {
+//     console.log('Reaction !')
+//     const userChannel = Helper.take_user_voiceChannel(reaction.message.channel)
+//     if (reaction.message.content.indexOf('Ex: ' + config.prefix + 'search pl 1') !== -1 && reaction.message.content.indexOf('Ex: ' + config.prefix + 'search p 2') === -1) {
+//         console.log('Music search array : ', reaction)
+//         console.log('Musique')
+//     }
+//     else if (reaction.message.content.indexOf('Ex: ' + config.prefix + 'search p 2') !== -1 && reaction.message.content.indexOf('Ex: ' + config.prefix + 'search pl 1') === -1) {
+//         console.log('Playlist search array : ', reaction)
+//         console.log('playlist')
+//     }
+//     console.log('user channel : ', userChannel)
+//     //console.log('User : ', user)
+// })
 
 function connectToDatabase() {
     console.log('Connecting to database ...')
