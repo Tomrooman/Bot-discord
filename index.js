@@ -21,7 +21,8 @@ bot.on('ready', () => {
 })
 
 bot.on('message', (message) => {
-    if (message.content.toLowerCase().startsWith(config.prefix)) {
+    message.content.toLowerCase().split(' ')[0].substr()
+    if (message.content.toLowerCase().startsWith(config.prefix) && message.content.indexOf('!!!') === -1) {
         Controller.dispatcher(message, config.prefix)
     }
     else if (message.author.id !== config.clientId) {
