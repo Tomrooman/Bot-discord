@@ -21,7 +21,6 @@ bot.on('ready', () => {
 })
 
 bot.on('message', (message) => {
-    message.content.toLowerCase().split(' ')[0].substr()
     if (message.content.toLowerCase().startsWith(config.prefix) && message.content.indexOf('!!!') === -1) {
         Controller.dispatcher(message, config.prefix)
     }
