@@ -29,39 +29,36 @@ bot.on('message', (message) => {
     }
 })
 
-// bot.on('messageReactionAdd', reaction => {
-//     console.log('Reaction emoji : ', reaction.emoji)
-//     const playlistExist = reaction.message.content.indexOf('Ex: ' + config.prefix + 'search pl 1') !== -1
-//     const videoExist = reaction.message.content.indexOf('Ex: ' + config.prefix + 'search p 2') !== -1
-//     if (playlistExist || videoExist) {
-//         let selection = 0
-//         if (reaction.emoji.name === 'one') {
-//             selection = 1
-//         }
-//         if (reaction.emoji.name === 'two') {
-//             selection = 2
-//         }
-//         if (reaction.emoji.name === 'three') {
-//             selection = 3
-//         }
-//         if (reaction.emoji.name === 'four') {
-//             selection = 4
-//         }
-//         if (reaction.emoji.name === 'five') {
-//             selection = 5
-//         }
-//         if (playlistExist && !videoExist) {
-//             console.log('Music search array : ', reaction)
-//             console.log('Musique')
-//             Player.selectSongOrPlaylistInSearchList(reaction.message, ['empty', 'pl', selection])
-//         }
-//         else if (videoExist && !playlistExist) {
-//             console.log('Playlist search array : ', reaction)
-//             console.log('playlist')
-//             Player.selectSongOrPlaylistInSearchList(reaction.message, ['empty', 'p', selection])
-//         }
-//     }
-// })
+bot.on('messageReactionAdd', reaction => {
+    const playlistExist = reaction.message.content.indexOf('Ex: ' + config.prefix + 'search pl 1') !== -1
+    const videoExist = reaction.message.content.indexOf('Ex: ' + config.prefix + 'search p 2') !== -1
+    if (playlistExist || videoExist) {
+        let selection = 0
+        if (reaction.emoji.name === '1️⃣') {
+            selection = 1
+        }
+        if (reaction.emoji.name === '2️⃣') {
+            selection = 2
+        }
+        if (reaction.emoji.name === '3️⃣') {
+            selection = 3
+        }
+        if (reaction.emoji.name === '4️⃣') {
+            selection = 4
+        }
+        if (reaction.emoji.name === '5️⃣') {
+            selection = 5
+        }
+        if (playlistExist && !videoExist) {
+            console.log('Music search reaction')
+            Player.selectSongOrPlaylistInSearchList(reaction.message, ['empty', 'pl', selection])
+        }
+        else if (videoExist && !playlistExist) {
+            console.log('Playlist search reaction : ', reaction)
+            Player.selectSongOrPlaylistInSearchList(reaction.message, ['empty', 'p', selection])
+        }
+    }
+})
 
 function connectToDatabase() {
     console.log('Connecting to database ...')

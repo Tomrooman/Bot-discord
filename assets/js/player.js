@@ -7,7 +7,6 @@ const config = require('./../../config.json')
 
 const connectionsArray = []
 const streamsArray = []
-const pausedArray = []
 const playlistArray = []
 const playlistInfos = []
 const connectedGuild = []
@@ -161,11 +160,11 @@ function toggleLoop(message) {
         if (playlistArray[userChannel.id] && playlistArray[userChannel.id].length) {
             if (!loopArray[userChannel.id]) {
                 loopArray[userChannel.id] = true
-                message.channel.send('Boucle activée !')
+                message.channel.send('> Boucle activée !')
             }
             else {
                 delete loopArray[userChannel.id]
-                message.channel.send('Boucle désactivée !')
+                message.channel.send('> Boucle désactivée !')
             }
         }
         else {
@@ -176,6 +175,7 @@ function toggleLoop(message) {
 
 function sendSearchResultsAsString(message, voiceChannel, type) {
     const selectedArray = type === 'video' ? searchArray[voiceChannel.id] : searchPlaylistArray[voiceChannel.id]
+    let finalString = ''
     let resultChoices = ''
     selectedArray.map((item, index) => {
         if (item.plLength) {
@@ -187,11 +187,21 @@ function sendSearchResultsAsString(message, voiceChannel, type) {
 
     })
     if (type === 'video') {
-        message.channel.send(`> **Selectionnez une musique parmi les ${selectedArray.length} ci-dessous.** \n > **Ex: ${config.prefix}search p 2** \n > \n ${resultChoices}`)
+        finalString = `> **Selectionnez une musique parmi les ${selectedArray.length} ci-dessous.** \n > **Ex: ${config.prefix}search p 2** \n > \n ${resultChoices}`
     }
     else {
-        message.channel.send(`> **Selectionnez une playlist parmi les ${selectedArray.length} ci-dessous.** \n > **Ex: ${config.prefix}search pl 1** \n > \n ${resultChoices}`)
+        finalString = `> **Selectionnez une playlist parmi les ${selectedArray.length} ci-dessous.** \n > **Ex: ${config.prefix}search pl 1** \n > \n ${resultChoices}`
     }
+    message.channel.send(finalString)
+        .then(message => addSearchReactions(message))
+}
+
+function addSearchReactions(message) {
+    message.react('1️⃣')
+        .then(message => message.react('2️⃣'))
+        .then(message => message.react('3️⃣'))
+        .then(message => message.react('4️⃣'))
+        .then(message => message.react('5️⃣'))
 }
 
 function selectSongOrPlaylistInSearchList(message, words) {
@@ -277,7 +287,6 @@ function getSongInSearchList(message) {
 
 function makeAndSendSearchListArray(message, userChannel, musicExist, playlistExist) {
     let resultChoices = ''
-    const emojis = message.channel.guild.emojis
     if (musicExist && playlistExist) {
         resultChoices += '> **Musiques** \n'
         searchArray[userChannel.id].map((song, index) => {
@@ -289,7 +298,7 @@ function makeAndSendSearchListArray(message, userChannel, musicExist, playlistEx
             resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n'
         })
         const countChoices = searchPlaylistArray[userChannel.id].length + searchArray[userChannel.id].length
-        message.channel.send(`> **Faites un choix parmi les ${countChoices} ci-dessous.** \n > **Ex: ${config.prefix}search p 3** \n > **Ex: ${config.prefix}search pl 4** \n > \n ${resultChoices}`)
+        message.channel.send(`> **Faites un choix parmi les ${countChoices} ci-dessous.** \n > **Ex: ${config.prefix}search p 2** \n > **Ex: ${config.prefix}search pl 1** \n > \n ${resultChoices}`)
     }
     else if (musicExist && !playlistExist) {
         resultChoices += '> **Musiques** \n'
@@ -297,13 +306,7 @@ function makeAndSendSearchListArray(message, userChannel, musicExist, playlistEx
             resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n'
         })
         message.channel.send(`> **Selectionnez une musique parmi les ${searchArray[userChannel.id].length} ci-dessous.** \n > **Ex: ${config.prefix}search p 2** \n > \n ${resultChoices}`)
-        // .then(message => message.react(emojis.find(emoji => emoji.name === 'one')))
-        // reaction.message.react(emojiOne)
-        // .then(() => reaction.message.react(emojiTwo))
-        // .then(() => reaction.message.react(emojiThree))
-        // .then(() => reaction.message.react(emojiFour))
-        // .then(() => reaction.message.react(emojiFive))
-        // .catch(() => console.log('One of the emojis failed to react !'))
+            .then(message => addSearchReactions(message))
     }
     else {
         resultChoices += '> **Playlists** \n'
@@ -311,6 +314,7 @@ function makeAndSendSearchListArray(message, userChannel, musicExist, playlistEx
             resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n'
         })
         message.channel.send(`> **Selectionnez une playlist parmi les ${searchPlaylistArray[userChannel.id].length} ci-dessous.** \n > **Ex: ${config.prefix}search pl 1** \n > \n ${resultChoices}`)
+            .then(message => addSearchReactions(message))
     }
 }
 
@@ -393,8 +397,11 @@ function setArrays(message) {
         // If playlist is empty
         if (!playlistArray[userChannel.id][0]) {
             waitArray[userChannel.id] = true
-            delete loopArray[userChannel.id]
-            message.channel.send('Plus de musique en file d\'attente')
+            if (loopArray[userChannel.id]) {
+                delete loopArray[userChannel.id]
+                message.channel.send('> Boucle désactivée')
+            }
+            message.channel.send('> Plus de musique en file d\'attente')
         }
         else {
             // If loop is activate and command 'next' is called
@@ -820,7 +827,6 @@ function quit(message) {
         delete connectedGuild[message.guild.id]
         delete radioPlayed[userChannel.id]
         delete loopArray[userChannel.id]
-        delete pausedArray[userChannel.id]
         delete waitArray[userChannel.id]
         delete isPlaying[userChannel.id]
         delete tryToNext[userChannel.id]
@@ -831,7 +837,6 @@ function pause(message) {
     const userChannel = Helper.take_user_voiceChannel(message)
     if (Helper.verifyBotLocation(message, userChannel)) {
         streamsArray[userChannel.id].pause(true)
-        pausedArray[userChannel.id] = 'onPause'
     }
 }
 
@@ -839,7 +844,6 @@ function resume(message) {
     const userChannel = Helper.take_user_voiceChannel(message)
     if (Helper.verifyBotLocation(message, userChannel)) {
         streamsArray[userChannel.id].resume()
-        delete pausedArray[userChannel.id]
     }
 }
 
