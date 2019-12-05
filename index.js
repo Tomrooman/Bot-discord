@@ -29,6 +29,26 @@ bot.on('message', (message) => {
     }
 })
 
+// bot.on('voiceStateUpdate', (oldMember, newMember) => {
+//     let newUserChannel = newMember.channelID
+//     let oldUserChannel = oldMember.channelID
+//     // console.log('new : ', newMember)
+//     // console.log('old : ', oldMember)
+//     if (!oldUserChannel && newUserChannel) {
+//         // User Joins a voice channel
+//         console.log('Joined channel !')
+//         console.log('new member : ', newMember)
+//         // if nobody in the channel except the bot & the user and there are music in queued so play music[0]
+
+
+//     } else if (oldUserChannel) {
+//         // User leaves a voice channel
+//         console.log('Leaved channel !')
+//         console.log('old member : ', oldMember)
+//         // if nobody except the bot and there are music in queued so set pause(true)
+//     }
+// })
+
 bot.on('messageReactionAdd', (reaction, user) => {
     if (!user.bot) {
         const playlistExist = reaction.message.content.indexOf('Ex: ' + config.prefix + 'search pl 1') !== -1

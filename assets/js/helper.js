@@ -33,6 +33,27 @@ function take_user_voiceChannel_by_reaction(message, author) {
     return voiceChannel
 }
 
+function getBot(message, choice) {
+    let botMember = false
+    message.guild.channels.map(channel => {
+        if (channel.type === 'voice') {
+            if (channel.members) {
+                channel.members.map(member => {
+                    if (member.user.bot && member.user.id === config.clientId) {
+                        if (choice === 'bot') {
+                            botMember = member
+                        }
+                        else if (choice === 'channel') {
+                            botMember = channel
+                        }
+                    }
+                })
+            }
+        }
+    })
+    return botMember
+}
+
 function getFirstAuthorizedChannel(guild) {
     if (guild.channels.has(guild.id)) return guild.channels.get(guild.id)
 
@@ -263,3 +284,4 @@ exports.showCommandlist = showCommandlist
 exports.availableCommand = availableCommand
 exports.getCommandInfos = getCommandInfos
 exports.take_user_voiceChannel_by_reaction = take_user_voiceChannel_by_reaction
+exports.getBot = getBot

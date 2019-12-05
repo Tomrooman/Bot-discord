@@ -142,7 +142,7 @@ function youtubeResearch(message, string, voiceChannel, type, nextPage = false) 
 }
 
 function makeSearchArray(voiceChannel, searchresults, type) {
-    const filteredResult = searchresults.items.filter(i => i.type === type)
+    const filteredResult = searchresults.items.filter(i => i.type === type && i.title !== '[Deleted video]')
     filteredResult.map(result => {
         const resultObj = {
             url: result.link,
@@ -344,17 +344,33 @@ function playSong(message, connection) {
     streamsArray[userChannel.id] = connection.play(stream, { highWaterMark: 100 })
     // streamsArray[userChannel.id].setVolume(1)
     streamsArray[userChannel.id].setVolumeDecibels(0.1)
-    console.log('------------------')
     // console.log('stream volume : ', streamsArray[userChannel.id].player.voiceConnection)
     setTimeout(() => {
-        console.log('timeout after 1000 in playsong')
+        console.log('------------------')
+        console.log('timeout after 2000 in playsong')
         console.log('status must be 0 (normally) : ', streamsArray[userChannel.id].player.voiceConnection.status)
         console.log('--------------------------')
-    }, 1000)
-    streamsArray[userChannel.id].on('finish', () => {
+    }, 2000)
+
+    streamsArray[userChannel.id].on('close', (e) => {
+        console.log('Closed : ', e)
+    })
+    streamsArray[userChannel.id].on('unpipe', (e) => {
+        console.log('unpipe ended (true) : ', e._readableState.ended)
+        console.log('unpipe endEmitted (true) : ', e._readableState.endEmitted)
+        console.log('unpipe emitClose (true) : ', e._readableState.emitClose)
+        console.log('unpipe destroyed (true) : ', e._readableState.destroyed)
+    })
+    streamsArray[userChannel.id].on('end', (e) => {
+        console.log('end (undefined): ', e)
+    })
+    streamsArray[userChannel.id].on('finish', (e, i) => {
+        console.log('finish (undefined) : ', e)
+        console.log('finish (undefined): ', i)
+        console.log('------------------------')
         setTimeout(() => {
             setArrays(message)
-        }, 1000)
+        }, 500)
     })
 }
 
@@ -387,7 +403,9 @@ function setArrays(message) {
                 delete nextSetLoop[userChannel.id]
             }
             streamsArray[userChannel.id].destroy()
-            playSong(message, connectionsArray[userChannel.id])
+            setTimeout(() => {
+                playSong(message, connectionsArray[userChannel.id])
+            }, 500)
         }
     }
 }
@@ -504,17 +522,19 @@ function addPlaylistItems(voiceChannel, message, playlist, connection, play) {
 function pushPlaylistItems(voiceChannel, playlist) {
     const videoURL = 'https://www.youtube.com/watch?v='
     playlist.items.map(video => {
-        playlistArray[voiceChannel.id].push(videoURL + video.id)
-        let thumbnailURL = ''
-        if (video.thumbnail) {
-            thumbnailURL = video.thumbnail
+        if (video.title !== '[Deleted video]') {
+            playlistArray[voiceChannel.id].push(videoURL + video.id)
+            let thumbnailURL = ''
+            if (video.thumbnail) {
+                thumbnailURL = video.thumbnail
+            }
+            playlistInfos[voiceChannel.id].push({
+                title: video.title,
+                id: video.id,
+                thumbnail: thumbnailURL,
+                duration: video.duration
+            })
         }
-        playlistInfos[voiceChannel.id].push({
-            title: video.title,
-            id: video.id,
-            thumbnail: thumbnailURL,
-            duration: video.duration
-        })
     })
 }
 
