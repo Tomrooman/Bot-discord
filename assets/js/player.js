@@ -200,7 +200,7 @@ function sendSearchResultsAsString(message, voiceChannel, type) {
             finalString = `> **Écrivez ou sélectionnez une playlist parmi les ${selectedArray.length} ci-dessous.** \n > **Ex: ${config.prefix}search pl 1** \n > \n ${resultChoices}`
         }
         message.channel.send(finalString)
-            .then(message => addSearchReactions(message))
+            .then(newMessage => addSearchReactions(newMessage))
     }
     else {
         message.channel.send('> Aucune ' + type + ' dans la liste des recherches')
@@ -322,7 +322,7 @@ function makeAndSendSearchListArray(message, userChannel, musicExist, playlistEx
             resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n'
         })
         message.channel.send(`> **Écrivez ou sélectionnez une musique parmi les ${searchArray[userChannel.id].length} ci-dessous.** \n > **Ex: ${config.prefix}search p 2** \n > \n ${resultChoices}`)
-            .then(message => addSearchReactions(message))
+            .then(newMessage => addSearchReactions(newMessage))
     }
     else {
         resultChoices += '> **Playlists** \n'
@@ -330,7 +330,7 @@ function makeAndSendSearchListArray(message, userChannel, musicExist, playlistEx
             resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n'
         })
         message.channel.send(`> **Écrivez ou sélectionnez une playlist parmi les ${searchPlaylistArray[userChannel.id].length} ci-dessous.** \n > **Ex: ${config.prefix}search pl 1** \n > \n ${resultChoices}`)
-            .then(message => addSearchReactions(message))
+            .then(newMessage => addSearchReactions(newMessage))
     }
 }
 
