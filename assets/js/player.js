@@ -48,8 +48,11 @@ const radioAvailable = [
     'France-Bleu'
 ]
 
-function playSongs(message, command, words) {
-    const voiceChannel = Helper.take_user_voiceChannel(message)
+function playSongs(message, command, words, byReaction = [false, false]) {
+    let voiceChannel = Helper.take_user_voiceChannel(message)
+    if (byReaction[0]) {
+        voiceChannel = Helper.take_user_voiceChannel_by_reaction(message, byReaction[1])
+    }
     if (voiceChannel) {
         if (!connectedGuild[message.guild.id]) {
             playSongsAndConnectOrNotBot(voiceChannel, message, command, words)
@@ -108,6 +111,9 @@ function youtubeResearch(message, string, voiceChannel, type, nextPage = false) 
     }
     if (nextPage) {
         options.nextpageRef = nextPage
+    }
+    else {
+        message.channel.send('Recherche de ' + type + ' : ' + '`' + string.trim() + '`')
     }
     if (type === 'video' && !nextPage) {
         delete searchArray[voiceChannel.id]
@@ -175,33 +181,39 @@ function toggleLoop(message) {
 
 function sendSearchResultsAsString(message, voiceChannel, type) {
     const selectedArray = type === 'video' ? searchArray[voiceChannel.id] : searchPlaylistArray[voiceChannel.id]
-    let finalString = ''
-    let resultChoices = ''
-    selectedArray.map((item, index) => {
-        if (item.plLength) {
-            resultChoices += '> **' + (index + 1) + '**. ' + item.title + ' (' + item.plLength + ')\n'
+    if (selectedArray && selectedArray.length) {
+        let finalString = ''
+        let resultChoices = ''
+        selectedArray.map((item, index) => {
+            if (item.plLength) {
+                resultChoices += '> **' + (index + 1) + '**. ' + item.title + ' (' + item.plLength + ')\n'
+            }
+            else {
+                resultChoices += '> **' + (index + 1) + '**. ' + item.title + '\n'
+            }
+
+        })
+        if (type === 'video') {
+            finalString = `> **Écrivez ou sélectionnez une musique parmi les ${selectedArray.length} ci-dessous.** \n > **Ex: ${config.prefix}search p 2** \n > \n ${resultChoices}`
         }
         else {
-            resultChoices += '> **' + (index + 1) + '**. ' + item.title + '\n'
+            finalString = `> **Écrivez ou sélectionnez une playlist parmi les ${selectedArray.length} ci-dessous.** \n > **Ex: ${config.prefix}search pl 1** \n > \n ${resultChoices}`
         }
-
-    })
-    if (type === 'video') {
-        finalString = `> **Selectionnez une musique parmi les ${selectedArray.length} ci-dessous.** \n > **Ex: ${config.prefix}search p 2** \n > \n ${resultChoices}`
+        message.channel.send(finalString)
+            .then(message => addSearchReactions(message))
     }
     else {
-        finalString = `> **Selectionnez une playlist parmi les ${selectedArray.length} ci-dessous.** \n > **Ex: ${config.prefix}search pl 1** \n > \n ${resultChoices}`
+        message.channel.send('> Aucune ' + type + ' dans la liste des recherches')
     }
-    message.channel.send(finalString)
-        .then(message => addSearchReactions(message))
+
 }
 
 function addSearchReactions(message) {
     message.react('1️⃣')
-        .then(message => message.react('2️⃣'))
-        .then(message => message.react('3️⃣'))
-        .then(message => message.react('4️⃣'))
-        .then(message => message.react('5️⃣'))
+        .then(() => message.react('2️⃣'))
+        .then(() => message.react('3️⃣'))
+        .then(() => message.react('4️⃣'))
+        .then(() => message.react('5️⃣'))
 }
 
 function selectSongOrPlaylistInSearchList(message, words) {
@@ -213,9 +225,7 @@ function selectSongOrPlaylistInSearchList(message, words) {
         }
         // If nothing after p|play send the list
         else if (userChannel) {
-            if (Helper.verifyBotLocation(message, userChannel)) {
-                sendSearchResultsAsString(message, userChannel, 'video')
-            }
+            sendSearchResultsAsString(message, userChannel, 'video')
         }
         else {
             message.channel.send('Vous devez être connecté dans un salon !')
@@ -228,9 +238,7 @@ function selectSongOrPlaylistInSearchList(message, words) {
         }
         // If nothing after pl|playlist send the list
         else if (userChannel) {
-            if (Helper.verifyBotLocation(message, userChannel)) {
-                sendSearchResultsAsString(message, userChannel, 'playlist')
-            }
+            sendSearchResultsAsString(message, userChannel, 'playlist')
         }
         else {
             message.channel.send('Vous devez être connecté dans un salon !')
@@ -241,15 +249,23 @@ function selectSongOrPlaylistInSearchList(message, words) {
     }
 }
 
-function selectSongInSearchList(message, number, type = 'musique') {
-    const userChannel = Helper.take_user_voiceChannel(message)
+function selectSongInSearchList(message, number, type = 'musique', byReaction = [false, false]) {
+    let userChannel = Helper.take_user_voiceChannel(message)
+    if (byReaction[0]) {
+        userChannel = Helper.take_user_voiceChannel_by_reaction(message, byReaction[1])
+    }
     if (userChannel) {
         if (Number.isFinite(parseInt(number))) {
             const choiceArray = type === 'musique' ? searchArray[userChannel.id] : searchPlaylistArray[userChannel.id]
             if (choiceArray && choiceArray.length) {
                 if (number >= 1 && number <= choiceArray.length) {
                     const command = type === 'musique' ? 'play' : 'playlist'
-                    playSongs(message, command, ['useless', choiceArray[number - 1].url])
+                    if (byReaction[0]) {
+                        playSongs(message, command, ['useless', choiceArray[number - 1].url], [true, byReaction[1]])
+                    }
+                    else {
+                        playSongs(message, command, ['useless', choiceArray[number - 1].url])
+                    }
                 }
                 else {
                     message.channel.send(`Choisissez un chiffre compris entre 1 et ${choiceArray.length}`)
@@ -305,7 +321,7 @@ function makeAndSendSearchListArray(message, userChannel, musicExist, playlistEx
         searchArray[userChannel.id].map((song, index) => {
             resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n'
         })
-        message.channel.send(`> **Selectionnez une musique parmi les ${searchArray[userChannel.id].length} ci-dessous.** \n > **Ex: ${config.prefix}search p 2** \n > \n ${resultChoices}`)
+        message.channel.send(`> **Écrivez ou sélectionnez une musique parmi les ${searchArray[userChannel.id].length} ci-dessous.** \n > **Ex: ${config.prefix}search p 2** \n > \n ${resultChoices}`)
             .then(message => addSearchReactions(message))
     }
     else {
@@ -313,7 +329,7 @@ function makeAndSendSearchListArray(message, userChannel, musicExist, playlistEx
         searchPlaylistArray[userChannel.id].map((song, index) => {
             resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n'
         })
-        message.channel.send(`> **Selectionnez une playlist parmi les ${searchPlaylistArray[userChannel.id].length} ci-dessous.** \n > **Ex: ${config.prefix}search pl 1** \n > \n ${resultChoices}`)
+        message.channel.send(`> **Écrivez ou sélectionnez une playlist parmi les ${searchPlaylistArray[userChannel.id].length} ci-dessous.** \n > **Ex: ${config.prefix}search pl 1** \n > \n ${resultChoices}`)
             .then(message => addSearchReactions(message))
     }
 }
@@ -329,52 +345,13 @@ function playSong(message, connection) {
     // streamsArray[userChannel.id].setVolume(1)
     streamsArray[userChannel.id].setVolumeDecibels(0.1)
     console.log('------------------')
-    console.log('stream highWaterMark : ', streamsArray[userChannel.id].player.dispatcher.streams.ffmpeg._readableState.highWaterMark)
-    console.log('stream reading : ', streamsArray[userChannel.id].player.dispatcher.streams.ffmpeg._readableState.reading)
     // console.log('stream volume : ', streamsArray[userChannel.id].player.voiceConnection)
     setTimeout(() => {
-        console.log('timeout 1000 at playsong')
-        if (streamsArray[userChannel.id]) {
-            console.log('get stream array')
-            if (streamsArray[userChannel.id].player) {
-                console.log('get stream player')
-                if (streamsArray[userChannel.id].player.dispatcher) {
-                    console.log('get player dispatcher')
-                    if (streamsArray[userChannel.id].player.dispatcher.streams) {
-                        console.log('get dispatcher streams')
-                        if (streamsArray[userChannel.id].player.dispatcher.streams.ffmpeg) {
-                            console.log('get streams ffmpeg')
-                            if (streamsArray[userChannel.id].player.dispatcher.streams.ffmpeg._readableState) {
-                                console.log('get ffmpeg readableState')
-                                if (streamsArray[userChannel.id].player.dispatcher.streams.ffmpeg._readableState.highWaterMark) {
-                                    console.log('get HighWaterMark : ', streamsArray[userChannel.id].player.dispatcher.streams.ffmpeg._readableState.highWaterMark)
-                                }
-                                if (streamsArray[userChannel.id].player.dispatcher.streams.ffmpeg._readableState.reading) {
-                                    console.log('get reading : ', streamsArray[userChannel.id].player.dispatcher.streams.ffmpeg._readableState.reading)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        console.log('stream highWaterMark : ', streamsArray[userChannel.id].player.dispatcher.streams.ffmpeg._readableState.highWaterMark)
-
-        console.log('stream reading : ', streamsArray[userChannel.id].player.dispatcher.streams.ffmpeg._readableState.reading)
+        console.log('timeout after 1000 in playsong')
+        console.log('status must be 0 (normally) : ', streamsArray[userChannel.id].player.voiceConnection.status)
         console.log('--------------------------')
     }, 1000)
-    streamsArray[userChannel.id].on('error', err => {
-        console.log('\n Error')
-        console.log('Erreur : ', err)
-    })
-    streamsArray[userChannel.id].on('debug', debug => {
-        console.log('\n Debug')
-        console.log('Erreur : ', debug)
-    })
-    streamsArray[userChannel.id].on('finish', (finish, e) => {
-        console.log('\n finish : ', finish)
-        console.log('finish e : ', e)
-        console.log('end stream : ', streamsArray[userChannel.id])
+    streamsArray[userChannel.id].on('finish', () => {
         setTimeout(() => {
             setArrays(message)
         }, 1000)
@@ -474,6 +451,7 @@ function sendMusicEmbed(message, musicTitle, musicId, added = [false, 1], type =
 }
 
 function getPlaylist(voiceChannel, message, words, playSongParams, connection = false) {
+    message.channel.send('> Ajout de la playlist en cours ...')
     ytpl(words[1], { limit: 0 }, (err, playlist) => {
         if (playlist) {
             if (playSongParams) {
