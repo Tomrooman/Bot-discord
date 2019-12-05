@@ -277,6 +277,7 @@ function getSongInSearchList(message) {
 
 function makeAndSendSearchListArray(message, userChannel, musicExist, playlistExist) {
     let resultChoices = ''
+    const emojis = message.channel.guild.emojis
     if (musicExist && playlistExist) {
         resultChoices += '> **Musiques** \n'
         searchArray[userChannel.id].map((song, index) => {
@@ -288,21 +289,28 @@ function makeAndSendSearchListArray(message, userChannel, musicExist, playlistEx
             resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n'
         })
         const countChoices = searchPlaylistArray[userChannel.id].length + searchArray[userChannel.id].length
-        message.channel.send(`> **Faites un choix parmi les ${countChoices} ci-dessous.** \n > **Ex: ${config.prefix}search p ${searchArray[userChannel.id].length}** \n > **Ex: ${config.prefix}search pl ${searchPlaylistArray[userChannel.id].length}** \n > \n ${resultChoices}`)
+        message.channel.send(`> **Faites un choix parmi les ${countChoices} ci-dessous.** \n > **Ex: ${config.prefix}search p 3** \n > **Ex: ${config.prefix}search pl 4** \n > \n ${resultChoices}`)
     }
     else if (musicExist && !playlistExist) {
         resultChoices += '> **Musiques** \n'
         searchArray[userChannel.id].map((song, index) => {
             resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n'
         })
-        message.channel.send(`> **Selectionnez une musique parmi les ${searchArray[userChannel.id].length} ci-dessous.** \n > **Ex: ${config.prefix}search p ${searchArray[userChannel.id].length}** \n > \n ${resultChoices}`)
+        message.channel.send(`> **Selectionnez une musique parmi les ${searchArray[userChannel.id].length} ci-dessous.** \n > **Ex: ${config.prefix}search p 2** \n > \n ${resultChoices}`)
+        // .then(message => message.react(emojis.find(emoji => emoji.name === 'one')))
+        // reaction.message.react(emojiOne)
+        // .then(() => reaction.message.react(emojiTwo))
+        // .then(() => reaction.message.react(emojiThree))
+        // .then(() => reaction.message.react(emojiFour))
+        // .then(() => reaction.message.react(emojiFive))
+        // .catch(() => console.log('One of the emojis failed to react !'))
     }
     else {
         resultChoices += '> **Playlists** \n'
         searchPlaylistArray[userChannel.id].map((song, index) => {
             resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n'
         })
-        message.channel.send(`> **Selectionnez une playlist parmi les ${searchPlaylistArray[userChannel.id].length} ci-dessous.** \n > **Ex: ${config.prefix}search pl ${searchPlaylistArray[userChannel.id].length}** \n > \n ${resultChoices}`)
+        message.channel.send(`> **Selectionnez une playlist parmi les ${searchPlaylistArray[userChannel.id].length} ci-dessous.** \n > **Ex: ${config.prefix}search pl 1** \n > \n ${resultChoices}`)
     }
 }
 
@@ -313,14 +321,56 @@ function playSong(message, connection) {
     delete tryToNext[userChannel.id]
     connectionsArray[userChannel.id] = connection
     const stream = ytdl(playlistArray[userChannel.id][0], { filter: 'audio', liveBuffer: 10000 })
-    streamsArray[userChannel.id] = connection.play(stream)
-    streamsArray[userChannel.id].setVolume(0.4)
+    streamsArray[userChannel.id] = connection.play(stream, { highWaterMark: 100 })
+    // streamsArray[userChannel.id].setVolume(1)
+    streamsArray[userChannel.id].setVolumeDecibels(0.1)
+    console.log('------------------')
+    console.log('stream highWaterMark : ', streamsArray[userChannel.id].player.dispatcher.streams.ffmpeg._readableState.highWaterMark)
+    console.log('stream reading : ', streamsArray[userChannel.id].player.dispatcher.streams.ffmpeg._readableState.reading)
+    // console.log('stream volume : ', streamsArray[userChannel.id].player.voiceConnection)
+    setTimeout(() => {
+        console.log('timeout 1000 at playsong')
+        if (streamsArray[userChannel.id]) {
+            console.log('get stream array')
+            if (streamsArray[userChannel.id].player) {
+                console.log('get stream player')
+                if (streamsArray[userChannel.id].player.dispatcher) {
+                    console.log('get player dispatcher')
+                    if (streamsArray[userChannel.id].player.dispatcher.streams) {
+                        console.log('get dispatcher streams')
+                        if (streamsArray[userChannel.id].player.dispatcher.streams.ffmpeg) {
+                            console.log('get streams ffmpeg')
+                            if (streamsArray[userChannel.id].player.dispatcher.streams.ffmpeg._readableState) {
+                                console.log('get ffmpeg readableState')
+                                if (streamsArray[userChannel.id].player.dispatcher.streams.ffmpeg._readableState.highWaterMark) {
+                                    console.log('get HighWaterMark : ', streamsArray[userChannel.id].player.dispatcher.streams.ffmpeg._readableState.highWaterMark)
+                                }
+                                if (streamsArray[userChannel.id].player.dispatcher.streams.ffmpeg._readableState.reading) {
+                                    console.log('get reading : ', streamsArray[userChannel.id].player.dispatcher.streams.ffmpeg._readableState.reading)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        console.log('stream highWaterMark : ', streamsArray[userChannel.id].player.dispatcher.streams.ffmpeg._readableState.highWaterMark)
+
+        console.log('stream reading : ', streamsArray[userChannel.id].player.dispatcher.streams.ffmpeg._readableState.reading)
+        console.log('--------------------------')
+    }, 1000)
     streamsArray[userChannel.id].on('error', err => {
-        console.log('\nError')
-        console.log('Musique : ', playlistInfos[userChannel.id][0].title)
+        console.log('\n Error')
         console.log('Erreur : ', err)
     })
-    streamsArray[userChannel.id].on('finish', () => {
+    streamsArray[userChannel.id].on('debug', debug => {
+        console.log('\n Debug')
+        console.log('Erreur : ', debug)
+    })
+    streamsArray[userChannel.id].on('finish', (finish, e) => {
+        console.log('\n finish : ', finish)
+        console.log('finish e : ', e)
+        console.log('end stream : ', streamsArray[userChannel.id])
         setTimeout(() => {
             setArrays(message)
         }, 1000)

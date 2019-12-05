@@ -2,7 +2,7 @@ const Discord = require('discord.js')
 const Controller = require('./assets/js/controller.js')
 const Level = require('./assets/js/level.js')
 const config = require('./config.json')
-// const Helper = require('./assets/js/helper.js')
+const Player = require('./assets/js/player.js')
 const mongoose = require('mongoose')
 const bot = new Discord.Client()
 
@@ -29,19 +29,38 @@ bot.on('message', (message) => {
     }
 })
 
-// bot.on('messageReactionAdd', (reaction, user) => {
-//     console.log('Reaction !')
-//     const userChannel = Helper.take_user_voiceChannel(reaction.message.channel)
-//     if (reaction.message.content.indexOf('Ex: ' + config.prefix + 'search pl 1') !== -1 && reaction.message.content.indexOf('Ex: ' + config.prefix + 'search p 2') === -1) {
-//         console.log('Music search array : ', reaction)
-//         console.log('Musique')
+// bot.on('messageReactionAdd', reaction => {
+//     console.log('Reaction emoji : ', reaction.emoji)
+//     const playlistExist = reaction.message.content.indexOf('Ex: ' + config.prefix + 'search pl 1') !== -1
+//     const videoExist = reaction.message.content.indexOf('Ex: ' + config.prefix + 'search p 2') !== -1
+//     if (playlistExist || videoExist) {
+//         let selection = 0
+//         if (reaction.emoji.name === 'one') {
+//             selection = 1
+//         }
+//         if (reaction.emoji.name === 'two') {
+//             selection = 2
+//         }
+//         if (reaction.emoji.name === 'three') {
+//             selection = 3
+//         }
+//         if (reaction.emoji.name === 'four') {
+//             selection = 4
+//         }
+//         if (reaction.emoji.name === 'five') {
+//             selection = 5
+//         }
+//         if (playlistExist && !videoExist) {
+//             console.log('Music search array : ', reaction)
+//             console.log('Musique')
+//             Player.selectSongOrPlaylistInSearchList(reaction.message, ['empty', 'pl', selection])
+//         }
+//         else if (videoExist && !playlistExist) {
+//             console.log('Playlist search array : ', reaction)
+//             console.log('playlist')
+//             Player.selectSongOrPlaylistInSearchList(reaction.message, ['empty', 'p', selection])
+//         }
 //     }
-//     else if (reaction.message.content.indexOf('Ex: ' + config.prefix + 'search p 2') !== -1 && reaction.message.content.indexOf('Ex: ' + config.prefix + 'search pl 1') === -1) {
-//         console.log('Playlist search array : ', reaction)
-//         console.log('playlist')
-//     }
-//     console.log('user channel : ', userChannel)
-//     // console.log('User : ', user)
 // })
 
 function connectToDatabase() {
@@ -78,3 +97,8 @@ function disconnectBotFromOldChannel() {
     })
     console.log('Disconnected from all channels !')
 }
+
+process.on('SIGINT', () => {
+    // close connections, clear cache, etc
+    process.exit(0);
+});
