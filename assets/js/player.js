@@ -334,9 +334,11 @@ function makeAndSendSearchListArray(message, userChannel, musicExist, playlistEx
     }
 }
 
-function playSong(message, connection) {
+function playSong(message, connection, retry = false) {
     const userChannel = Helper.take_user_voiceChannel(message)
-    sendMusicEmbed(message, playlistInfos[userChannel.id][0].title, playlistInfos[userChannel.id][0].id, [false, 1])
+    if (!retry) {
+        sendMusicEmbed(message, playlistInfos[userChannel.id][0].title, playlistInfos[userChannel.id][0].id, [false, 1])
+    }
     isPlaying[userChannel.id] = true
     delete tryToNext[userChannel.id]
     connectionsArray[userChannel.id] = connection
@@ -344,30 +346,17 @@ function playSong(message, connection) {
     streamsArray[userChannel.id] = connection.play(stream, { highWaterMark: 100 })
     // streamsArray[userChannel.id].setVolume(1)
     streamsArray[userChannel.id].setVolumeDecibels(0.1)
-    // console.log('stream volume : ', streamsArray[userChannel.id].player.voiceConnection)
     setTimeout(() => {
         console.log('------------------')
-        console.log('timeout after 2000 in playsong')
-        console.log('status must be 0 (normally) : ', streamsArray[userChannel.id].player.voiceConnection.status)
+        console.log('timeout after 3500 in playsong - Check if music stop anormaly')
+        if (!streamsArray[userChannel.id].player.voiceConnection.speaking.bitfield) {
+            console.log('STOP ANORMALY -> Retry song : ', playlistInfos[userChannel.id][0].title)
+            streamsArray[userChannel.id].destroy()
+            playSong(message, connection, true)
+        }
         console.log('--------------------------')
-    }, 2000)
-
-    streamsArray[userChannel.id].on('close', (e) => {
-        console.log('Closed : ', e)
-    })
-    streamsArray[userChannel.id].on('unpipe', (e) => {
-        console.log('unpipe ended (true) : ', e._readableState.ended)
-        console.log('unpipe endEmitted (true) : ', e._readableState.endEmitted)
-        console.log('unpipe emitClose (true) : ', e._readableState.emitClose)
-        console.log('unpipe destroyed (true) : ', e._readableState.destroyed)
-    })
-    streamsArray[userChannel.id].on('end', (e) => {
-        console.log('end (undefined): ', e)
-    })
+    }, 3500)
     streamsArray[userChannel.id].on('finish', (e, i) => {
-        console.log('finish (undefined) : ', e)
-        console.log('finish (undefined): ', i)
-        console.log('------------------------')
         setTimeout(() => {
             setArrays(message)
         }, 500)
