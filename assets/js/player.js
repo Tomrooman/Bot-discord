@@ -543,7 +543,7 @@ function pushPlaylistItems(voiceChannel, playlist) {
 }
 
 function getVideo(voiceChannel, message, words, playSongParams = true) {
-    console.log('get video')
+    console.log('get video : ', words[1])
     ytdl.getBasicInfo(words[1], (err, infos) => {
         console.log('infos : ', infos)
         if (infos) {
