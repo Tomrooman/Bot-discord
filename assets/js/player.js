@@ -369,9 +369,8 @@ function playSong(message, connection, retry = false) {
             else {
                 console.log('STOP ANORMALY')
             }
-            streamsArray[userChannel.id].destroy()
-            // streamsArray[userChannel.id].pause(true)
-            // streamsArray[userChannel.id].pause()
+            streamsArray[userChannel.id].pause(true)
+            streamsArray[userChannel.id].pause()
             playSong(message, connectionsArray[userChannel.id], true)
         }
         console.log('--------------------------')
