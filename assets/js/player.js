@@ -545,6 +545,7 @@ function pushPlaylistItems(voiceChannel, playlist) {
 function getVideo(voiceChannel, message, words, playSongParams = true) {
     console.log('get video')
     ytdl.getBasicInfo(words[1], (err, infos) => {
+        console.log('infos : ', infos)
         if (infos) {
             setMusicArrayAndPlayMusic(voiceChannel, infos, message, playSongParams)
         }
