@@ -374,7 +374,7 @@ function playSong(message, connection, retry = false) {
             playSong(message, connectionsArray[userChannel.id], true)
         }
         console.log('--------------------------')
-    }, 3500)
+    }, 6000)
     streamsArray[userChannel.id].on('finish', () => {
         setTimeout(() => {
             setArrays(message)
