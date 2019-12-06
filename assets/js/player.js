@@ -366,9 +366,9 @@ function playSong(message, connection, retry = false) {
             if (playlistInfos[userChannel.id]) {
                 console.log('STOP ANORMALY -> Retry song : ', playlistInfos[userChannel.id][0].title)
             }
-            setTimeout(() => {
-                playSong(message, connection, true)
-            }, 500);
+            userChannel.join(connect => {
+                playSong(message, connect, true)
+            })
         }
         console.log('--------------------------')
     }, 3500)
