@@ -348,7 +348,6 @@ function makeAndSendSearchListArray(message, userChannel, musicExist, playlistEx
 }
 
 function playSong(message, connection, retry = false) {
-    console.log('play song function')
     const userChannel = Helper.take_user_voiceChannel(message)
     if (!retry) {
         sendMusicEmbed(message, playlistInfos[userChannel.id][0].title, playlistInfos[userChannel.id][0].id, [false, 1])
@@ -362,7 +361,7 @@ function playSong(message, connection, retry = false) {
     setTimeout(() => {
         // Check if player is playing when it must be, if not destroy stream and retry to play song
         console.log('------------------')
-        console.log('timeout after 3500 in playsong - Check if music stop anormaly')
+        console.log('timeout after 3000 in playsong - Check if music stop anormaly')
         if (streamsArray[userChannel.id] && !streamsArray[userChannel.id].player.voiceConnection.speaking.bitfield && !tryToNext[userChannel.id]) {
             if (playlistInfos[userChannel.id]) {
                 console.log('STOP ANORMALY -> RETRY SONG')
@@ -373,7 +372,7 @@ function playSong(message, connection, retry = false) {
             }
         }
         console.log('--------------------------')
-    }, 2000)
+    }, 3000)
     streamsArray[userChannel.id].on('finish', () => {
         setTimeout(() => {
             setArrays(message)
@@ -543,9 +542,7 @@ function pushPlaylistItems(voiceChannel, playlist) {
 }
 
 function getVideo(voiceChannel, message, words, playSongParams = true) {
-    console.log('get video : ', words[1])
     ytdl.getBasicInfo(words[1], (err, infos) => {
-        console.log('infos : ', infos)
         if (infos) {
             setMusicArrayAndPlayMusic(voiceChannel, infos, message, playSongParams)
         }
@@ -556,9 +553,7 @@ function getVideo(voiceChannel, message, words, playSongParams = true) {
 }
 
 function setMusicArrayAndPlayMusic(voiceChannel, infos, message, playSongParams) {
-    console.log('set music array')
     if (playSongParams || waitArray[voiceChannel.id]) {
-        console.log('set music array and play song')
         delete waitArray[voiceChannel.id]
         voiceChannel.join()
             .then(connection => {
