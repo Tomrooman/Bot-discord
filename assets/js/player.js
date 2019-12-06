@@ -385,15 +385,9 @@ function playSong(message, connection, retry = false) {
     //     console.log('--------------------------')
     // }, 1500)
 
-    streamsArray[userChannel.id].on('debug', (e) => {
-        console.log('debug : ', e)
-    })
-    streamsArray[userChannel.id].on('error', (e) => {
-        console.log('error : ', e)
-    })
     streamsArray[userChannel.id].on('unpipe', (e, a) => {
-        console.log('unpipe e: ', e)
-        console.log('unpipe a: ', a)
+        console.log('unpipe e: ', e._readableState.ended)
+        console.log('unpipe e: ', e._readableState.endEmitted)
     })
     streamsArray[userChannel.id].on('finish', () => {
         setTimeout(() => {
