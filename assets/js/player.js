@@ -16,8 +16,8 @@ const searchPlaylistArray = []
 const loopArray = []
 const waitArray = []
 const nextSetLoop = []
-const isPlaying = []
 const tryToNext = []
+const retryArray = []
 const radioAvailable = [
     'NRJ',
     'Subarashii',
@@ -47,6 +47,20 @@ const radioAvailable = [
     'France-Musique',
     'France-Bleu'
 ]
+
+function getPlaylistArrayLength(channelID) {
+    if (playlistArray[channelID]) {
+        return playlistArray[channelID].length
+    }
+    return false
+}
+
+function getStreamsBitfieldAndPause(channelID) {
+    if (streamsArray[channelID]) {
+        return [streamsArray[channelID].player.voiceConnection.speaking.bitfield, streamsArray[channelID].player.voiceConnection.player.dispatcher.pausedSince]
+    }
+    return false
+}
 
 function playSongs(message, command, words, byReaction = [false, false]) {
     let voiceChannel = Helper.take_user_voiceChannel(message)
@@ -336,10 +350,12 @@ function makeAndSendSearchListArray(message, userChannel, musicExist, playlistEx
 
 function playSong(message, connection, retry = false) {
     const userChannel = Helper.take_user_voiceChannel(message)
-    if (!retry) {
+    if (!retryArray[userChannel.id]) {
         sendMusicEmbed(message, playlistInfos[userChannel.id][0].title, playlistInfos[userChannel.id][0].id, [false, 1])
     }
-    isPlaying[userChannel.id] = true
+    else {
+        delete retryArray[userChannel.id]
+    }
     delete tryToNext[userChannel.id]
     connectionsArray[userChannel.id] = connection
     const stream = ytdl(playlistArray[userChannel.id][0], { filter: 'audio', liveBuffer: 10000 })
@@ -347,16 +363,20 @@ function playSong(message, connection, retry = false) {
     // streamsArray[userChannel.id].setVolume(1)
     streamsArray[userChannel.id].setVolumeDecibels(0.1)
     setTimeout(() => {
+        // Check if player is playing when it must be, if not destroy stream and retry to play song
         console.log('------------------')
         console.log('timeout after 3500 in playsong - Check if music stop anormaly')
-        if (!streamsArray[userChannel.id].player.voiceConnection.speaking.bitfield) {
+        if (!streamsArray[userChannel.id].player.voiceConnection.speaking.bitfield && !tryToNext[userChannel.id]) {
             console.log('STOP ANORMALY -> Retry song : ', playlistInfos[userChannel.id][0].title)
             streamsArray[userChannel.id].destroy()
-            playSong(message, connection, true)
+            playlistArray[userChannel.id].splice(1, 0, playlistArray[userChannel.id][0])
+            playlistInfos[userChannel.id].splice(1, 0, playlistInfos[userChannel.id][0])
+            retryArray[userChannel.id] = true
+            next(message)
         }
         console.log('--------------------------')
     }, 3500)
-    streamsArray[userChannel.id].on('finish', (e, i) => {
+    streamsArray[userChannel.id].on('finish', () => {
         setTimeout(() => {
             setArrays(message)
         }, 500)
@@ -364,9 +384,7 @@ function playSong(message, connection, retry = false) {
 }
 
 function setArrays(message) {
-    // const userChannel = Helper.take_user_voiceChannel(message)
     const userChannel = Helper.take_user_voiceChannel(message)
-    delete isPlaying[userChannel.id]
     // If still connected but the end callback is call to early (after few seconds of playing)
     if (playlistArray[userChannel.id]) {
         // If loop is desactivate
@@ -417,7 +435,6 @@ function sendMusicEmbed(message, musicTitle, musicId, added = [false, 1], type =
         }
         else {
             title = 'Musique ajoutée'
-            // thumbnail = playlistInfos[userChannel.id][0].thumbnail
         }
         // #398240 | Vert foncé
         color = 3768896
@@ -425,7 +442,6 @@ function sendMusicEmbed(message, musicTitle, musicId, added = [false, 1], type =
     else {
         // #354F94 | Bleu foncé
         color = 3493780
-        // thumbnail = playlistInfos[userChannel.id][0].thumbnail
     }
     thumbnail = playlistInfos[userChannel.id][0].thumbnail
     message.channel.send({
@@ -485,10 +501,10 @@ function addPlaylistItems(voiceChannel, message, playlist, connection, play) {
     if (playlist.title) {
         playlistTitle = playlist.title
     }
-    if (radioPlayed[voiceChannel.id] === 'played') {
+    if (radioPlayed[voiceChannel.id]) {
         playlistArray[voiceChannel.id] = []
         playlistInfos[voiceChannel.id] = []
-        radioPlayed[voiceChannel.id] = 'notPlay'
+        delete radioPlayed[voiceChannel.id]
     }
     pushPlaylistItems(voiceChannel, playlist)
     if (play) {
@@ -503,6 +519,7 @@ function addPlaylistItems(voiceChannel, message, playlist, connection, play) {
             playSong(message, connectionsArray[voiceChannel.id])
         }
         else if (waitArray[voiceChannel.id]) {
+            delete waitArray[voiceChannel.id]
             playSong(message, connectionsArray[voiceChannel.id])
         }
     }
@@ -566,6 +583,7 @@ function clearAndAddArrayInfos(voiceChannel, infos, clear = true) {
         playlistInfos[voiceChannel.id] = []
     }
     playlistArray[voiceChannel.id].push(infos.video_url)
+    // console.log('get video : ', infos.player_response)
     playlistInfos[voiceChannel.id].push({
         title: infos.title,
         id: infos.video_id,
@@ -699,7 +717,7 @@ function connectRadio(voiceChannel, message, words) {
     if (voiceChannel) {
         delete tryToNext[voiceChannel.id]
         delete loopArray[voiceChannel.id]
-        radioPlayed[voiceChannel.id] = 'played'
+        radioPlayed[voiceChannel.id] = true
         if (!connectedGuild[message.guild.id]) {
             voiceChannel.join()
                 .then(connection => {
@@ -815,8 +833,8 @@ function quit(message) {
         delete radioPlayed[userChannel.id]
         delete loopArray[userChannel.id]
         delete waitArray[userChannel.id]
-        delete isPlaying[userChannel.id]
         delete tryToNext[userChannel.id]
+        delete retryArray[userChannel.id]
     }
 }
 
@@ -863,3 +881,5 @@ exports.selectSongInSearchList = selectSongInSearchList
 exports.getSongInSearchList = getSongInSearchList
 exports.toggleLoop = toggleLoop
 exports.selectSongOrPlaylistInSearchList = selectSongOrPlaylistInSearchList
+exports.getPlaylistArrayLength = getPlaylistArrayLength
+exports.getStreamsBitfieldAndPause = getStreamsBitfieldAndPause

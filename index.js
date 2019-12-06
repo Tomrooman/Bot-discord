@@ -1,6 +1,7 @@
 const Discord = require('discord.js')
 const Controller = require('./assets/js/controller.js')
 const Level = require('./assets/js/level.js')
+const Helper = require('./assets/js/helper.js')
 const config = require('./config.json')
 const Player = require('./assets/js/player.js')
 const mongoose = require('mongoose')
@@ -30,22 +31,23 @@ bot.on('message', (message) => {
 })
 
 // bot.on('voiceStateUpdate', (oldMember, newMember) => {
-//     let newUserChannel = newMember.channelID
-//     let oldUserChannel = oldMember.channelID
-//     // console.log('new : ', newMember)
-//     // console.log('old : ', oldMember)
-//     if (!oldUserChannel && newUserChannel) {
-//         // User Joins a voice channel
-//         console.log('Joined channel !')
-//         console.log('new member : ', newMember)
-//         // if nobody in the channel except the bot & the user and there are music in queued so play music[0]
-
-
-//     } else if (oldUserChannel) {
-//         // User leaves a voice channel
-//         console.log('Leaved channel !')
-//         console.log('old member : ', oldMember)
-//         // if nobody except the bot and there are music in queued so set pause(true)
+//     const newUserChannel = Helper.verifyBotLocation(newMember, { id: newMember.channelID }, false)
+//     if (newUserChannel) {
+//         // User Join the bot voice channel
+//         let memberCount = 0
+//         newMember.channel.members.map(() => memberCount++)
+//         if (memberCount === 2) {
+//             // If only the suer and the bot in the channel
+//             console.log('2 in the same channel : ')
+//             const newUserArray = Player.getPlaylistArrayLength(newMember.channelID)
+//             const bitfieldAndPause = Player.getStreamsBitfieldAndPause(newMember.channelID)
+//             const bitfield = bitfieldAndPause[0]
+//             const pause = bitfieldAndPause[1]
+//             // If there are songs in queued and not playing and not paused so play the next song
+//             if (newUserArray && !bitfield && !pause) {
+//                 Player.next(newMember)
+//             }
+//         }
 //     }
 // })
 

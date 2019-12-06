@@ -69,17 +69,21 @@ function getFirstAuthorizedChannel(guild) {
         .first();
 }
 
-function verifyBotLocation(message, userChannel) {
+function verifyBotLocation(message, userChannel, sendMessage = true) {
     const locationInfos = Player.getVerifyBotLocationInfos(userChannel.id, message.guild.id)
     if (locationInfos[0] && locationInfos[1] === userChannel.id) {
         return true
     }
     else if (!locationInfos[1]) {
-        message.channel.send('Je ne suis pas connecté dans un salon !')
+        if (sendMessage) {
+            message.channel.send('Je ne suis pas connecté dans un salon !')
+        }
         return false
     }
     else {
-        message.channel.send('Vous n\'êtes pas dans le même salon que le bot !')
+        if (sendMessage) {
+            message.channel.send('Vous n\'êtes pas dans le même salon que le bot !')
+        }
         return false
     }
 }
