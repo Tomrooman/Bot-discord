@@ -377,7 +377,7 @@ function playSong(message, connection, retry = false) {
             sendMusicEmbed(message, playlistInfos[userChannel.id][0].title, playlistInfos[userChannel.id][0].id, [false, 1])
         }
         console.log('--------------------------')
-    }, 1500)
+    }, 6000)
     streamsArray[userChannel.id].on('finish', () => {
         setTimeout(() => {
             setArrays(message)
