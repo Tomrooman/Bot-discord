@@ -384,11 +384,6 @@ function playSong(message, connection, retry = false) {
     //     }
     //     console.log('--------------------------')
     // }, 1500)
-
-    streamsArray[userChannel.id].on('unpipe', (e, a) => {
-        console.log('unpipe e: ', e._readableState.ended)
-        console.log('unpipe e: ', e._readableState.endEmitted)
-    })
     streamsArray[userChannel.id].on('finish', () => {
         setTimeout(() => {
             setArrays(message)
