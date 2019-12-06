@@ -274,7 +274,7 @@ function selectSongInSearchList(message, number, type = 'musique', byReaction = 
                 if (number >= 1 && number <= choiceArray.length) {
                     const command = type === 'musique' ? 'play' : 'playlist'
                     if (byReaction[0]) {
-                        playSongs(message, command, ['useless', choiceArray[number - 1].url], [true, byReaction[1]])
+                        playSongs(message, command, ['useless', choiceArray[number - 1].url], byReaction)
                     }
                     else {
                         playSongs(message, command, ['useless', choiceArray[number - 1].url])
