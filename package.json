@@ -6,11 +6,11 @@
     "scripts": {
         "eslint": "./node_modules/.bin/eslint ./",
         "test": "mocha ./tests/index.test.js --exit",
-        "start": "./node_modules/pm2/bin/pm2 start index.js --name syxbot",
-        "dev": "./node_modules/pm2/bin/pm2 start index.js --watch --name syxbot",
-        "log": "./node_modules/pm2/bin/pm2 log --lines 100 syxbot ",
-        "status": "./node_modules/pm2/bin/pm2 status",
-        "stop": "./node_modules/pm2/bin/pm2 stop all",
+        "start": "pm2 start index.js --name syxbot",
+        "dev": "pm2 start index.js --watch --name syxbot",
+        "log": "pm2 log --lines 100 syxbot ",
+        "status": "pm2 status",
+        "stop": "pm2 stop all",
         "mongodb": "sudo service mongod start"
     },
     "private": true,
@@ -23,7 +23,6 @@
         "lodash": "^4.17.15",
         "mongoose": "^5.7.12",
         "node-opus": "^0.3.3",
-        "pm2": "^4.2.0",
         "ytdl-core": "1.0.3",
         "ytpl": "^0.1.18",
         "ytsr": "^0.1.10"
