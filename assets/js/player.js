@@ -371,7 +371,7 @@ function playSong(message, connection, retry = false) {
             }
             // playlistInfos[userChannel.id].splice(2, 0, playlistInfos[userChannel.id][0])
             // playlistArray[userChannel.id].splice(2, 0, playlistArray[userChannel.id][0])
-            next(message)
+            // next(message)
         }
         else {
             sendMusicEmbed(message, playlistInfos[userChannel.id][0].title, playlistInfos[userChannel.id][0].id, [false, 1])
@@ -384,6 +384,10 @@ function playSong(message, connection, retry = false) {
     })
     streamsArray[userChannel.id].on('error', (e) => {
         console.log('error : ', e)
+    })
+    streamsArray[userChannel.id].on('unpipe', (e, a) => {
+        console.log('unpipe e: ', e)
+        console.log('unpipe a: ', a)
     })
     streamsArray[userChannel.id].on('finish', () => {
         setTimeout(() => {
