@@ -352,37 +352,38 @@ function playSong(message, connection, retry = false) {
     // if (!retry) {
     //     sendMusicEmbed(message, playlistInfos[userChannel.id][0].title, playlistInfos[userChannel.id][0].id, [false, 1])
     // }
+    sendMusicEmbed(message, playlistInfos[userChannel.id][0].title, playlistInfos[userChannel.id][0].id, [false, 1])
     delete tryToNext[userChannel.id]
     connectionsArray[userChannel.id] = connection
     const stream = ytdl(playlistArray[userChannel.id][0], { filter: 'audio', liveBuffer: 10000 })
     streamsArray[userChannel.id] = connection.play(stream, { highWaterMark: 100 })
     // streamsArray[userChannel.id].setVolume(1)
     streamsArray[userChannel.id].setVolumeDecibels(0.1)
-    setTimeout(() => {
-        // Check if player is playing when it must be, if not destroy stream and retry to play song
-        console.log('------------------')
-        console.log('timeout after 3500 in playsong - Check if music stop anormaly')
-        if (streamsArray[userChannel.id] && !streamsArray[userChannel.id].player.voiceConnection.speaking.bitfield && !tryToNext[userChannel.id]) {
-            if (playlistInfos[userChannel.id]) {
-                console.log('STOP ANORMALY -> Retry song : ', playlistInfos[userChannel.id][0].title)
-            }
-            else {
-                console.log('STOP ANORMALY')
-            }
-            playlistInfos[userChannel.id].splice(1, 0, playlistInfos[userChannel.id][0])
-            playlistArray[userChannel.id].splice(1, 0, playlistArray[userChannel.id][0])
-            message.channel.send(config.prefix + 'next')
-                .then(newMessage => {
-                    setTimeout(() => {
-                        newMessage.delete()
-                    }, 1000)
-                })
-        }
-        else {
-            sendMusicEmbed(message, playlistInfos[userChannel.id][0].title, playlistInfos[userChannel.id][0].id, [false, 1])
-        }
-        console.log('--------------------------')
-    }, 1500)
+    // setTimeout(() => {
+    //     // Check if player is playing when it must be, if not destroy stream and retry to play song
+    //     console.log('------------------')
+    //     console.log('timeout after 3500 in playsong - Check if music stop anormaly')
+    //     if (streamsArray[userChannel.id] && !streamsArray[userChannel.id].player.voiceConnection.speaking.bitfield && !tryToNext[userChannel.id]) {
+    //         if (playlistInfos[userChannel.id]) {
+    //             console.log('STOP ANORMALY -> Retry song : ', playlistInfos[userChannel.id][0].title)
+    //         }
+    //         else {
+    //             console.log('STOP ANORMALY')
+    //         }
+    //         playlistInfos[userChannel.id].splice(1, 0, playlistInfos[userChannel.id][0])
+    //         playlistArray[userChannel.id].splice(1, 0, playlistArray[userChannel.id][0])
+    //         message.channel.send(config.prefix + 'next')
+    //             .then(newMessage => {
+    //                 setTimeout(() => {
+    //                     newMessage.delete()
+    //                 }, 1000)
+    //             })
+    //     }
+    //     else {
+    //         sendMusicEmbed(message, playlistInfos[userChannel.id][0].title, playlistInfos[userChannel.id][0].id, [false, 1])
+    //     }
+    //     console.log('--------------------------')
+    // }, 1500)
 
     streamsArray[userChannel.id].on('debug', (e) => {
         console.log('debug : ', e)
