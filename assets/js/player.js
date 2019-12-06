@@ -359,7 +359,7 @@ function playSong(message, connection) {
     delete tryToNext[userChannel.id]
     connectionsArray[userChannel.id] = connection
     const stream = ytdl(playlistArray[userChannel.id][0], { filter: 'audio' })
-    streamsArray[userChannel.id] = connection.play(stream)
+    streamsArray[userChannel.id] = connection.play(stream, { highWaterMark: 30 })
     // streamsArray[userChannel.id].setVolume(1)
     streamsArray[userChannel.id].setVolumeDecibels(0.1)
     setTimeout(() => {
