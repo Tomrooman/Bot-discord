@@ -370,12 +370,9 @@ function playSong(message, connection) {
             if (playlistInfos[userChannel.id]) {
                 console.log('STOP ANORMALY -> RETRY SONG')
                 retryArray[userChannel] = true
-                streamsArray[userChannel.id].destroy()
                 playlistInfos[userChannel.id].splice(1, 0, playlistInfos[userChannel.id][0])
                 playlistArray[userChannel.id].splice(1, 0, playlistArray[userChannel.id][0])
-                setTimeout(() => {
-                    next(message)
-                }, 500)
+                next(message)
             }
         }
         console.log('--------------------------')
