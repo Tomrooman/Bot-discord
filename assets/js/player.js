@@ -369,9 +369,14 @@ function playSong(message, connection, retry = false) {
             else {
                 console.log('STOP ANORMALY')
             }
-            // playlistInfos[userChannel.id].splice(2, 0, playlistInfos[userChannel.id][0])
-            // playlistArray[userChannel.id].splice(2, 0, playlistArray[userChannel.id][0])
-            // next(message)
+            playlistInfos[userChannel.id].splice(1, 0, playlistInfos[userChannel.id][0])
+            playlistArray[userChannel.id].splice(1, 0, playlistArray[userChannel.id][0])
+            message.channel.send(config.prefix + 'next')
+                .then(newMessage => {
+                    setTimeout(() => {
+                        newMessage.delete()
+                    }, 1000)
+                })
         }
         else {
             sendMusicEmbed(message, playlistInfos[userChannel.id][0].title, playlistInfos[userChannel.id][0].id, [false, 1])
