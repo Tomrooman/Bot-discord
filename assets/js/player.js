@@ -16,6 +16,7 @@ const searchPlaylistArray = []
 const loopArray = []
 const waitArray = []
 const nextSetLoop = []
+const retryArray = []
 const tryToNext = []
 const radioAvailable = [
     'NRJ',
@@ -347,10 +348,13 @@ function makeAndSendSearchListArray(message, userChannel, musicExist, playlistEx
     }
 }
 
-function playSong(message, connection, retry = false) {
+function playSong(message, connection) {
     const userChannel = Helper.take_user_voiceChannel(message)
-    if (!retry) {
+    if (!retryArray[userChannel.id]) {
         sendMusicEmbed(message, playlistInfos[userChannel.id][0].title, playlistInfos[userChannel.id][0].id, [false, 1])
+    }
+    else {
+        delete retryArray[userChannel.id]
     }
     delete tryToNext[userChannel.id]
     connectionsArray[userChannel.id] = connection
@@ -361,22 +365,25 @@ function playSong(message, connection, retry = false) {
     setTimeout(() => {
         // Check if player is playing when it must be, if not destroy stream and retry to play song
         console.log('------------------')
-        console.log('timeout after 3000 in playsong - Check if music stop anormaly')
+        console.log('timeout after 2500 in playsong - Check if music stop anormaly')
         if (streamsArray[userChannel.id] && !streamsArray[userChannel.id].player.voiceConnection.speaking.bitfield && !tryToNext[userChannel.id]) {
             if (playlistInfos[userChannel.id]) {
                 console.log('STOP ANORMALY -> RETRY SONG')
+                retryArray[userChannel] = true
                 streamsArray[userChannel.id].destroy()
+                playlistInfos[userChannel.id].splice(1, 0, playlistInfos[userChannel.id][0])
+                playlistArray[userChannel.id].splice(1, 0, playlistArray[userChannel.id][0])
                 setTimeout(() => {
-                    playSong(message, connectionsArray[userChannel.id], true)
+                    next(message)
                 }, 500)
             }
         }
         console.log('--------------------------')
-    }, 3000)
+    }, 2500)
     streamsArray[userChannel.id].on('finish', () => {
         setTimeout(() => {
             setArrays(message)
-        }, 500)
+        }, 1500)
     })
 }
 
