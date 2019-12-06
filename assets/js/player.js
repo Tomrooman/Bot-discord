@@ -372,7 +372,14 @@ function playSong(message, connection) {
                 retryArray[userChannel.id] = true
                 playlistInfos[userChannel.id].splice(1, 0, playlistInfos[userChannel.id][0])
                 playlistArray[userChannel.id].splice(1, 0, playlistArray[userChannel.id][0])
-                next(message)
+                setTimeout(() => {
+                    message.channel.send(config.prefix + 'next')
+                        .then(newMessage => {
+                            setTimeout(() => {
+                                newMessage.delete()
+                            }, 2000)
+                        })
+                }, 200)
             }
         }
         console.log('--------------------------')
