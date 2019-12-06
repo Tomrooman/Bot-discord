@@ -17,7 +17,6 @@ const loopArray = []
 const waitArray = []
 const nextSetLoop = []
 const tryToNext = []
-const retryArray = []
 const radioAvailable = [
     'NRJ',
     'Subarashii',
@@ -350,11 +349,8 @@ function makeAndSendSearchListArray(message, userChannel, musicExist, playlistEx
 
 function playSong(message, connection, retry = false) {
     const userChannel = Helper.take_user_voiceChannel(message)
-    if (!retryArray[userChannel.id]) {
+    if (!retry) {
         sendMusicEmbed(message, playlistInfos[userChannel.id][0].title, playlistInfos[userChannel.id][0].id, [false, 1])
-    }
-    else {
-        delete retryArray[userChannel.id]
     }
     delete tryToNext[userChannel.id]
     connectionsArray[userChannel.id] = connection
@@ -366,13 +362,16 @@ function playSong(message, connection, retry = false) {
         // Check if player is playing when it must be, if not destroy stream and retry to play song
         console.log('------------------')
         console.log('timeout after 3500 in playsong - Check if music stop anormaly')
-        if (!streamsArray[userChannel.id].player.voiceConnection.speaking.bitfield && !tryToNext[userChannel.id]) {
+        if (streamsArray[userChannel.id] && !streamsArray[userChannel.id].player.voiceConnection.speaking.bitfield && !tryToNext[userChannel.id]) {
             console.log('STOP ANORMALY -> Retry song : ', playlistInfos[userChannel.id][0].title)
             streamsArray[userChannel.id].destroy()
-            playlistArray[userChannel.id].splice(1, 0, playlistArray[userChannel.id][0])
-            playlistInfos[userChannel.id].splice(1, 0, playlistInfos[userChannel.id][0])
-            retryArray[userChannel.id] = true
-            next(message)
+            connectionsArray[userChannel.id].channel.leave()
+                .then(() => {
+                    userChannel.join()
+                        .then(connect => {
+                            playSong(message, connect, true)
+                        })
+                })
         }
         console.log('--------------------------')
     }, 3500)
@@ -834,7 +833,6 @@ function quit(message) {
         delete loopArray[userChannel.id]
         delete waitArray[userChannel.id]
         delete tryToNext[userChannel.id]
-        delete retryArray[userChannel.id]
     }
 }
 
