@@ -349,9 +349,9 @@ function makeAndSendSearchListArray(message, userChannel, musicExist, playlistEx
 
 function playSong(message, connection, retry = false) {
     const userChannel = Helper.take_user_voiceChannel(message)
-    if (!retry) {
-        sendMusicEmbed(message, playlistInfos[userChannel.id][0].title, playlistInfos[userChannel.id][0].id, [false, 1])
-    }
+    // if (!retry) {
+    //     sendMusicEmbed(message, playlistInfos[userChannel.id][0].title, playlistInfos[userChannel.id][0].id, [false, 1])
+    // }
     delete tryToNext[userChannel.id]
     connectionsArray[userChannel.id] = connection
     const stream = ytdl(playlistArray[userChannel.id][0], { filter: 'audio', liveBuffer: 10000 })
@@ -369,12 +369,15 @@ function playSong(message, connection, retry = false) {
             else {
                 console.log('STOP ANORMALY')
             }
-            streamsArray[userChannel.id].pause(true)
-            streamsArray[userChannel.id].pause()
-            playSong(message, connectionsArray[userChannel.id], true)
+            playlistInfos[userChannel.id].splice(2, 0, playlistInfos[userChannel.id][0])
+            playlistArray[userChannel.id].splice(2, 0, playlistArray[userChannel.id][0])
+            next(message)
+        }
+        else {
+            sendMusicEmbed(message, playlistInfos[userChannel.id][0].title, playlistInfos[userChannel.id][0].id, [false, 1])
         }
         console.log('--------------------------')
-    }, 6000)
+    }, 1500)
     streamsArray[userChannel.id].on('finish', () => {
         setTimeout(() => {
             setArrays(message)
