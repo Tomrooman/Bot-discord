@@ -369,7 +369,7 @@ function playSong(message, connection) {
         if (streamsArray[userChannel.id] && !streamsArray[userChannel.id].player.voiceConnection.speaking.bitfield && !tryToNext[userChannel.id]) {
             if (playlistInfos[userChannel.id]) {
                 console.log('STOP ANORMALY -> RETRY SONG')
-                retryArray[userChannel] = true
+                retryArray[userChannel.id] = true
                 playlistInfos[userChannel.id].splice(1, 0, playlistInfos[userChannel.id][0])
                 playlistArray[userChannel.id].splice(1, 0, playlistArray[userChannel.id][0])
                 next(message)
