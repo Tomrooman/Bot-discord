@@ -364,11 +364,9 @@ function playSong(message, connection, retry = false) {
         console.log('timeout after 3500 in playsong - Check if music stop anormaly')
         if (streamsArray[userChannel.id] && !streamsArray[userChannel.id].player.voiceConnection.speaking.bitfield && !tryToNext[userChannel.id]) {
             console.log('STOP ANORMALY -> Retry song : ', playlistInfos[userChannel.id][0].title)
-            streamsArray[userChannel.id].destroy()
-            userChannel.join()
-                .then(connect => {
-                    playSong(message, connect, true)
-                })
+            playlistArray[userChannel.id].splice(1, 0, playlistArray[userChannel.id][0])
+            playlistInfos[userChannel.id].splice(1, 0, playlistInfos[userChannel.id][0])
+            setArrays(message)
         }
         console.log('--------------------------')
     }, 3500)
