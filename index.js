@@ -76,6 +76,7 @@ bot.on('messageReactionAdd', (reaction, user) => {
                 Player.selectSongInSearchList(reaction.message, selection, 'playlist', [true, user])
             }
             else if (videoExist && !playlistExist) {
+                console.group('select video by reaction')
                 Player.selectSongInSearchList(reaction.message, selection, 'musique', [true, user])
             }
         }

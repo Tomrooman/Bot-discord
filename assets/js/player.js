@@ -348,6 +348,7 @@ function makeAndSendSearchListArray(message, userChannel, musicExist, playlistEx
 }
 
 function playSong(message, connection, retry = false) {
+    console.log('play song function')
     const userChannel = Helper.take_user_voiceChannel(message)
     if (!retry) {
         sendMusicEmbed(message, playlistInfos[userChannel.id][0].title, playlistInfos[userChannel.id][0].id, [false, 1])
@@ -542,6 +543,7 @@ function pushPlaylistItems(voiceChannel, playlist) {
 }
 
 function getVideo(voiceChannel, message, words, playSongParams = true) {
+    console.log('get video')
     ytdl.getBasicInfo(words[1], (err, infos) => {
         if (infos) {
             setMusicArrayAndPlayMusic(voiceChannel, infos, message, playSongParams)
@@ -553,7 +555,9 @@ function getVideo(voiceChannel, message, words, playSongParams = true) {
 }
 
 function setMusicArrayAndPlayMusic(voiceChannel, infos, message, playSongParams) {
+    console.log('set music array')
     if (playSongParams || waitArray[voiceChannel.id]) {
+        console.log('set music array and play song')
         delete waitArray[voiceChannel.id]
         voiceChannel.join()
             .then(connection => {
