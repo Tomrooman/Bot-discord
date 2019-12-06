@@ -366,6 +366,7 @@ function playSong(message, connection, retry = false) {
             if (playlistInfos[userChannel.id]) {
                 console.log('STOP ANORMALY -> Retry song : ', playlistInfos[userChannel.id][0].title)
             }
+            streamsArray[userChannel.id].destroy()
             userChannel.join(connect => {
                 playSong(message, connect, true)
             })
