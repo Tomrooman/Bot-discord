@@ -76,7 +76,7 @@ bot.on('messageReactionAdd', (reaction, user) => {
                 Player.selectSongInSearchList(reaction.message, selection, 'playlist', [true, user])
             }
             else if (videoExist && !playlistExist) {
-                Player.selectSongInSearchList(reaction.message, selection, 'video', [true, user])
+                Player.selectSongInSearchList(reaction.message, selection, 'musique', [true, user])
             }
         }
     }
