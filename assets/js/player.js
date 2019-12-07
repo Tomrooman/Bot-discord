@@ -103,25 +103,9 @@ function playSongsAndConnectOrNotBot(message, command, words, playSongParams = t
     }
 }
 
-function youtubeResearch(message, string, type, nextPage = false) {
-    const options = {
-        limit: 50
-    }
-    if (nextPage) {
-        options.nextpageRef = nextPage
-    }
-    else {
-        message.channel.send('Recherche de ' + type + ' : ' + '`' + string.trim() + '`')
-    }
-    if (type === 'video' && !nextPage) {
-        delete searchArray[message.guild.id]
-        searchArray[message.guild.id] = []
-    }
-    else if (type === 'playlist' && !nextPage) {
-        delete searchPlaylistArray[message.guild.id]
-        searchPlaylistArray[message.guild.id] = []
-    }
-    ytsr(string, options, (err, searchresults) => {
+function youtubeResearch(message, title, type, nextPage = false, byReaction = [false, false]) {
+    const options = setArrayWithChoice(message, title, type, nextPage, byReaction)
+    ytsr(title, options, (err, searchresults) => {
         if (searchresults) {
             const buildedArray = makeSearchArray(message, searchresults, type)
             if (buildedArray.length < 5 && searchresults.nextpageRef) {
@@ -130,6 +114,14 @@ function youtubeResearch(message, string, type, nextPage = false) {
             }
             else if (buildedArray.length === 5 || !searchresults.nextpageRef) {
                 // If i've got 5 item or no nextpageRef so send the list
+                if (searchresults.nextpageRef) {
+                    if (type === 'video') {
+                        searchArray[message.guild.id]['nextpage'] = searchresults.nextpageRef
+                    }
+                    else {
+                        searchPlaylistArray[message.guild.id]['nextpage'] = searchresults.nextpageRef
+                    }
+                }
                 sendSearchResultsAsString(message, type)
             }
         }
@@ -137,6 +129,38 @@ function youtubeResearch(message, string, type, nextPage = false) {
             console.log('Error search by title no results')
         }
     })
+}
+
+function setArrayWithChoice(message, title, type, nextPage, byReaction) {
+    let nextPageVar = nextPage
+    const options = {
+        limit: 50
+    }
+    if (type === 'video' && !nextPage) {
+        if (searchArray[message.guild.id]) {
+            if (byReaction[0]) {
+                nextPageVar = searchArray[message.guild.id]['nextpage']
+            }
+            delete searchArray[message.guild.id]
+        }
+        searchArray[message.guild.id] = []
+    }
+    else if (type === 'playlist' && !nextPage) {
+        if (searchPlaylistArray[message.guild.id]) {
+            if (byReaction[0]) {
+                nextPageVar = searchPlaylistArray[message.guild.id]['nextpage']
+            }
+            delete searchPlaylistArray[message.guild.id]
+        }
+        searchPlaylistArray[message.guild.id] = []
+    }
+    if (nextPageVar) {
+        options.nextpageRef = nextPageVar
+    }
+    else {
+        message.channel.send('Recherche de ' + type + ' : ' + '`' + title.trim() + '`')
+    }
+    return options
 }
 
 function makeSearchArray(message, searchresults, type) {
@@ -212,6 +236,7 @@ function addSearchReactions(message) {
         .then(() => message.react('3️⃣'))
         .then(() => message.react('4️⃣'))
         .then(() => message.react('5️⃣'))
+        .then(() => message.react('⏩'))
 }
 
 function selectSongOrPlaylistInSearchList(message, words) {
@@ -350,16 +375,23 @@ function playSong(message) {
             if (playlistInfos[message.guild.id]) {
                 console.log('STOP ANORMALY -> RETRY SONG')
                 retryArray[message.guild.id] = true
-                streamsArray[message.guild.id].pause(true)
-                playlistInfos[message.guild.id].splice(1, 0, playlistInfos[message.guild.id][0])
-                playlistArray[message.guild.id].splice(1, 0, playlistArray[message.guild.id][0])
-                setTimeout(() => {
-                    next(message)
-                }, 500)
+                // playlistInfos[message.guild.id].splice(2, 0, playlistInfos[message.guild.id][0])
+                // playlistArray[message.guild.id].splice(2, 0, playlistArray[message.guild.id][0])
+                const botChannel = Helper.getBot(message, 'channel')
+                streamsArray[message.guild.id].destroy()
+                connectionsArray[message.guild.id].channel.leave()
+                botChannel.join()
+                    .then(co => {
+                        connectionsArray[message.guild.id] = co
+                        playSong(message)
+                    })
             }
         }
         console.log('--------------------------')
     }, 3000)
+    streamsArray[message.guild.id].on('error', (e) => {
+        console.log('Error : ', e)
+    })
     streamsArray[message.guild.id].on('finish', () => {
         setTimeout(() => {
             setArrays(message)
@@ -887,3 +919,4 @@ exports.getSongInSearchList = getSongInSearchList
 exports.toggleLoop = toggleLoop
 exports.selectSongOrPlaylistInSearchList = selectSongOrPlaylistInSearchList
 exports.getConnectedGuild = getConnectedGuild
+exports.youtubeResearch = youtubeResearch

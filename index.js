@@ -2,6 +2,7 @@ const Discord = require('discord.js')
 const Controller = require('./assets/js/controller.js')
 const Level = require('./assets/js/level.js')
 const config = require('./config.json')
+const Helper = require('./assets/js/helper.js')
 const Player = require('./assets/js/player.js')
 const mongoose = require('mongoose')
 const bot = new Discord.Client()
@@ -51,10 +52,25 @@ bot.on('messageReactionAdd', (reaction, user) => {
                 selection = 5
             }
             if (playlistExist && !videoExist) {
-                Player.selectSongInSearchList(reaction.message, selection, 'playlist', [true, user])
+                const userChannel = Helper.take_user_voiceChannel_by_reaction(reaction.message, user)
+                if (reaction.emoji.name === '⏩') {
+                    if (userChannel) {
+                        Player.youtubeResearch(reaction.message, null, 'playlist', false, [true, user])
+                    }
+                }
+                else {
+                    Player.selectSongInSearchList(reaction.message, selection, 'playlist', [true, user])
+                }
             }
             else if (videoExist && !playlistExist) {
-                Player.selectSongInSearchList(reaction.message, selection, 'musique', [true, user])
+                if (reaction.emoji.name === '⏩') {
+                    if (userChannel) {
+                        Player.youtubeResearch(reaction.message, null, 'video', false, [true, user])
+                    }
+                }
+                else {
+                    Player.selectSongInSearchList(reaction.message, selection, 'musique', [true, user])
+                }
             }
         }
     }
