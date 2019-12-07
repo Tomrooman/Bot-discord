@@ -55,10 +55,10 @@ function playSongs(message, command, words, byReaction = [false, false]) {
     }
     if (voiceChannel) {
         if (!connectedGuild[message.guild.id]) {
-            playSongsAndConnectOrNotBot(message, command, words)
+            playSongsAndConnectOrNotBot(message, command, words, true, byReaction)
         }
         else if (connectedGuild[message.guild.id] === voiceChannel.id) {
-            playSongsAndConnectOrNotBot(message, command, words, false)
+            playSongsAndConnectOrNotBot(message, command, words, false, byReaction)
         }
         else {
             message.channel.send('Vous n\'êtes pas dans le même canal que le bot !')
@@ -69,11 +69,11 @@ function playSongs(message, command, words, byReaction = [false, false]) {
     }
 }
 
-function playSongsAndConnectOrNotBot(message, command, words, playSongParams = true) {
+function playSongsAndConnectOrNotBot(message, command, words, playSongParams = true, byReaction) {
     if (words[1] && words[1].includes('youtu') && (words[1].includes('http://') || words[1].includes('https://'))) {
         if (command === 'playlist' || command === 'pl') {
             if (ytpl.validateURL(words[1])) {
-                getPlaylist(message, words, playSongParams)
+                getPlaylist(message, words, playSongParams, byReaction)
             }
             else {
                 message.channel.send('Merci de renseigner une URL de playlist valide !')
@@ -81,7 +81,7 @@ function playSongsAndConnectOrNotBot(message, command, words, playSongParams = t
         }
         else if (command === 'play' || command === 'p') {
             if (ytdl.validateURL(words[1])) {
-                getVideo(message, words, playSongParams)
+                getVideo(message, words, playSongParams, byReaction)
             }
             else {
                 message.channel.send('Ce n\'est pas une URL de vidéo valide !')
@@ -451,9 +451,12 @@ function sendMusicEmbed(message, musicTitle, musicId, added = [false, 1], type =
     })
 }
 
-function getPlaylist(message, words, playSongParams) {
+function getPlaylist(message, words, playSongParams, byReaction) {
     message.channel.send('> Ajout de la playlist en cours ...')
-    const voiceChannel = Helper.take_user_voiceChannel(message)
+    let voiceChannel = Helper.take_user_voiceChannel(message)
+    if (byReaction[0]) {
+        voiceChannel = Helper.take_user_voiceChannel_by_reaction(message, byReaction[1])
+    }
     ytpl(words[1], { limit: 0 }, (err, playlist) => {
         if (playlist) {
             if (playSongParams) {
@@ -463,7 +466,7 @@ function getPlaylist(message, words, playSongParams) {
                         playlistInfos[message.guild.id] = []
                         connectedGuild[message.guild.id] = voiceChannel.id
                         connectionsArray[message.guild.id] = conection
-                        addPlaylistItems(message, message, playlist, playSongParams)
+                        addPlaylistItems(message, playlist, playSongParams)
                     })
             }
             else {
@@ -524,10 +527,10 @@ function pushPlaylistItems(message, playlist) {
     })
 }
 
-function getVideo(message, words, playSongParams = true) {
+function getVideo(message, words, playSongParams = true, byReaction) {
     ytdl.getBasicInfo(words[1], (err, infos) => {
         if (infos) {
-            setMusicArrayAndPlayMusic(infos, message, playSongParams)
+            setMusicArrayAndPlayMusic(infos, message, playSongParams, byReaction)
         }
         else {
             message.channel.send('Une erreur s\'est produite')
@@ -535,10 +538,13 @@ function getVideo(message, words, playSongParams = true) {
     })
 }
 
-function setMusicArrayAndPlayMusic(infos, message, playSongParams) {
+function setMusicArrayAndPlayMusic(infos, message, playSongParams, byReaction) {
     if (playSongParams || waitArray[message.guild.id]) {
         delete waitArray[message.guild.id]
-        const voiceChannel = Helper.take_user_voiceChannel(message)
+        let voiceChannel = Helper.take_user_voiceChannel(message)
+        if (byReaction[0]) {
+            voiceChannel = Helper.take_user_voiceChannel_by_reaction(message, byReaction[1])
+        }
         voiceChannel.join()
             .then(connection => {
                 clearAndAddArrayInfos(message, infos)
