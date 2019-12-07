@@ -57,6 +57,9 @@ bot.on('messageReactionAdd', (reaction, user) => {
                     if (userChannel) {
                         Player.youtubeResearch(reaction.message, null, 'playlist', false, [true, user])
                     }
+                    else {
+                        reaction.message.channel.send('Vous devez être connecté dans un salon !')
+                    }
                 }
                 else {
                     Player.selectSongInSearchList(reaction.message, selection, 'playlist', [true, user])
@@ -66,6 +69,9 @@ bot.on('messageReactionAdd', (reaction, user) => {
                 if (reaction.emoji.name === '⏩') {
                     if (userChannel) {
                         Player.youtubeResearch(reaction.message, null, 'video', false, [true, user])
+                    }
+                    else {
+                        reaction.message.channel.send('Vous devez être connecté dans un salon !')
                     }
                 }
                 else {

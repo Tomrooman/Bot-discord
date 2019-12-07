@@ -375,16 +375,17 @@ function playSong(message) {
             if (playlistInfos[message.guild.id]) {
                 console.log('STOP ANORMALY -> RETRY SONG')
                 retryArray[message.guild.id] = true
-                // playlistInfos[message.guild.id].splice(2, 0, playlistInfos[message.guild.id][0])
-                // playlistArray[message.guild.id].splice(2, 0, playlistArray[message.guild.id][0])
-                const botChannel = Helper.getBot(message, 'channel')
-                streamsArray[message.guild.id].destroy()
-                connectionsArray[message.guild.id].channel.leave()
-                botChannel.join()
-                    .then(co => {
-                        connectionsArray[message.guild.id] = co
-                        playSong(message)
-                    })
+                playlistInfos[message.guild.id].splice(1, 0, playlistInfos[message.guild.id][0])
+                playlistArray[message.guild.id].splice(1, 0, playlistArray[message.guild.id][0])
+                // const botChannel = Helper.getBot(message, 'channel')
+                // streamsArray[message.guild.id].destroy()
+                // connectionsArray[message.guild.id].channel.leave()
+                // botChannel.join()
+                //     .then(co => {
+                //         connectionsArray[message.guild.id] = co
+                //         playSong(message)
+                //     })
+                message.channel.send('Fais la commande next')
             }
         }
         console.log('--------------------------')
