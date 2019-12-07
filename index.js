@@ -1,7 +1,6 @@
 const Discord = require('discord.js')
 const Controller = require('./assets/js/controller.js')
 const Level = require('./assets/js/level.js')
-const Helper = require('./assets/js/helper.js')
 const config = require('./config.json')
 const Player = require('./assets/js/player.js')
 const mongoose = require('mongoose')
