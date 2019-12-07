@@ -30,27 +30,6 @@ bot.on('message', (message) => {
     }
 })
 
-// bot.on('voiceStateUpdate', (oldMember, newMember) => {
-//     const newUserChannel = Helper.verifyBotLocation(newMember, { id: newMember.channelID }, false)
-//     if (newUserChannel) {
-//         // User Join the bot voice channel
-//         let memberCount = 0
-//         newMember.channel.members.map(() => memberCount++)
-//         if (memberCount === 2) {
-//             // If only the suer and the bot in the channel
-//             console.log('2 in the same channel : ')
-//             const newUserArray = Player.getPlaylistArrayLength(newMember.channelID)
-//             const bitfieldAndPause = Player.getStreamsBitfieldAndPause(newMember.channelID)
-//             const bitfield = bitfieldAndPause[0]
-//             const pause = bitfieldAndPause[1]
-//             // If there are songs in queued and not playing and not paused so play the next song
-//             if (newUserArray && !bitfield && !pause) {
-//                 Player.next(newMember)
-//             }
-//         }
-//     }
-// })
-
 bot.on('messageReactionAdd', (reaction, user) => {
     if (!user.bot) {
         const playlistExist = reaction.message.content.indexOf('Ex: ' + config.prefix + 'search pl 1') !== -1

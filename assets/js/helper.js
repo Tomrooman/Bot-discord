@@ -70,22 +70,40 @@ function getFirstAuthorizedChannel(guild) {
 }
 
 function verifyBotLocation(message, userChannel, sendMessage = true) {
-    const locationInfos = Player.getVerifyBotLocationInfos(userChannel.id, message.guild.id)
-    if (locationInfos[0] && locationInfos[1] === userChannel.id) {
-        return true
+    // const locationInfos = Player.getVerifyBotLocationInfos(userChannel.id, message.guild.id)
+    const connectedGuild = Player.getConnectedGuild(message.guild.id)
+    if (connectedGuild) {
+        if (connectedGuild === userChannel.id) {
+            return true
+        }
+        else {
+            if (sendMessage) {
+                message.channel.send('Vous n\'êtes pas dans le même salon que le bot !')
+            }
+            return false
+        }
     }
-    else if (!locationInfos[1]) {
+    else {
         if (sendMessage) {
             message.channel.send('Je ne suis pas connecté dans un salon !')
         }
         return false
     }
-    else {
-        if (sendMessage) {
-            message.channel.send('Vous n\'êtes pas dans le même salon que le bot !')
-        }
-        return false
-    }
+    // if (locationInfos[0] && locationInfos[1] === userChannel.id) {
+    //     return true
+    // }
+    // else if (!locationInfos[1]) {
+    //     if (sendMessage) {
+    //         message.channel.send('Je ne suis pas connecté dans un salon !')
+    //     }
+    //     return false
+    // }
+    // else {
+    //     if (sendMessage) {
+    //         message.channel.send('Vous n\'êtes pas dans le même salon que le bot !')
+    //     }
+    //     return false
+    // }
 }
 
 function showCommandlist(message) {
