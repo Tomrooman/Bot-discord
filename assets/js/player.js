@@ -651,11 +651,12 @@ function clearAndAddArrayInfos(message, infos, clear = true) {
     playlistArray[message.guild.id].push(infos.video_url)
     // console.log('get video : ', infos)
     // convert length second to 1:25 format
-    const videoDate = new Date(infos.player_response.videoDetails.lengthSeconds * 1000)
-    console.log('jour : ', videoDate.getDay())
-    console.log('heure : ', videoDate.getHours())
-    console.log('min : ', videoDate.getMinutes())
-    console.log('sec : ', videoDate.getSeconds())
+    // const videoDate = new Date(infos.player_response.videoDetails.lengthSeconds * 1000)
+    // console.log('jour : ', videoDate.getDay())
+    // getDays().toString()
+    // console.log('heure : ', videoDate.getHours())
+    // console.log('min : ', videoDate.getMinutes())
+    // console.log('sec : ', videoDate.getSeconds())
     playlistInfos[message.guild.id].push({
         title: infos.title,
         id: infos.video_id,

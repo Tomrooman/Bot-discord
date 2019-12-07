@@ -52,8 +52,8 @@ bot.on('messageReactionAdd', (reaction, user) => {
                 selection = 5
             }
             if (playlistExist && !videoExist) {
-                const userChannel = Helper.take_user_voiceChannel_by_reaction(reaction.message, user)
                 if (reaction.emoji.name === '⏩') {
+                    const userChannel = Helper.take_user_voiceChannel_by_reaction(reaction.message, user)
                     if (userChannel) {
                         Player.youtubeResearch(reaction.message, null, 'playlist', false, [true, user])
                     }
@@ -67,6 +67,7 @@ bot.on('messageReactionAdd', (reaction, user) => {
             }
             else if (videoExist && !playlistExist) {
                 if (reaction.emoji.name === '⏩') {
+                    const userChannel = Helper.take_user_voiceChannel_by_reaction(reaction.message, user)
                     if (userChannel) {
                         Player.youtubeResearch(reaction.message, null, 'video', false, [true, user])
                     }
