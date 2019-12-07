@@ -92,7 +92,7 @@ function connectToDatabase() {
     })
     mongoose.connection.once('open', () => {
         console.log('Connected to database !')
-        bot.login(config.token)
+        bot.login(config.token, { retry: 50 })
     })
 }
 
