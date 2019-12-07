@@ -140,7 +140,7 @@ function youtubeResearch(message, string, type, nextPage = false) {
 }
 
 function makeSearchArray(message, searchresults, type) {
-    const filteredResult = searchresults.items.filter(i => i.type === type && i.title !== '[Deleted video]')
+    const filteredResult = searchresults.items.filter(i => i.type === type && i.title !== '[Deleted video]' && i.title !== '[Private video]')
     filteredResult.map(result => {
         const resultObj = {
             url: result.link,
@@ -150,7 +150,6 @@ function makeSearchArray(message, searchresults, type) {
             searchArray[message.guild.id].push(resultObj)
         }
         else if (type === 'playlist' && searchPlaylistArray[message.guild.id].length < 5) {
-            // console.log('playlist result : ', result)
             resultObj.plLength = result.length
             searchPlaylistArray[message.guild.id].push(resultObj)
         }
@@ -318,7 +317,12 @@ function makeAndSendSearchListArray(message, musicExist, playlistExist) {
     else {
         resultChoices += '> **Playlists** \n'
         searchPlaylistArray[message.guild.id].map((song, index) => {
-            resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n'
+            if (song.plLength) {
+                resultChoices += '> **' + (index + 1) + '**. ' + song.title + ' (' + song.plLength + ')\n'
+            }
+            else {
+                resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n'
+            }
         })
         message.channel.send(`> **Écrivez ou sélectionnez une playlist parmi les ${searchPlaylistArray[message.guild.id].length} ci-dessous.** \n > **Ex: ${config.prefix}search pl 1** \n > \n ${resultChoices}`)
             .then(newMessage => addSearchReactions(newMessage))
@@ -327,7 +331,7 @@ function makeAndSendSearchListArray(message, musicExist, playlistExist) {
 
 function playSong(message) {
     if (!retryArray[message.guild.id]) {
-        sendMusicEmbed(message, playlistInfos[message.guild.id][0].title, playlistInfos[message.guild.id][0].id, [false, 1])
+        sendMusicEmbed(message, playlistInfos[message.guild.id][0].title, playlistInfos[message.guild.id][0].id, playlistInfos[message.guild.id][0].thumbnail, [false, 1])
     }
     else {
         delete retryArray[message.guild.id]
@@ -346,11 +350,11 @@ function playSong(message) {
             if (playlistInfos[message.guild.id]) {
                 console.log('STOP ANORMALY -> RETRY SONG')
                 retryArray[message.guild.id] = true
-                // playlistInfos[userChannel.guild.id].splice(1, 0, playlistInfos[userChannel.guild.id][0])
-                // playlistArray[userChannel.guild.id].splice(1, 0, playlistArray[userChannel.guild.id][0])
-                streamsArray[message.guild.id].destroy()
+                streamsArray[message.guild.id].pause(true)
+                playlistInfos[message.guild.id].splice(1, 0, playlistInfos[message.guild.id][0])
+                playlistArray[message.guild.id].splice(1, 0, playlistArray[message.guild.id][0])
                 setTimeout(() => {
-                    playSong(message)
+                    next(message)
                 }, 500)
             }
         }
@@ -396,11 +400,10 @@ function setArrays(message) {
     }
 }
 
-function sendMusicEmbed(message, musicTitle, musicId, added = [false, 1], type = 'video') {
+function sendMusicEmbed(message, musicTitle, musicId, thumbnail, added = [false, 1], type = 'video') {
     let title = 'Musique'
     let color = false
     let musicLink = musicTitle
-    let thumbnail = ''
     if (type === 'video') {
         musicLink = `[${musicTitle}](https://www.youtube.com/watch?v=${musicId})`
     }
@@ -421,7 +424,6 @@ function sendMusicEmbed(message, musicTitle, musicId, added = [false, 1], type =
         // #354F94 | Bleu foncé
         color = 3493780
     }
-    thumbnail = playlistInfos[message.guild.id][0].thumbnail
     message.channel.send({
         'embed': {
             'footer': {
@@ -453,25 +455,9 @@ function sendMusicEmbed(message, musicTitle, musicId, added = [false, 1], type =
 
 function getPlaylist(message, words, playSongParams, byReaction) {
     message.channel.send('> Ajout de la playlist en cours ...')
-    let voiceChannel = Helper.take_user_voiceChannel(message)
-    if (byReaction[0]) {
-        voiceChannel = Helper.take_user_voiceChannel_by_reaction(message, byReaction[1])
-    }
     ytpl(words[1], { limit: 0 }, (err, playlist) => {
         if (playlist) {
-            if (playSongParams) {
-                voiceChannel.join()
-                    .then(conection => {
-                        playlistArray[message.guild.id] = []
-                        playlistInfos[message.guild.id] = []
-                        connectedGuild[message.guild.id] = voiceChannel.id
-                        connectionsArray[message.guild.id] = conection
-                        addPlaylistItems(message, playlist, playSongParams)
-                    })
-            }
-            else {
-                addPlaylistItems(message, playlist, playSongParams)
-            }
+            addPlaylistItems(message, playlist, playSongParams, byReaction)
         }
         else {
             message.channel.send('Une erreur s\'est produite #2')
@@ -479,23 +465,32 @@ function getPlaylist(message, words, playSongParams, byReaction) {
     })
 }
 
-function addPlaylistItems(message, playlist, play) {
+function addPlaylistItems(message, playlist, play, byReaction) {
     let playlistTitle = 'Playlist'
+    let voiceChannel = Helper.take_user_voiceChannel(message)
+    if (byReaction[0]) {
+        voiceChannel = Helper.take_user_voiceChannel_by_reaction(message, byReaction[1])
+    }
     if (playlist.title) {
         playlistTitle = playlist.title
     }
-    if (radioPlayed[message.guild.id]) {
+    if (radioPlayed[message.guild.id] || play) {
         playlistArray[message.guild.id] = []
         playlistInfos[message.guild.id] = []
         delete radioPlayed[message.guild.id]
     }
     pushPlaylistItems(message, playlist)
     if (play) {
-        sendMusicEmbed(message, playlistTitle, false, [true, playlist.items.length], 'playlist')
-        playSong(message)
+        voiceChannel.join()
+            .then(conection => {
+                connectedGuild[message.guild.id] = voiceChannel.id
+                connectionsArray[message.guild.id] = conection
+                sendMusicEmbed(message, playlistTitle, playlist.id, playlist.items[0].thumbnail, [true, playlist.items.length], 'playlist')
+                playSong(message)
+            })
     }
     else {
-        sendMusicEmbed(message, playlistTitle, false, [true, playlist.items.length], 'playlist')
+        sendMusicEmbed(message, playlistTitle, playlist.id, playlist.items[0].thumbnail, [true, playlist.items.length], 'playlist')
         if (radioPlayed[message.guild.id]) {
             streamsArray[message.guild.id].destroy()
             delete radioPlayed[message.guild.id]
@@ -510,8 +505,10 @@ function addPlaylistItems(message, playlist, play) {
 
 function pushPlaylistItems(message, playlist) {
     const videoURL = 'https://www.youtube.com/watch?v='
+    let pushCount = 0;
     playlist.items.map(video => {
-        if (video.title !== '[Deleted video]') {
+        if (video.title !== '[Deleted video]' && video.title !== '[Private video]') {
+            pushCount++
             playlistArray[message.guild.id].push(videoURL + video.id)
             let thumbnailURL = ''
             if (video.thumbnail) {
@@ -525,12 +522,26 @@ function pushPlaylistItems(message, playlist) {
             })
         }
     })
+    const deletedVideo = playlist.total_items - pushCount
+    if (deletedVideo >= 1) {
+        if (deletedVideo === 1) {
+            message.channel.send('> ' + deletedVideo + ' vidéo supprimée')
+        }
+        else {
+            message.channel.send('> ' + deletedVideo + ' vidéos supprimées')
+        }
+    }
 }
 
 function getVideo(message, words, playSongParams = true, byReaction) {
     ytdl.getBasicInfo(words[1], (err, infos) => {
         if (infos) {
-            setMusicArrayAndPlayMusic(infos, message, playSongParams, byReaction)
+            if (infos.title !== '[Deleted video]' && infos.title !== '[Private video]') {
+                setMusicArrayAndPlayMusic(infos, message, playSongParams, byReaction)
+            }
+            else {
+                message.channel.send('Cette vidéo n\'est pas disponible !')
+            }
         }
         else {
             message.channel.send('Une erreur s\'est produite')
@@ -561,7 +572,7 @@ function setMusicArrayAndPlayMusic(infos, message, playSongParams, byReaction) {
     }
     else {
         clearAndAddArrayInfos(message, infos, false)
-        sendMusicEmbed(message, infos.title, infos.video_id, [true, 1])
+        sendMusicEmbed(message, infos.title, infos.video_id, infos.player_response.videoDetails.thumbnail.thumbnails[0], [true, 1])
     }
 }
 
@@ -571,7 +582,8 @@ function clearAndAddArrayInfos(message, infos, clear = true) {
         playlistInfos[message.guild.id] = []
     }
     playlistArray[message.guild.id].push(infos.video_url)
-    // console.log('get video : ', infos.player_response)
+    // console.log('get video : ', infos)
+    // convert length second to 1:25 format
     playlistInfos[message.guild.id].push({
         title: infos.title,
         id: infos.video_id,
