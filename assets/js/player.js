@@ -15,6 +15,10 @@ const searchArray = []
 const searchPlaylistArray = []
 const searchArrayInfos = []
 const searchPlaylistArrayInfos = []
+const lastSearchArray = []
+const lastSearchPlaylistArray = []
+const oldSearchPlaylistArray = []
+const oldSearchArray = []
 const loopArray = []
 const waitArray = []
 const nextSetLoop = []
@@ -106,53 +110,125 @@ function playSongsAndConnectOrNotBot(message, command, words, playSongParams = t
 }
 
 function youtubeResearch(message, title, type, nextPage = false, byReaction = [false, false]) {
+    if (searchArray[message.guild.id]) {
+        oldSearchArray[message.guild.id] = searchArray[message.guild.id]
+    }
+    if (searchPlaylistArray[message.guild.id]) {
+        oldSearchPlaylistArray[message.guild.id] = searchPlaylistArray[message.guild.id]
+    }
     const options = setArrayWithChoice(message, title, type, nextPage, byReaction)
-    ytsr(title, options, (err, searchresults) => {
-        if (searchresults) {
-            const buildedArray = makeSearchArray(message, searchresults, type, byReaction)
-            if (buildedArray.length < 5 && searchresults.nextpageRef) {
-                message.channel.send('> ' + buildedArray.length + '/5 trouvé')
-                youtubeResearch(message, title, type, searchresults.nextpageRef)
+    clearSearchArrays(message, type, byReaction)
+    const oldArrayResult = verifyOldResearch(message, type, byReaction)
+    if (!oldArrayResult) {
+        ytsr(title, options, (err, searchresults) => {
+            if (searchresults) {
+                const buildedArray = makeSearchArray(message, searchresults.items, type)
+                if (buildedArray.length < 5 && searchresults.nextpageRef) {
+                    message.channel.send('> ' + buildedArray.length + '/5 trouvé')
+                    youtubeResearch(message, title, type, searchresults.nextpageRef, byReaction)
+                }
+                else if (buildedArray.length === 5 || !searchresults.nextpageRef) {
+                    // If i've got 5 item or no nextpageRef so send the list
+                    if (type === 'video') {
+                        delete oldSearchArray[message.guild.id]
+                    }
+                    else {
+                        delete oldSearchPlaylistArray[message.guild.id]
+                    }
+                    setArrayInfos(message, type, title, searchresults)
+                    sendSearchResultsAsString(message, type)
+                }
             }
-            else if (buildedArray.length === 5 || !searchresults.nextpageRef) {
-                // If i've got 5 item or no nextpageRef so send the list
+            else {
                 if (type === 'video') {
-                    if (searchresults.nextpageRef) {
-                        searchArray[message.guild.id]['nextpage'] = searchresults.nextpageRef
-                    }
-                    if (title) {
-                        searchArrayInfos[message.guild.id]['title'] = title
-                        searchArrayInfos[message.guild.id]['count'] = 2
-                    }
-                    else {
-                        searchArrayInfos[message.guild.id]['count']++
-                    }
+                    searchArray[message.guild.id] = oldSearchArray[message.guild.id]
                 }
-                else {
-                    if (searchresults.nextpageRef) {
-                        searchPlaylistArray[message.guild.id]['nextpage'] = searchresults.nextpageRef
-                    }
-                    if (title) {
-                        searchPlaylistArrayInfos[message.guild.id]['title'] = title
-                        searchPlaylistArrayInfos[message.guild.id]['count'] = 2
-                    }
-                    else {
-                        searchPlaylistArrayInfos[message.guild.id]['count']++
-                    }
+                else if (type === 'playlist') {
+                    searchPlaylistArray[message.guild.id] = oldSearchPlaylistArray[message.guild.id]
                 }
+                message.channel.send('> Aucun résultat obtenu')
                 sendSearchResultsAsString(message, type)
             }
+        })
+    }
+}
+
+function verifyOldResearch(message, type, byReaction) {
+    if (byReaction[0]) {
+        if (type === 'video' && lastSearchArray[message.guild.id].length) {
+            delete searchArray[message.guild.id]
+            searchArray[message.guild.id] = []
+            const lastArray = makeSearchArray(message, lastSearchArray[message.guild.id], 'video', true)
+            if (lastArray && lastArray.length === 5) {
+                setArrayInfos(message, type, false, { nextPageRef: false })
+                sendSearchResultsAsString(message, type)
+                return true
+            }
+            return false
+        }
+        else if (type === 'playlist' && lastSearchPlaylistArray[message.guild.id].length) {
+            delete searchPlaylistArray[message.guild.id]
+            searchPlaylistArray[message.guild.id] = []
+            const lastPlaylistArray = makeSearchArray(message, lastSearchPlaylistArray[message.guild.id], 'playlist', true)
+            if (lastPlaylistArray && lastPlaylistArray.length === 5) {
+                setArrayInfos(message, type, false, { nextPageRef: false })
+                sendSearchResultsAsString(message, type)
+                return true
+            }
+            return false
+        }
+    }
+    return false
+}
+
+function setArrayInfos(message, type, title, searchresults) {
+    if (type === 'video') {
+        if (searchresults.nextpageRef) {
+            searchArray[message.guild.id]['nextpage'] = searchresults.nextpageRef
+        }
+        if (title) {
+            searchArrayInfos[message.guild.id]['title'] = title
+            searchArrayInfos[message.guild.id]['count'] = 2
         }
         else {
-            console.log('Error search by title no results')
+            searchArrayInfos[message.guild.id]['count']++
         }
-    })
+    }
+    else {
+        if (searchresults.nextpageRef) {
+            searchPlaylistArray[message.guild.id]['nextpage'] = searchresults.nextpageRef
+        }
+        if (title) {
+            searchPlaylistArrayInfos[message.guild.id]['title'] = title
+            searchPlaylistArrayInfos[message.guild.id]['count'] = 2
+        }
+        else {
+            searchPlaylistArrayInfos[message.guild.id]['count']++
+        }
+    }
+}
+
+function clearSearchArrays(message, type, byReaction) {
+    if (!byReaction[0]) {
+        if (type === 'video') {
+            delete searchArrayInfos[message.guild.id]
+            delete lastSearchArray[message.guild.id]
+            searchArrayInfos[message.guild.id] = []
+            lastSearchArray[message.guild.id] = []
+        }
+        else {
+            delete searchPlaylistArrayInfos[message.guild.id]
+            delete lastSearchPlaylistArray[message.guild.id]
+            searchPlaylistArrayInfos[message.guild.id] = []
+            lastSearchPlaylistArray[message.guild.id] = []
+        }
+    }
 }
 
 function setArrayWithChoice(message, title, type, nextPage, byReaction) {
     let nextPageVar = nextPage
     const options = {
-        limit: 50
+        limit: 20
     }
     if (type === 'video' && !nextPage) {
         if (searchArray[message.guild.id]) {
@@ -174,27 +250,28 @@ function setArrayWithChoice(message, title, type, nextPage, byReaction) {
         }
         searchPlaylistArray[message.guild.id] = []
     }
+    if (!byReaction[0]) {
+        const goodTitle = title ? title : type === 'video' ? searchArrayInfos[message.guild.id]['title'] : searchPlaylistArrayInfos[message.guild.id]['title']
+        message.channel.send('Recherche de ' + type + ' : ' + '`' + goodTitle.trim() + '`')
+    }
     if (nextPageVar) {
         options.nextpageRef = nextPageVar
-    }
-    else {
-        message.channel.send('Recherche de ' + type + ' : ' + '`' + title.trim() + '`')
     }
     return options
 }
 
-function makeSearchArray(message, searchresults, type, byReaction) {
-    if (!byReaction[0]) {
+function makeSearchArray(message, searchresults, type, verify = false) {
+    const filteredResult = searchresults.filter(i => i.type === type && i.title !== '[Deleted video]' && i.title !== '[Private video]')
+    if (verify) {
         if (type === 'video') {
-            delete searchArrayInfos[message.guild.id]
-            searchArrayInfos[message.guild.id] = []
+            delete lastSearchArray[message.guild.id]
+            lastSearchArray[message.guild.id] = []
         }
         else {
-            delete searchPlaylistArrayInfos[message.guild.id]
-            searchPlaylistArrayInfos[message.guild.id] = []
+            delete lastSearchPlaylistArray[message.guild.id]
+            lastSearchPlaylistArray[message.guild.id] = []
         }
     }
-    const filteredResult = searchresults.items.filter(i => i.type === type && i.title !== '[Deleted video]' && i.title !== '[Private video]')
     filteredResult.map(result => {
         const resultObj = {
             url: result.link,
@@ -206,6 +283,12 @@ function makeSearchArray(message, searchresults, type, byReaction) {
         else if (type === 'playlist' && searchPlaylistArray[message.guild.id].length < 5) {
             resultObj.plLength = result.length
             searchPlaylistArray[message.guild.id].push(resultObj)
+        }
+        else if (type === 'playlist') {
+            lastSearchPlaylistArray[message.guild.id].push(result)
+        }
+        else if (type === 'video') {
+            lastSearchArray[message.guild.id].push(result)
         }
     })
     const array = type == 'video' ? searchArray[message.guild.id] : searchPlaylistArray[message.guild.id]
@@ -356,7 +439,7 @@ function makeAndSendSearchListArray(message, musicExist, playlistExist) {
         resultChoices += '> \n'
         resultChoices += '> **Playlists** \n'
         searchPlaylistArray[message.guild.id].map((song, index) => {
-            resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n'
+            resultChoices += '> **' + (index + 1) + '**. ' + song.title + '(' + song.plLength + ')\n'
         })
         const countChoices = searchPlaylistArray[message.guild.id].length + searchArray[message.guild.id].length
         message.channel.send(`> **Faites un choix parmi les ${countChoices} ci-dessous.** \n > **Ex: ${config.prefix}search p 2** \n > **Ex: ${config.prefix}search pl 1** \n > \n ${resultChoices}`)
@@ -422,6 +505,8 @@ function playSong(message) {
         console.log('Titre : ', playlistInfos[message.guild.id][0].title)
         playlistInfos[message.guild.id]['error'] = true
         console.log(e)
+        console.log('e message : ', e.message)
+        // e.message = 'Cannot call write after a stream was destroyed'
         message.channel.send('> Vidéo bloquée par droit d\'auteur : `' + playlistInfos[message.guild.id][0].title + '`')
         next(message)
         console.log('--------------------------------------')
