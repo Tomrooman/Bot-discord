@@ -386,7 +386,8 @@ function makeAndSendSearchListArray(message, musicExist, playlistExist) {
 
 function playSong(message) {
     if (!retryArray[message.guild.id]) {
-        sendMusicEmbed(message, playlistInfos[message.guild.id][0].title, playlistInfos[message.guild.id][0].id, playlistInfos[message.guild.id][0].thumbnail, [false, 1])
+        const embedObj = setEmbedObj(playlistInfos[message.guild.id][0].title, playlistInfos[message.guild.id][0].id, playlistInfos[message.guild.id][0].thumbnail, playlistInfos[message.guild.id][0].duration)
+        sendMusicEmbed(message, embedObj, [false, 1])
     }
     else {
         delete retryArray[message.guild.id]
@@ -401,7 +402,7 @@ function playSong(message) {
     setTimeout(() => {
         // Check if player is playing when it must be, if not destroy stream and retry to play song
         console.log('------------------')
-        console.log('timeout after 3000 in playsong - Check if music stop anormaly')
+        console.log('timeout after 4500 in playsong - Check if music stop anormaly')
         if (streamsArray[message.guild.id] && !playlistInfos[message.guild.id]['error'] && !streamsArray[message.guild.id].player.voiceConnection.speaking.bitfield && !tryToNext[message.guild.id]) {
             if (playlistInfos[message.guild.id]) {
                 console.log('titre : ', playlistInfos[message.guild.id][0].title)
@@ -415,7 +416,7 @@ function playSong(message) {
             }
         }
         console.log('--------------------------')
-    }, 3000)
+    }, 4500)
     streamsArray[message.guild.id].on('error', (e) => {
         console.log('--------------------------------------')
         console.log('Titre : ', playlistInfos[message.guild.id][0].title)
@@ -466,16 +467,12 @@ function setArrays(message) {
     }
 }
 
-function sendMusicEmbed(message, musicTitle, musicId, thumbnail, added = [false, 1], type = 'video') {
+function sendMusicEmbed(message, embedObj, added = [false, 1], type = 'video') {
     let title = 'Musique'
     let color = false
-    let musicLink = musicTitle
-    if (type === 'video') {
-        musicLink = `[${musicTitle}](https://www.youtube.com/watch?v=${musicId})`
-    }
-    else {
-        musicLink = `[${musicTitle}](https://www.youtube.com/playlist?list=${musicId})`
-    }
+    let queuedLength = playlistArray[message.guild.id].length - 1
+    let musicLink = type === 'video' ? `[${embedObj.title}](https://www.youtube.com/watch?v=${embedObj.id})` : `[${embedObj.title}](https://www.youtube.com/playlist?list=${embedObj.id})`
+    musicLink += embedObj.duration !== 0 ? '\n `' + embedObj.duration + '`' : ''
     if (added[0]) {
         if (added[1] > 1) {
             title = 'Playlist ajoutée'
@@ -490,6 +487,15 @@ function sendMusicEmbed(message, musicTitle, musicId, thumbnail, added = [false,
         // #354F94 | Bleu foncé
         color = 3493780
     }
+    if (playlistArray[message.guild.id].length >= 2) {
+        playlistInfos[message.guild.id].map((video, index) => {
+            if (index >= 1) {
+                addDuration(message, index, video.duration, 'current')
+            }
+        })
+        const formattedDuration = convertSecondsToFormattedDuration(playlistArray[message.guild.id]['currentDuration'])
+        queuedLength += '\n `' + formattedDuration + '`'
+    }
     message.channel.send({
         'embed': {
             'footer': {
@@ -501,7 +507,7 @@ function sendMusicEmbed(message, musicTitle, musicId, thumbnail, added = [false,
                 'icon_url': 'https://syxbot.com/img/embed_music.png'
             },
             'thumbnail': {
-                'url': thumbnail
+                'url': embedObj.thumbnail
             },
             'fields': [
                 {
@@ -511,7 +517,7 @@ function sendMusicEmbed(message, musicTitle, musicId, thumbnail, added = [false,
                 },
                 {
                     'name': 'File d\'attente',
-                    'value': `${playlistArray[message.guild.id].length - 1}`,
+                    'value': queuedLength,
                     'inline': true
                 }
             ]
@@ -532,13 +538,9 @@ function getPlaylist(message, words, playSongParams, byReaction) {
 }
 
 function addPlaylistItems(message, playlist, play, byReaction) {
-    let playlistTitle = 'Playlist'
     let voiceChannel = Helper.take_user_voiceChannel(message)
     if (byReaction[0]) {
         voiceChannel = Helper.take_user_voiceChannel_by_reaction(message, byReaction[1])
-    }
-    if (playlist.title) {
-        playlistTitle = playlist.title
     }
     if (radioPlayed[message.guild.id] || play) {
         playlistArray[message.guild.id] = []
@@ -546,17 +548,19 @@ function addPlaylistItems(message, playlist, play, byReaction) {
         delete radioPlayed[message.guild.id]
     }
     pushPlaylistItems(message, playlist)
+    const formattedDuration = convertSecondsToFormattedDuration(playlistArray[message.guild.id]['newPlaylistDuration'])
+    const embedObj = setEmbedObj(playlist.title, playlist.id, playlist.items[0].thumbnail, formattedDuration)
     if (play) {
         voiceChannel.join()
             .then(conection => {
                 connectedGuild[message.guild.id] = voiceChannel.id
                 connectionsArray[message.guild.id] = conection
-                sendMusicEmbed(message, playlistTitle, playlist.id, playlist.items[0].thumbnail, [true, playlist.items.length], 'playlist')
+                sendMusicEmbed(message, embedObj, [true, playlist.items.length], 'playlist')
                 playSong(message)
             })
     }
     else {
-        sendMusicEmbed(message, playlistTitle, playlist.id, playlist.items[0].thumbnail, [true, playlist.items.length], 'playlist')
+        sendMusicEmbed(message, embedObj, [true, playlist.items.length], 'playlist')
         if (radioPlayed[message.guild.id]) {
             streamsArray[message.guild.id].destroy()
             delete radioPlayed[message.guild.id]
@@ -573,9 +577,10 @@ function pushPlaylistItems(message, playlist) {
     const videoURL = 'https://www.youtube.com/watch?v='
     let pushCount = 0;
     playlist.items.map(video => {
-        console.log('video in playlist : ', video)
         if (video.title !== '[Deleted video]' && video.title !== '[Private video]') {
             pushCount++
+            // Set the added duration
+            addDuration(message, pushCount, video.duration, 'new')
             playlistArray[message.guild.id].push(videoURL + video.id)
             let thumbnailURL = ''
             if (video.thumbnail) {
@@ -598,6 +603,50 @@ function pushPlaylistItems(message, playlist) {
             message.channel.send('> ' + deletedVideo + ' vidéos supprimées')
         }
     }
+}
+
+function convertSecondsToFormattedDuration(duration) {
+    const videoDate = new Date(duration * 1000)
+    const hours = videoDate.getUTCHours()
+    const minutes = videoDate.getUTCMinutes()
+    const seconds = videoDate.getUTCSeconds()
+    let formatedDuration = ''
+    formatedDuration += hours > 0 ? hours.toString() + ':' : ''
+    formatedDuration += minutes > 9 ? minutes.toString() + ':' : hours > 0 ? '0' + minutes.toString() + ':' : minutes.toString() + ':'
+    formatedDuration += seconds > 9 ? seconds.toString() : '0' + seconds.toString()
+    return formatedDuration
+}
+
+function addDuration(message, count, duration, type = 'new') {
+    if (count === 1) {
+        if (type === 'new') {
+            playlistArray[message.guild.id]['newPlaylistDuration'] = getSeconds(duration)
+        }
+        else {
+            playlistArray[message.guild.id]['currentDuration'] = getSeconds(duration)
+        }
+    }
+    else if (type === 'new') {
+        playlistArray[message.guild.id]['newPlaylistDuration'] += getSeconds(duration)
+    }
+    else {
+        playlistArray[message.guild.id]['currentDuration'] += getSeconds(duration)
+    }
+}
+
+function getSeconds(duration) {
+    const splittedDuration = duration.split(':')
+    let resultSeconds = 0
+    if (splittedDuration.length === 3) {
+        resultSeconds += Number(splittedDuration[0]) * 3600
+        resultSeconds += Number(splittedDuration[1]) * 60
+        resultSeconds += Number(splittedDuration[2])
+    }
+    else {
+        resultSeconds += Number(splittedDuration[0]) * 60
+        resultSeconds += Number(splittedDuration[1])
+    }
+    return resultSeconds
 }
 
 function getVideo(message, words, playSongParams = true, byReaction) {
@@ -638,8 +687,18 @@ function setMusicArrayAndPlayMusic(infos, message, playSongParams, byReaction) {
         playSong(message)
     }
     else {
-        clearAndAddArrayInfos(message, infos, false)
-        sendMusicEmbed(message, infos.title, infos.video_id, infos.player_response.videoDetails.thumbnail.thumbnails[0], [true, 1])
+        const formattedDuration = clearAndAddArrayInfos(message, infos, false)
+        const embedObj = setEmbedObj(infos.title, infos.video_id, infos.player_response.videoDetails.thumbnail.thumbnails[0].url, formattedDuration)
+        sendMusicEmbed(message, embedObj, [true, 1])
+    }
+}
+
+function setEmbedObj(title, id, thumbnail, duration) {
+    return {
+        title: title,
+        id: id,
+        thumbnail: thumbnail,
+        duration: duration
     }
 }
 
@@ -649,20 +708,14 @@ function clearAndAddArrayInfos(message, infos, clear = true) {
         playlistInfos[message.guild.id] = []
     }
     playlistArray[message.guild.id].push(infos.video_url)
-    // console.log('get video : ', infos)
-    // convert length second to 1:25 format
-    // const videoDate = new Date(infos.player_response.videoDetails.lengthSeconds * 1000)
-    // console.log('jour : ', videoDate.getDay())
-    // getDays().toString()
-    // console.log('heure : ', videoDate.getHours())
-    // console.log('min : ', videoDate.getMinutes())
-    // console.log('sec : ', videoDate.getSeconds())
+    const formattedDuration = convertSecondsToFormattedDuration(infos.player_response.videoDetails.lengthSeconds)
     playlistInfos[message.guild.id].push({
         title: infos.title,
         id: infos.video_id,
         thumbnail: infos.player_response.videoDetails.thumbnail.thumbnails[0].url,
-        duration: infos.player_response.videoDetails.lengthSeconds
+        duration: formattedDuration
     })
+    return formattedDuration
 }
 
 function radioExist(radioCheck) {
