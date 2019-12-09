@@ -25,10 +25,6 @@ bot.on('message', (message) => {
     }
 })
 
-bot.on('guildMemberAdd', user => {
-    console.log('user added : ', user)
-})
-
 bot.on('messageReactionAdd', (reaction, user) => {
     if (!user.bot) {
         const playlistExist = reaction.message.content.indexOf('Ex: ' + config.prefix + 'search pl 1') !== -1

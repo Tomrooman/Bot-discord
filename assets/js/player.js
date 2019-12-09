@@ -506,7 +506,7 @@ function playSong(message) {
         playlistInfos[message.guild.id]['error'] = true
         console.log(e)
         console.log('e message : ', e.message)
-        console.log('indexOf content : ', e.message.indexOf('This video contains content'))
+        // console.log('indexOf content : ', e.message.indexOf('This video contains content'))
         // e.message = 'Cannot call write after a stream was destroyed'
         message.channel.send('> Vidéo bloquée par droit d\'auteur : `' + playlistInfos[message.guild.id][0].title + '`')
         next(message)
@@ -1153,7 +1153,7 @@ function sendRemoveEmbed(message, number) {
             'color': color,
             'author': {
                 'name': title,
-                'icon_url': 'https://syxbot.com/img/embed_music.png'
+                'icon_url': 'https://syxbot.com/img/music_remove.png'
             },
             'fields': [
                 {
