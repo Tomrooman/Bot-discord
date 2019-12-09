@@ -17,6 +17,12 @@ function take_user_voiceChannel(message) {
     return voiceChannel
 }
 
+function countConnectedGuilds(bot) {
+    let count = 0
+    bot.guilds.map(() => count++)
+    return count
+}
+
 function take_user_voiceChannel_by_reaction(message, author) {
     let voiceChannel = false
     message.guild.channels.map(channel => {
@@ -304,3 +310,4 @@ exports.availableCommand = availableCommand
 exports.getCommandInfos = getCommandInfos
 exports.take_user_voiceChannel_by_reaction = take_user_voiceChannel_by_reaction
 exports.getBot = getBot
+exports.countConnectedGuilds = countConnectedGuilds

@@ -6,6 +6,10 @@ function controller(message, words, bot) {
             if (words[1] === 'message') {
                 sendMessageToAllServer(message, words, bot)
             }
+            else if (words[1] === 'count') {
+                const count = Helper.countConnectedGuilds(bot)
+                message.channel.send('> Connected guilds : **' + count + '**')
+            }
             else {
                 message.channel.send('> Cette commande admin n\'existe pas')
             }

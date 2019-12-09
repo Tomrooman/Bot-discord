@@ -12,8 +12,7 @@ connectToDatabase()
 bot.on('ready', () => {
     disconnectBotFromOldChannel()
     console.log('----- Connected ' + config.WHAT + ' -----')
-    let count = 0
-    bot.guilds.map(() => count++)
+    const count = Helper.countConnectedGuilds(bot)
     console.log('Connected guilds : ', count)
 })
 
@@ -24,6 +23,10 @@ bot.on('message', (message) => {
     else if (message.author.id !== config.clientId) {
         Level.addXp(message)
     }
+})
+
+bot.on('guildMemberAdd', user => {
+    console.log('user added : ', user)
 })
 
 bot.on('messageReactionAdd', (reaction, user) => {
