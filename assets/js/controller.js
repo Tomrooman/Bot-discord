@@ -3,8 +3,9 @@ const Message = require('./message.js')
 const Level = require('./level.js')
 const Helper = require('./helper.js')
 const Custom = require('./custom.js')
+const Admin = require('./admin.js')
 
-function dispatcher(message, prefix) {
+function dispatcher(message, prefix, bot) {
     const words = message.content.substr(prefix.length, message.content.length - prefix.length).split(' ')
     const command = words[0].toLowerCase()
     if (message.content.length > prefix.length) {
@@ -81,6 +82,9 @@ function dispatcher(message, prefix) {
         }
         else if (command === 'pioupiou') {
             Custom.pioupiou(message)
+        }
+        else if (command === 'admin') {
+            Admin.controller(message, words, bot)
         }
         else {
             message.channel.send('Cette commande n\'existe pas ! \n Tapez **' + prefix + 'help** pour afficher la liste des commandes.')

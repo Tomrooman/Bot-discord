@@ -12,18 +12,11 @@ connectToDatabase()
 bot.on('ready', () => {
     disconnectBotFromOldChannel()
     console.log('----- Connected ' + config.WHAT + ' -----')
-    // send message to all first available guild's channel
-    // bot.guilds.map(guild => {
-    //     if (guild.available) {
-    //         let channel = Helper.getFirstAuthorizedChannel(guild)
-    //         channel.send('Je suis en ligne !')
-    //     }
-    // })
 })
 
 bot.on('message', (message) => {
     if (message.content.toLowerCase().startsWith(config.prefix) && message.content.indexOf('!!!') === -1) {
-        Controller.dispatcher(message, config.prefix)
+        Controller.dispatcher(message, config.prefix, bot)
     }
     else if (message.author.id !== config.clientId) {
         Level.addXp(message)
@@ -35,31 +28,10 @@ bot.on('messageReactionAdd', (reaction, user) => {
         const playlistExist = reaction.message.content.indexOf('Ex: ' + config.prefix + 'search pl 1') !== -1
         const videoExist = reaction.message.content.indexOf('Ex: ' + config.prefix + 'search p 2') !== -1
         if (playlistExist || videoExist) {
-            let selection = 0
-            if (reaction.emoji.name === '1️⃣') {
-                selection = 1
-            }
-            if (reaction.emoji.name === '2️⃣') {
-                selection = 2
-            }
-            if (reaction.emoji.name === '3️⃣') {
-                selection = 3
-            }
-            if (reaction.emoji.name === '4️⃣') {
-                selection = 4
-            }
-            if (reaction.emoji.name === '5️⃣') {
-                selection = 5
-            }
+            const selection = getSelectionByReaction(reaction)
             if (playlistExist && !videoExist) {
                 if (reaction.emoji.name === '⏩') {
-                    const userChannel = Helper.take_user_voiceChannel_by_reaction(reaction.message, user)
-                    if (userChannel) {
-                        Player.youtubeResearch(reaction.message, null, 'playlist', false, [true, user])
-                    }
-                    else {
-                        reaction.message.channel.send('Vous devez être connecté dans un salon !')
-                    }
+                    nextReaction(reaction, user, 'playlist')
                 }
                 else {
                     Player.selectSongInSearchList(reaction.message, selection, 'playlist', [true, user])
@@ -67,13 +39,7 @@ bot.on('messageReactionAdd', (reaction, user) => {
             }
             else if (videoExist && !playlistExist) {
                 if (reaction.emoji.name === '⏩') {
-                    const userChannel = Helper.take_user_voiceChannel_by_reaction(reaction.message, user)
-                    if (userChannel) {
-                        Player.youtubeResearch(reaction.message, null, 'video', false, [true, user])
-                    }
-                    else {
-                        reaction.message.channel.send('Vous devez être connecté dans un salon !')
-                    }
+                    nextReaction(reaction, user, 'video')
                 }
                 else {
                     Player.selectSongInSearchList(reaction.message, selection, 'musique', [true, user])
@@ -82,6 +48,35 @@ bot.on('messageReactionAdd', (reaction, user) => {
         }
     }
 })
+
+function nextReaction(reaction, user, type) {
+    const userChannel = Helper.take_user_voiceChannel_by_reaction(reaction.message, user)
+    if (userChannel) {
+        Player.youtubeResearch(reaction.message, null, type, false, [true, user])
+    }
+    else {
+        reaction.message.channel.send('Vous devez être connecté dans un salon !')
+    }
+}
+
+function getSelectionByReaction(reaction) {
+    if (reaction.emoji.name === '1️⃣') {
+        return 1
+    }
+    if (reaction.emoji.name === '2️⃣') {
+        return 2
+    }
+    if (reaction.emoji.name === '3️⃣') {
+        return 3
+    }
+    if (reaction.emoji.name === '4️⃣') {
+        return 4
+    }
+    if (reaction.emoji.name === '5️⃣') {
+        return 5
+    }
+    return false
+}
 
 function connectToDatabase() {
     console.log('Connecting to database ...')
