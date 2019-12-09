@@ -556,8 +556,8 @@ function sendMusicEmbed(message, embedObj, added = [false, 1], type = 'video') {
     let title = 'Musique'
     let color = false
     let queuedLength = playlistArray[message.guild.id].length - 1
+    let formattedDuration = 0
     let musicLink = type === 'video' ? `[${embedObj.title}](https://www.youtube.com/watch?v=${embedObj.id})` : `[${embedObj.title}](https://www.youtube.com/playlist?list=${embedObj.id})`
-    musicLink += embedObj.duration !== 0 ? '\n `' + embedObj.duration + '`' : ''
     if (added[0]) {
         if (added[1] > 1) {
             title = 'Playlist ajoutée'
@@ -578,8 +578,7 @@ function sendMusicEmbed(message, embedObj, added = [false, 1], type = 'video') {
                 addDuration(message, index, video.duration, 'current')
             }
         })
-        const formattedDuration = convertSecondsToFormattedDuration(playlistArray[message.guild.id]['currentDuration'])
-        queuedLength += '\n `' + formattedDuration + '`'
+        formattedDuration = convertSecondsToFormattedDuration(playlistArray[message.guild.id]['currentDuration'])
     }
     message.channel.send({
         'embed': {
@@ -603,6 +602,16 @@ function sendMusicEmbed(message, embedObj, added = [false, 1], type = 'video') {
                 {
                     'name': 'File d\'attente',
                     'value': queuedLength,
+                    'inline': true
+                },
+                {
+                    'name': 'Durée',
+                    'value': embedObj.duration,
+                    'inline': true
+                },
+                {
+                    'name': 'Durée totale',
+                    'value': formattedDuration,
                     'inline': true
                 }
             ]
@@ -664,7 +673,6 @@ function pushPlaylistItems(message, playlist) {
     playlist.items.map(video => {
         if (video.title !== '[Deleted video]' && video.title !== '[Private video]') {
             pushCount++
-            // Set the added duration
             addDuration(message, pushCount, video.duration, 'new')
             playlistArray[message.guild.id].push(videoURL + video.id)
             let thumbnailURL = ''
@@ -957,10 +965,6 @@ function getConnectedGuild(guildID) {
     }
     return false
 }
-
-// function getVerifyBotLocationInfos(userChannelId, guildId) {
-//     return [connectionsArray[userChannelId], connectedGuild[guildId]]
-// }
 
 function getSongInPlaylist(message, number) {
     const userChannel = Helper.take_user_voiceChannel(message)
