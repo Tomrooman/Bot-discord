@@ -506,6 +506,7 @@ function playSong(message) {
         playlistInfos[message.guild.id]['error'] = true
         console.log(e)
         console.log('e message : ', e.message)
+        //console.log('indexof content : ', e.message.indexOf('This video contains content'))
         // e.message = 'Cannot call write after a stream was destroyed'
         message.channel.send('> Vidéo bloquée par droit d\'auteur : `' + playlistInfos[message.guild.id][0].title + '`')
         next(message)
@@ -555,9 +556,9 @@ function setArrays(message) {
 function sendMusicEmbed(message, embedObj, added = [false, 1], type = 'video') {
     let title = 'Musique'
     let color = false
-    let queuedLength = playlistArray[message.guild.id].length - 1
+    const queuedLength = playlistArray[message.guild.id].length - 1
     let formattedDuration = 0
-    let musicLink = type === 'video' ? `[${embedObj.title}](https://www.youtube.com/watch?v=${embedObj.id})` : `[${embedObj.title}](https://www.youtube.com/playlist?list=${embedObj.id})`
+    const musicLink = type === 'video' ? `[${embedObj.title}](https://www.youtube.com/watch?v=${embedObj.id})` : `[${embedObj.title}](https://www.youtube.com/playlist?list=${embedObj.id})`
     if (added[0]) {
         if (added[1] > 1) {
             title = 'Playlist ajoutée'
@@ -1043,6 +1044,133 @@ function createSongsString(message) {
     return songsArray
 }
 
+function removeSelectedSongsMaster(message, words) {
+    const userChannel = Helper.take_user_voiceChannel(message)
+    if (userChannel) {
+        if (Helper.verifyBotLocation(message, userChannel)) {
+            if (playlistArray[message.guild.id] && playlistArray[message.guild.id].length) {
+                if (words[2]) {
+                    const selection = words[2].split('-')
+                    if (selection.length <= 2) {
+                        removeSelectedSongs(message, selection)
+                    }
+                    else {
+                        message.channel.send('> Veuillez n\'écrire que 2 index maximum.```Ex: ' + config.prefix + 'p remove 15-20```')
+                    }
+                }
+                else {
+                    message.channel.send('Vous devez sélectionner la/les musique(s) à supprimé')
+                }
+            }
+            else {
+                message.channel.send('Aucune musique dans la file d\'attente')
+            }
+        }
+    }
+    else {
+        message.channel.send('Vous devez être connecté dans un salon !')
+    }
+
+}
+
+function removeSelectedSongs(message, selection) {
+    const selectZero = Number(selection[0])
+    if (selection[1]) {
+        const selectOne = Number(selection[1])
+        if (selectOne && selectZero && selectZero < selectOne) {
+            if (selectZero > 0 && selectOne < playlistArray[message.guild.id].length) {
+                for (let i = selectZero; i <= selectOne; i++) {
+                    delete playlistInfos[message.guild.id][i]
+                    delete playlistArray[message.guild.id][i]
+                }
+                playlistArray[message.guild.id] = _.compact(playlistArray[message.guild.id])
+                playlistInfos[message.guild.id] = _.compact(playlistInfos[message.guild.id])
+                sendRemoveEmbed(message, (selectOne - selectZero) + 1)
+            }
+            else {
+                message.channel.send('Sélectionnez des musiques compris entre 1 et ' + playlistArray[message.guild.id].length - 1)
+            }
+        }
+        else {
+            message.channel.send('Le 2ème index doit être plus grand que le premier !')
+        }
+    }
+    else if (selectZero && selectZero > 0) {
+        delete playlistInfos[message.guild.id][selectZero]
+        delete playlistArray[message.guild.id][selectZero]
+        playlistArray[message.guild.id] = _.compact(playlistArray[message.guild.id])
+        playlistInfos[message.guild.id] = _.compact(playlistInfos[message.guild.id])
+        sendRemoveEmbed(message, 1)
+    }
+    else {
+        message.channel.send('Sélectionnez une musique compris entre 1 et ' + playlistArray[message.guild.id].length - 1)
+    }
+}
+
+function go(message, words) {
+    const userChannel = Helper.take_user_voiceChannel(message)
+    if (userChannel) {
+        if (Helper.verifyBotLocation(message, userChannel)) {
+            if (words[1] && Number(words[1])) {
+                const number = Number(words[1])
+                if (playlistArray[message.guild.id] && playlistArray[message.guid.id].length) {
+                    if (number > 0 && number < playlistArray[message.guild.id].length) {
+                        streamsArray[message.guild.id].destroy()
+                        for (let i = 0; i < number; i++) {
+                            delete playlistInfos[message.guild.id][i]
+                            delete playlistArray[message.guild.id][i]
+                        }
+                        playlistArray[message.guild.id] = _.compact(playlistArray[message.guild.id])
+                        playlistInfos[message.guild.id] = _.compact(playlistInfos[message.guild.id])
+                        sendRemoveEmbed(message, number)
+                        playSong(message)
+                    }
+                    else {
+                        message.channel.send('Sélectionnez une musique compris entre 1 et ' + playlistArray[message.guild.id].length - 1)
+                    }
+                }
+                else {
+                    message.channel.send('Aucune musique dans la file d\'attente')
+                }
+            }
+            else {
+                message.channel.send('Sélectionnez l\'index d\'une musique.```Ex: ' + config.prefix + 'go 12```')
+            }
+        }
+    }
+    else {
+        message.channel.send('Vous devez être connecté dans un salon !')
+    }
+}
+
+function sendRemoveEmbed(message, number) {
+    const title = number > 1 ? 'Musiques supprimées' : 'Musique supprimée'
+    const queuedLength = playlistArray[message.guild.id].length - 1
+    // #e00000 | Rouge | Decimal value
+    const color = 14680064
+    message.channel.send({
+        'embed': {
+            'color': color,
+            'author': {
+                'name': title,
+                'icon_url': 'https://syxbot.com/img/embed_music.png'
+            },
+            'fields': [
+                {
+                    'name': 'Nombre',
+                    'value': number,
+                    'inline': true
+                },
+                {
+                    'name': 'File d\'attente',
+                    'value': queuedLength,
+                    'inline': true
+                }
+            ]
+        }
+    })
+}
+
 function quit(message) {
     const userChannel = Helper.take_user_voiceChannel(message)
     if (Helper.verifyBotLocation(message, userChannel)) {
@@ -1103,3 +1231,5 @@ exports.toggleLoop = toggleLoop
 exports.selectSongOrPlaylistInSearchList = selectSongOrPlaylistInSearchList
 exports.getConnectedGuild = getConnectedGuild
 exports.youtubeResearch = youtubeResearch
+exports.removeSelectedSongsMaster = removeSelectedSongsMaster
+exports.go = go

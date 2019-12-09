@@ -12,6 +12,9 @@ function dispatcher(message, prefix) {
             if (words[1] === 'list') {
                 Player.showQueuedSongs(message)
             }
+            else if (words[1] === 'r' || words[1] === 'remove') {
+                Player.removeSelectedSongsMaster(message, words)
+            }
             else if (Number.isFinite(parseInt(words[1]))) {
                 Player.getSongInPlaylist(message, parseInt(words[1]))
             }
@@ -26,6 +29,9 @@ function dispatcher(message, prefix) {
             else {
                 Player.getSongInSearchList(message)
             }
+        }
+        else if (command === 'go') {
+            Player.go(message, words)
         }
         else if (command === 'loop') {
             Player.toggleLoop(message)
