@@ -17,7 +17,10 @@ bot.on('ready', () => {
 })
 
 bot.on('message', (message) => {
-    if (message.content.toLowerCase().startsWith(config.prefix) && message.content.indexOf('!!!') === -1) {
+    if (message.type === 'GUILD_MEMBER_JOIN' && message.author.id === config.clientId) {
+        message.channel.send('> Mon préfix est : `' + config.prefix + '` \n > Pour afficher la liste des commandes faites : `' + config.prefix + 'help`')
+    }
+    else if (message.content.toLowerCase().startsWith(config.prefix) && message.content.indexOf('!!!') === -1) {
         Controller.dispatcher(message, config.prefix, bot)
     }
     else if (message.author.id !== config.clientId) {
