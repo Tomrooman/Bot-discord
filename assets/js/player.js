@@ -506,7 +506,7 @@ function playSong(message) {
         playlistInfos[message.guild.id]['error'] = true
         console.log(e)
         console.log('e message : ', e.message)
-        // console.log('indexOf content : ', e.message.indexOf('This video contains content'))
+        console.log('indexOf content : ', e.message.indexOf('This video contains content'))
         // e.message = 'Cannot call write after a stream was destroyed'
         message.channel.send('> Vidéo bloquée par droit d\'auteur : `' + playlistInfos[message.guild.id][0].title + '`')
         next(message)
@@ -570,8 +570,8 @@ function sendMusicEmbed(message, embedObj, added = [false, 1], type = 'video') {
         color = 3768896
     }
     else {
-        // #354F94 | Bleu foncé
-        color = 3493780
+        // #5b1aa6 | Mauve
+        color = 5970598
     }
     if (playlistArray[message.guild.id].length >= 2) {
         playlistInfos[message.guild.id].map((video, index) => {
