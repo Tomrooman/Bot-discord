@@ -12,6 +12,9 @@ connectToDatabase()
 bot.on('ready', () => {
     disconnectBotFromOldChannel()
     console.log('----- Connected ' + config.WHAT + ' -----')
+    let count = 0
+    bot.guilds.map(() => count++)
+    console.log('Connected guilds : ', count)
 })
 
 bot.on('message', (message) => {

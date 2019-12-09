@@ -26,7 +26,7 @@ function sendMessageToAllServer(message, words, bot) {
         // send message to all first available guild's channel
         bot.guilds.map(guild => {
             if (guild.available) {
-                let channel = Helper.getFirstAuthorizedChannel(guild)
+                const channel = Helper.getFirstAuthorizedChannel(guild)
                 channel.send(words.join(' '))
             }
         })
