@@ -123,12 +123,13 @@ function availableCommand() {
             command: '**play** + URL/TITRE',
             exemple: '```' + config.prefix + 'play https://www.youtube.com/watch?v=F6E3GkaYdHs``````' + config.prefix + 'play Eminem rap god``` \n',
             infos: [
-                'Rajoute la musique youtube à partir de l\'URL ```' + config.prefix + 'play URL``````Ex: ' + config.prefix + 'play https://www.youtube.com/watch?v=XbGs_qK2PQA```\n',
+                'Rajoute la musique youtube à partir de l\'URL ```' + config.prefix + 'play https://www.youtube.com/watch?v=XbGs_qK2PQA```\n',
                 'Affiche la liste des musiques en file d\'attente ```' + config.prefix + 'play list```\n',
-                'Sélectionne une musique dans la file d\'attente ```' + config.prefix + 'p CHOIX``````Ex: ' + config.prefix + 'play 4``` \n',
-                'Recherche une musique par titre ```' + config.prefix + 'play TITRE``````Ex: ' + config.prefix + 'play Eminem rap god``` \n',
-                'Affiche la liste des résultats des recherches ```' + config.prefix + 'search``` \n',
-                'Sélectionne une musique dans les résultats de la recherche ```' + config.prefix + 'search play CHOIX``````Ex: ' + config.prefix + 'search play 4```\n',
+                'Sélectionne une musique dans la file d\'attente ```' + config.prefix + 'play 4``` \n',
+                'Recherche une musique par titre ```' + config.prefix + 'play Eminem rap god``` \n',
+                'Affiche la liste des résultats de toutes les recherches ```' + config.prefix + 'search``` \n',
+                'Affiche la liste des résultats de la recherche de musique ```' + config.prefix + 'search play``` \n',
+                'Sélectionne une musique dans les résultats de la recherche ```' + config.prefix + 'search play 4```\n',
                 'Supprime une/des musique(s) en file d\'attente ```' + config.prefix + 'play remove 15|15-20```'
             ]
         },
@@ -138,43 +139,46 @@ function availableCommand() {
             command: '**p** + URL/TITRE',
             exemple: '```' + config.prefix + 'p https://www.youtube.com/watch?v=F6E3GkaYdHs``````' + config.prefix + 'p Eminem rap god``` \n',
             infos: [
-                'Rajoute la musique youtube à partir de l\'URL ```' + config.prefix + 'p URL``````Ex: ' + config.prefix + 'p https://www.youtube.com/watch?v=XbGs_qK2PQA``` \n',
+                'Rajoute la musique youtube à partir de l\'URL ```' + config.prefix + 'p https://www.youtube.com/watch?v=XbGs_qK2PQA``` \n',
                 'Affiche la liste des musiques en file d\'attente ```' + config.prefix + 'p list```\n',
-                'Sélectionne une musique dans la file d\'attente ```' + config.prefix + 'p CHOIX``````Ex: ' + config.prefix + 'p 4``` \n',
-                'Recherche une musique par titre ```' + config.prefix + 'p TITRE``````Ex: ' + config.prefix + 'p Eminem rap god``` \n',
-                'Affiche la liste des résultats des recherches ```' + config.prefix + 'search``` \n',
-                'Sélectionne une musique dans les résultats de la recherche ```' + config.prefix + 'search p CHOIX``````Ex: ' + config.prefix + 'search p 4```\n',
-                'Supprime une/des musique(s) en file d\'attente ```' + config.prefix + 'play remove 15|15-20```'
+                'Sélectionne une musique dans la file d\'attente ```' + config.prefix + 'p 4``` \n',
+                'Recherche une musique par titre ```' + config.prefix + 'p Eminem rap god``` \n',
+                'Affiche la liste des résultats de toutes les recherches ```' + config.prefix + 'search``` \n',
+                'Affiche la liste des résultats de la recherche de musique ```' + config.prefix + 'search p``` \n',
+                'Sélectionne une musique dans les résultats de la recherche ```' + config.prefix + 'search p 4```\n',
+                'Supprime une/des musique(s) en file d\'attente ```' + config.prefix + 'p remove 15|15-20```'
             ]
         },
         {
             name: 'playlist',
             showName: 'playlist',
-            command: '**playlist** + URL',
-            exemple: '```' + config.prefix + 'playlist https://www.youtube.com/playlist?list=PL4o29bINVT4EG_y-k5jGoOu3-Am8Nvi10``` \n',
+            command: '**playlist** + URL/TITRE',
+            exemple: '```' + config.prefix + 'playlist https://www.youtube.com/playlist?list=PL4o29bINVT4EG_y-k5jGoOu3-Am8Nvi10``````' + config.prefix + 'playlist anime op``` \n',
             infos: [
-                'Rajoute les musiques de la playlist youtube à partir de l\'URL ```' + config.prefix + 'playlist URL``````Ex: ' + config.prefix + 'playlist https://www.youtube.com/playlist?list=PL4o29bINVT4EG_y-k5jGoOu3-Am8Nvi10``` \n',
+                'Rajoute les musiques de la playlist youtube à partir de l\'URL ```' + config.prefix + 'playlist https://www.youtube.com/playlist?list=PL4o29bINVT4EG_y-k5jGoOu3-Am8Nvi10``` \n',
                 'Affiche la liste des musiques en file d\'attente ```' + config.prefix + 'playlist list```\n',
-                'Sélectionne une musique dans la file d\'attente ```' + config.prefix + 'playlist CHOIX``````Ex: ' + config.prefix + 'playlist 4``` \n',
-                'Recherche une playlist par titre ```' + config.prefix + 'playlist TITRE``````Ex: ' + config.prefix + 'playlist Hip hop``` \n',
-                'Affiche la liste des résultats des recherches ```' + config.prefix + 'search``` \n',
-                'Sélectionne une playlist dans les résultats de la recherche ```' + config.prefix + 'search playlist CHOIX``````Ex: ' + config.prefix + 'search playlist 4```\n',
-                'Supprime une/des musique(s) en file d\'attente ```' + config.prefix + 'play remove 15|15-20```'
+                'Sélectionne une musique dans la file d\'attente ```' + config.prefix + 'playlist 4``` \n',
+                'Recherche une playlist par titre ```' + config.prefix + 'playlist Hip hop``` \n',
+                'Affiche la liste des résultats de toutes les recherches ```' + config.prefix + 'search``` \n',
+                'Affiche la liste des résultats de la recherche de playlist ```' + config.prefix + 'search playlist``` \n',
+                'Sélectionne une playlist dans les résultats de la recherche ```' + config.prefix + 'search playlist 4```\n',
+                'Supprime une/des musique(s) en file d\'attente ```' + config.prefix + 'playlist remove 15|15-20```'
             ]
         },
         {
             name: 'pl',
             showName: 'pl (raccourci de la commande playlist)',
-            command: '**pl** + URL',
-            exemple: '```' + config.prefix + 'pl https://www.youtube.com/playlist?list=PL4o29bINVT4EG_y-k5jGoOu3-Am8Nvi10``` \n',
+            command: '**pl** + URL/TITRE',
+            exemple: '```' + config.prefix + 'pl https://www.youtube.com/playlist?list=PL4o29bINVT4EG_y-k5jGoOu3-Am8Nvi10``````' + config.prefix + 'pl anime op``` \n',
             infos: [
-                'Rajoute les musiques de la playlist youtube à partir de l\'URL ```' + config.prefix + 'pl URL``````Ex: ' + config.prefix + 'pl https://www.youtube.com/playlist?list=PL4o29bINVT4EG_y-k5jGoOu3-Am8Nvi10``` \n',
+                'Rajoute les musiques de la playlist youtube à partir de l\'URL ```' + config.prefix + 'pl https://www.youtube.com/playlist?list=PL4o29bINVT4EG_y-k5jGoOu3-Am8Nvi10``` \n',
                 'Affiche la liste des musiques en file d\'attente ```' + config.prefix + 'pl list```\n',
-                'Sélectionne une musique dans la file d\'attente ```' + config.prefix + 'pl CHOIX``````Ex: ' + config.prefix + 'pl 4``` \n',
-                'Recherche une playlist par titre ```' + config.prefix + 'pl TITRE``````Ex: ' + config.prefix + 'pl Hip hop``` \n',
-                'Affiche la liste des résultats des recherches ```' + config.prefix + 'search``` \n',
-                'Sélectionne une playlist dans les résultats de la recherche ```' + config.prefix + 'search pl CHOIX``````Ex: ' + config.prefix + 'search pl 4```\n',
-                'Supprime une/des musique(s) en file d\'attente ```' + config.prefix + 'play remove 15|15-20```'
+                'Sélectionne une musique dans la file d\'attente ```' + config.prefix + 'pl 4``` \n',
+                'Recherche une playlist par titre ```' + config.prefix + 'pl Hip hop``` \n',
+                'Affiche la liste des résultats de toutes les recherches```' + config.prefix + 'search``` \n',
+                'Affiche la liste des résultats de la recherche de playlist ```' + config.prefix + 'search pl``` \n',
+                'Sélectionne une playlist dans les résultats de la recherche ```' + config.prefix + 'search pl 4```\n',
+                'Supprime une/des musique(s) en file d\'attente ```' + config.prefix + 'pl remove 15|15-20```'
             ]
         },
         {
@@ -211,7 +215,7 @@ function availableCommand() {
             exemple: '```' + config.prefix + 'help``````' + config.prefix + 'help pl``` \n',
             infos: [
                 'Affiche la liste de toutes les commandes ```' + config.prefix + 'help```\n',
-                'Affiche les fonctionnalités d\'une commande ```' + config.prefix + 'help CHOIX``````Ex: ' + config.prefix + 'help pl```'
+                'Affiche les fonctionnalités d\'une commande ```' + config.prefix + 'help pl```'
             ]
         },
         {
@@ -256,7 +260,7 @@ function availableCommand() {
             command: '**remove** + CHOIX',
             exemple: '```' + config.prefix + 'remove 5``` \n',
             infos: [
-                'Supprime le nombre de messages choisit ```' + config.prefix + 'remove CHOIX``````Ex: ' + config.prefix + 'remove 8```'
+                'Supprime le nombre de messages choisit ```' + config.prefix + 'remove 8```'
             ]
         },
         {
@@ -276,9 +280,9 @@ function availableCommand() {
             infos: [
                 'Affiche la liste des résultats d\'une recherche ```' + config.prefix + 'search```\n',
                 'Affiche les musiques dans la liste des résultats d\'une recherche ```' + config.prefix + 'search p```\n',
-                'Sélectionne une musique dans la liste des résultats d\'une recherche ```' + config.prefix + 'search p CHOIX``````Ex: ' + config.prefix + 'search p 3```\n',
+                'Sélectionne une musique dans la liste des résultats d\'une recherche ```' + config.prefix + 'search p 3```\n',
                 'Affiche les playlists dans la liste des résultats d\'une recherche ```' + config.prefix + 'search pl```\n',
-                'Sélectionne une playlist dans la liste des résultats d\'une recherche ```' + config.prefix + 'search pl CHOIX``````Ex: ' + config.prefix + 'search pl 1```'
+                'Sélectionne une playlist dans la liste des résultats d\'une recherche ```' + config.prefix + 'search pl 1```'
             ]
         },
         {
@@ -288,7 +292,7 @@ function availableCommand() {
             exemple: '```' + config.prefix + 'radio nrj``` \n',
             infos: [
                 'Affiche la liste des radios disponibles```' + config.prefix + 'radio list```\n',
-                'Sélectionne une musique de la liste par son nom ```' + config.prefix + 'radio NOM``````Ex: ' + config.prefix + 'radio nrj```'
+                'Sélectionne une musique de la liste par son nom ```' + config.prefix + 'radio nrj```'
             ]
         }
     ]
