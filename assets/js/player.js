@@ -4,6 +4,7 @@ const ytsr = require('ytsr')
 const Helper = require('./helper.js')
 const _ = require('lodash')
 const config = require('./../../config.json')
+const Discord = require('discord.js')
 
 const connectionsArray = []
 const streamsArray = []
@@ -12,6 +13,7 @@ const playlistInfos = []
 const connectedGuild = []
 const radioPlayed = []
 const searchArray = []
+const cancelArray = []
 const searchPlaylistArray = []
 const searchArrayInfos = []
 const searchPlaylistArrayInfos = []
@@ -67,11 +69,11 @@ function playSongs(message, command, words, byReaction = [false, false]) {
             playSongsAndConnectOrNotBot(message, command, words, false, byReaction)
         }
         else {
-            message.channel.send('Vous n\'êtes pas dans le même canal que le bot !')
+            message.channel.send('> Vous n\'êtes pas dans le même canal que le bot !')
         }
     }
     else {
-        message.channel.send('Vous devez être connecté dans un salon !');
+        message.channel.send('> Vous devez être connecté dans un salon !');
     }
 }
 
@@ -82,7 +84,7 @@ function playSongsAndConnectOrNotBot(message, command, words, playSongParams = t
                 getPlaylist(message, words, playSongParams, byReaction)
             }
             else {
-                message.channel.send('Merci de renseigner une URL de playlist valide !')
+                message.channel.send('> Vous devez renseigner une URL de playlist valide !')
             }
         }
         else if (command === 'play' || command === 'p') {
@@ -90,7 +92,7 @@ function playSongsAndConnectOrNotBot(message, command, words, playSongParams = t
                 getVideo(message, words, playSongParams, byReaction)
             }
             else {
-                message.channel.send('Ce n\'est pas une URL de vidéo valide !')
+                message.channel.send('> Ce n\'est pas une URL de vidéo valide !')
             }
         }
     }
@@ -98,14 +100,16 @@ function playSongsAndConnectOrNotBot(message, command, words, playSongParams = t
         delete words[0];
         const title = words.join(' ')
         if (command === 'playlist' || command === 'pl') {
+            delete cancelArray[message.guild.id]
             youtubeResearch(message, title, 'playlist')
         }
         else if (command === 'play' || command === 'p') {
+            delete cancelArray[message.guild.id]
             youtubeResearch(message, title, 'video')
         }
     }
     else {
-        message.channel.send('Vous n\'avez pas écrit de recherche !')
+        message.channel.send('> Vous n\'avez pas écrit de recherche !')
     }
 }
 
@@ -120,37 +124,56 @@ function youtubeResearch(message, title, type, nextPage = false, byReaction = [f
     clearSearchArrays(message, type, byReaction)
     const oldArrayResult = verifyOldResearch(message, type, byReaction)
     if (!oldArrayResult) {
-        ytsr(title, options, (err, searchresults) => {
-            if (searchresults) {
-                const buildedArray = makeSearchArray(message, searchresults.items, type)
-                if (buildedArray.length < 5 && searchresults.nextpageRef) {
-                    message.channel.send('> ' + buildedArray.length + '/5 trouvé')
-                    youtubeResearch(message, title, type, searchresults.nextpageRef, byReaction)
-                }
-                else if (buildedArray.length === 5 || !searchresults.nextpageRef) {
-                    // If i've got 5 item or no nextpageRef so send the list
-                    if (type === 'video') {
-                        delete oldSearchArray[message.guild.id]
-                    }
-                    else {
-                        delete oldSearchPlaylistArray[message.guild.id]
-                    }
-                    setArrayInfos(message, type, title, searchresults)
-                    sendSearchResultsAsString(message, type)
-                }
+        getYoutubeResearch(message, title, type, options, byReaction)
+    }
+}
+
+function cancel(message) {
+    cancelArray[message.guild.id] = true
+}
+
+function sendCurrentResultAndRecall(message, title, type, buildedArray, searchresults, byReaction) {
+    message.channel.send('> ' + buildedArray.length + '/5 trouvé')
+    setTimeout(() => {
+        if (!cancelArray[message.guild.id]) {
+            youtubeResearch(message, title, type, searchresults.nextpageRef, byReaction)
+        }
+        else {
+            delete cancelArray[message.guild.id]
+            message.channel.send('> Recherche arrêtée !')
+        }
+    }, 1500)
+}
+
+function getYoutubeResearch(message, title, type, options, byReaction) {
+    ytsr(title, options, (err, searchresults) => {
+        if (searchresults) {
+            const buildedArray = makeSearchArray(message, searchresults.items, type)
+            if (buildedArray.length < 5 && searchresults.nextpageRef) {
+                sendCurrentResultAndRecall(message, title, type, buildedArray, searchresults, byReaction)
             }
-            else {
+            else if (buildedArray.length === 5 || !searchresults.nextpageRef) {
                 if (type === 'video') {
-                    searchArray[message.guild.id] = oldSearchArray[message.guild.id]
+                    delete oldSearchArray[message.guild.id]
                 }
                 else if (type === 'playlist') {
-                    searchPlaylistArray[message.guild.id] = oldSearchPlaylistArray[message.guild.id]
+                    delete oldSearchPlaylistArray[message.guild.id]
                 }
-                message.channel.send('> Aucun résultat obtenu')
+                setArrayInfos(message, type, title, searchresults)
                 sendSearchResultsAsString(message, type)
             }
-        })
-    }
+        }
+        else {
+            if (type === 'video') {
+                searchArray[message.guild.id] = oldSearchArray[message.guild.id]
+            }
+            else if (type === 'playlist') {
+                searchPlaylistArray[message.guild.id] = oldSearchPlaylistArray[message.guild.id]
+            }
+            message.channel.send('> Aucun résultat obtenu')
+            sendSearchResultsAsString(message, type)
+        }
+    })
 }
 
 function verifyOldResearch(message, type, byReaction) {
@@ -234,7 +257,7 @@ function setArrayWithChoice(message, title, type, nextPage, byReaction) {
         if (searchArray[message.guild.id]) {
             if (byReaction[0]) {
                 nextPageVar = searchArray[message.guild.id]['nextpage']
-                message.channel.send('Recherche de ' + type + ' : ' + '`' + searchArrayInfos[message.guild.id]['title'].trim() + '` #' + searchArrayInfos[message.guild.id]['count'])
+                message.channel.send('> Recherche de ' + type + ' : ' + '`' + searchArrayInfos[message.guild.id]['title'].trim() + '` #' + searchArrayInfos[message.guild.id]['count'])
             }
             delete searchArray[message.guild.id]
         }
@@ -244,15 +267,15 @@ function setArrayWithChoice(message, title, type, nextPage, byReaction) {
         if (searchPlaylistArray[message.guild.id]) {
             if (byReaction[0]) {
                 nextPageVar = searchPlaylistArray[message.guild.id]['nextpage']
-                message.channel.send('Recherche de ' + type + ' : ' + '`' + searchPlaylistArrayInfos[message.guild.id]['title'].trim() + '` #' + searchPlaylistArrayInfos[message.guild.id]['count'])
+                message.channel.send('> Recherche de ' + type + ' : ' + '`' + searchPlaylistArrayInfos[message.guild.id]['title'].trim() + '` #' + searchPlaylistArrayInfos[message.guild.id]['count'])
             }
             delete searchPlaylistArray[message.guild.id]
         }
         searchPlaylistArray[message.guild.id] = []
     }
-    if (!byReaction[0]) {
+    if (!byReaction[0] && !nextPage) {
         const goodTitle = title ? title : type === 'video' ? searchArrayInfos[message.guild.id]['title'] : searchPlaylistArrayInfos[message.guild.id]['title']
-        message.channel.send('Recherche de ' + type + ' : ' + '`' + goodTitle.trim() + '`')
+        message.channel.send('> Recherche de ' + type + ' : ' + '`' + goodTitle.trim() + '`')
     }
     if (nextPageVar) {
         options.nextpageRef = nextPageVar
@@ -309,7 +332,7 @@ function toggleLoop(message) {
             }
         }
         else {
-            message.channel.send('Vous n\'écoutez pas de musique !')
+            message.channel.send('> Vous n\'écoutez pas de musique !')
         }
     }
 }
@@ -373,7 +396,7 @@ function selectSongOrPlaylistInSearchList(message, words) {
         }
     }
     else {
-        message.channel.send('Vous devez écrire le type de sélection.```Ex: ' + config.prefix + 'search p```')
+        message.channel.send('> Vous devez écrire le type de sélection.```Ex: ' + config.prefix + 'search p```')
     }
 }
 
@@ -396,19 +419,19 @@ function selectSongInSearchList(message, number, type = 'musique', byReaction = 
                     }
                 }
                 else {
-                    message.channel.send(`Choisissez un chiffre compris entre 1 et ${choiceArray.length}`)
+                    message.channel.send(`> Choisissez un chiffre compris entre 1 et ${choiceArray.length}`)
                 }
             }
             else {
-                message.channel.send(`Aucune ${type} enregistrée dans la recherche`)
+                message.channel.send(`> Aucune ${type} enregistrée dans la recherche`)
             }
         }
         else {
-            message.channel.send('Vous devez écrire un chiffre après le mot search !')
+            message.channel.send('> Vous devez écrire un chiffre après le mot search !')
         }
     }
     else {
-        message.channel.send('Vous devez être connecté dans un salon !')
+        message.channel.send('> Vous devez être connecté dans un salon !')
     }
 }
 
@@ -421,11 +444,11 @@ function getSongInSearchList(message) {
             makeAndSendSearchListArray(message, musicExist, playlistExist)
         }
         else {
-            message.channel.send('Aucune musique enregistrée dans la recherche')
+            message.channel.send('> Aucune musique enregistrée dans la recherche')
         }
     }
     else {
-        message.channel.send('Vous devez être connecté dans un salon !')
+        message.channel.send('> Vous devez être connecté dans un salon !')
     }
 }
 
@@ -504,12 +527,17 @@ function playSong(message) {
         console.log('--------------------------------------')
         console.log('Titre : ', playlistInfos[message.guild.id][0].title)
         playlistInfos[message.guild.id]['error'] = true
-        console.log(e)
         console.log('e message : ', e.message)
-        // console.log('indexOf content : ', e.message.indexOf('This video contains content'))
+        if (e.message.indexOf('This video contains content') !== -1) {
+            console.log('Droit d\'auteur')
+            message.channel.send('> Vidéo bloquée par droit d\'auteur : `' + playlistInfos[message.guild.id][0].title + '`')
+            next(message)
+        }
+        else {
+            console.log('Pas les droit d\'auteur')
+            next(message)
+        }
         // e.message = 'Cannot call write after a stream was destroyed'
-        message.channel.send('> Vidéo bloquée par droit d\'auteur : `' + playlistInfos[message.guild.id][0].title + '`')
-        next(message)
         console.log('--------------------------------------')
         // console.log('contained video : ', e.indexOf('This video contains content'))
     })
@@ -570,8 +598,8 @@ function sendMusicEmbed(message, embedObj, added = [false, 1], type = 'video') {
         color = 3768896
     }
     else {
-        // #5b1aa6 | Mauve
-        color = 5970598
+        // #543A99 | Mauve
+        color = 5520025
     }
     if (playlistArray[message.guild.id].length >= 2) {
         playlistInfos[message.guild.id].map((video, index) => {
@@ -581,43 +609,18 @@ function sendMusicEmbed(message, embedObj, added = [false, 1], type = 'video') {
         })
         formattedDuration = convertSecondsToFormattedDuration(playlistArray[message.guild.id]['currentDuration'])
     }
-    message.channel.send({
-        'embed': {
-            'footer': {
-                'text': '"' + config.prefix + 'p list" pour afficher la file d\'attente'
-            },
-            'color': color,
-            'author': {
-                'name': title,
-                'icon_url': 'https://syxbot.com/img/embed_music.png'
-            },
-            'thumbnail': {
-                'url': embedObj.thumbnail
-            },
-            'fields': [
-                {
-                    'name': 'Titre',
-                    'value': musicLink,
-                    'inline': true
-                },
-                {
-                    'name': 'File d\'attente',
-                    'value': queuedLength,
-                    'inline': true
-                },
-                {
-                    'name': 'Durée',
-                    'value': embedObj.duration,
-                    'inline': true
-                },
-                {
-                    'name': 'Durée totale',
-                    'value': formattedDuration,
-                    'inline': true
-                }
-            ]
-        }
-    })
+    const embed = new Discord.MessageEmbed()
+        .setAuthor(title, 'https://syxbot.com/img/embed_music.png')
+        .setColor(color)
+        .setFooter('"' + config.prefix + 'p list" pour afficher la file d\'attente')
+        .setThumbnail(embedObj.thumbnail)
+        .addBlankField(true)
+        .addField('Titre', musicLink, true)
+        .addField('File d\'attente', queuedLength, true)
+        .addBlankField(true)
+        .addField('Durée', embedObj.duration, true)
+        .addField('Durée en attente', formattedDuration, true)
+    message.channel.send({ embed });
 }
 
 function getPlaylist(message, words, playSongParams, byReaction) {
@@ -627,7 +630,7 @@ function getPlaylist(message, words, playSongParams, byReaction) {
             addPlaylistItems(message, playlist, playSongParams, byReaction)
         }
         else {
-            message.channel.send('Une erreur s\'est produite #2')
+            message.channel.send('> Une erreur s\'est produite #2')
         }
     })
 }
@@ -750,11 +753,11 @@ function getVideo(message, words, playSongParams = true, byReaction) {
                 setMusicArrayAndPlayMusic(infos, message, playSongParams, byReaction)
             }
             else {
-                message.channel.send('Cette vidéo n\'est pas disponible !')
+                message.channel.send('> Cette vidéo n\'est pas disponible !')
             }
         }
         else {
-            message.channel.send('Une erreur s\'est produite')
+            message.channel.send('> Une erreur s\'est produite')
         }
     })
 }
@@ -923,11 +926,11 @@ function radio(message, words) {
             connectRadio(message, words)
         }
         else {
-            message.channel.send('**Cette radio n\'existe pas !** \n Tapez **' + config.prefix + 'radio list** pour obtenir la liste des radios disponibles.')
+            message.channel.send('> **Cette radio n\'existe pas !** \n > Tapez **' + config.prefix + 'radio list** pour obtenir la liste des radios disponibles.')
         }
     }
     else {
-        message.channel.send('Choisir une radio, c\'est mieux !')
+        message.channel.send('> Choisir une radio, c\'est mieux !')
     }
 }
 
@@ -956,7 +959,7 @@ function connectRadio(message, words) {
         }
     }
     else {
-        message.channel.send('Vous devez être connecté dans un salon !')
+        message.channel.send('> Vous devez être connecté dans un salon !')
     }
 }
 
@@ -989,11 +992,11 @@ function getSongInPlaylist(message, number) {
                 if (playlistInfos[message.guild.id].length >= 10) {
                     howToSay = 'nombre'
                 }
-                message.channel.send(`Choisissez un ${howToSay} compris entre 1 et ${playlistInfos[message.guild.id].length} - 1`)
+                message.channel.send(`> Choisissez un ${howToSay} compris entre 1 et ${playlistInfos[message.guild.id].length} - 1`)
             }
         }
         else {
-            message.channel.send('Aucune musique dans la file d\'attente')
+            message.channel.send('> Aucune musique dans la file d\'attente')
         }
     }
 }
@@ -1018,7 +1021,7 @@ function showQueuedSongs(message) {
             })
         }
         else {
-            message.channel.send('Aucune musique dans la file d\'attente')
+            message.channel.send('> Aucune musique dans la file d\'attente')
         }
     }
 }
@@ -1059,16 +1062,16 @@ function removeSelectedSongsMaster(message, words) {
                     }
                 }
                 else {
-                    message.channel.send('Vous devez sélectionner la/les musique(s) à supprimé')
+                    message.channel.send('> Vous devez sélectionner la/les musique(s) à supprimé')
                 }
             }
             else {
-                message.channel.send('Aucune musique dans la file d\'attente')
+                message.channel.send('> Aucune musique dans la file d\'attente')
             }
         }
     }
     else {
-        message.channel.send('Vous devez être connecté dans un salon !')
+        message.channel.send('> Vous devez être connecté dans un salon !')
     }
 
 }
@@ -1088,11 +1091,11 @@ function removeSelectedSongs(message, selection) {
                 sendRemoveEmbed(message, (selectOne - selectZero) + 1)
             }
             else {
-                message.channel.send('Sélectionnez des musiques compris entre 1 et ' + playlistArray[message.guild.id].length - 1)
+                message.channel.send('> Sélectionnez des musiques compris entre 1 et ' + playlistArray[message.guild.id].length - 1)
             }
         }
         else {
-            message.channel.send('Le 2ème index doit être plus grand que le premier !')
+            message.channel.send('> Le 2ème index doit être plus grand que le premier !')
         }
     }
     else if (selectZero && selectZero > 0) {
@@ -1103,7 +1106,7 @@ function removeSelectedSongs(message, selection) {
         sendRemoveEmbed(message, 1)
     }
     else {
-        message.channel.send('Sélectionnez une musique compris entre 1 et ' + playlistArray[message.guild.id].length - 1)
+        message.channel.send('> Sélectionnez une musique compris entre 1 et ' + playlistArray[message.guild.id].length - 1)
     }
 }
 
@@ -1113,7 +1116,7 @@ function go(message, words) {
         if (Helper.verifyBotLocation(message, userChannel)) {
             if (words[1] && Number(words[1])) {
                 const number = Number(words[1])
-                if (playlistArray[message.guild.id] && playlistArray[message.guid.id].length) {
+                if (playlistArray[message.guild.id] && playlistArray[message.guild.id].length) {
                     if (number > 0 && number < playlistArray[message.guild.id].length) {
                         streamsArray[message.guild.id].destroy()
                         for (let i = 0; i < number; i++) {
@@ -1126,34 +1129,34 @@ function go(message, words) {
                         playSong(message)
                     }
                     else {
-                        message.channel.send('Sélectionnez une musique compris entre 1 et ' + playlistArray[message.guild.id].length - 1)
+                        message.channel.send('> Sélectionnez une musique compris entre 1 et ' + playlistArray[message.guild.id].length - 1)
                     }
                 }
                 else {
-                    message.channel.send('Aucune musique dans la file d\'attente')
+                    message.channel.send('> Aucune musique dans la file d\'attente')
                 }
             }
             else {
-                message.channel.send('Sélectionnez l\'index d\'une musique.```Ex: ' + config.prefix + 'go 12```')
+                message.channel.send('> Sélectionnez l\'index d\'une musique.```Ex: ' + config.prefix + 'go 12```')
             }
         }
     }
     else {
-        message.channel.send('Vous devez être connecté dans un salon !')
+        message.channel.send('> Vous devez être connecté dans un salon !')
     }
 }
 
 function sendRemoveEmbed(message, number) {
     const title = number > 1 ? 'Musiques supprimées' : 'Musique supprimée'
     const queuedLength = playlistArray[message.guild.id].length - 1
-    // #e00000 | Rouge | Decimal value
-    const color = 14680064
+    // #952716 | Rouge | Decimal value
+    const color = 9774870
     message.channel.send({
         'embed': {
             'color': color,
             'author': {
                 'name': title,
-                'icon_url': 'https://syxbot.com/img/music_remove.png'
+                'icon_url': 'https://syxbot.com/img/removed_music.png'
             },
             'fields': [
                 {
@@ -1233,3 +1236,4 @@ exports.getConnectedGuild = getConnectedGuild
 exports.youtubeResearch = youtubeResearch
 exports.removeSelectedSongsMaster = removeSelectedSongsMaster
 exports.go = go
+exports.cancel = cancel

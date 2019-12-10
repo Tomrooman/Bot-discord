@@ -15,7 +15,7 @@ function addXp(message) {
 }
 
 function grade(message) {
-    message.channel.send('Fonctionnalité à venir')
+    message.channel.send('> Fonctionnalité à venir')
     // userModel.checkExist(message.author.id, message.guild.id)
     //     .then(response => {
     //         if (response) {

@@ -1,6 +1,6 @@
 function remove(message, howMany) {
     if (howMany > 99) {
-        message.channel.send('Écrivez un chiffre inférieur ou égal à 99')
+        message.channel.send('> Écrivez un chiffre inférieur ou égal à 99')
     }
     else {
         let limit = {}

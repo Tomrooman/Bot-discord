@@ -4,14 +4,20 @@ const Level = require('./level.js')
 const Helper = require('./helper.js')
 const Custom = require('./custom.js')
 const Admin = require('./admin.js')
+const _ = require('lodash')
 
 function dispatcher(message, prefix, bot) {
-    const words = message.content.substr(prefix.length, message.content.length - prefix.length).split(' ')
+    let words = message.content.substr(prefix.length, message.content.length - prefix.length).split(' ')
     const command = words[0].toLowerCase()
     if (message.content.length > prefix.length) {
         if (command === 'play' || command === 'playlist' || command === 'p' || command === 'pl') {
             if (words[1] === 'list') {
                 Player.showQueuedSongs(message)
+            }
+            else if (words[1] === 'go') {
+                delete words[1]
+                words = _.compact(words)
+                Player.go(message, words)
             }
             else if (words[1] === 'r' || words[1] === 'remove') {
                 Player.removeSelectedSongsMaster(message, words)
@@ -37,6 +43,9 @@ function dispatcher(message, prefix, bot) {
         else if (command === 'loop') {
             Player.toggleLoop(message)
         }
+        else if (command === 'cancel') {
+            Player.cancel(message)
+        }
         else if (command === 'quit') {
             Player.quit(message)
         }
@@ -57,7 +66,7 @@ function dispatcher(message, prefix, bot) {
                 Message.remove(message, parseInt(words[1]))
             }
             else {
-                message.channel.send('Vous devez écrire le nombre de messages que vous voulez supprimé.')
+                message.channel.send('> Vous devez écrire le nombre de messages que vous voulez supprimé.')
             }
         }
         else if (command === 'clear') {
@@ -72,7 +81,7 @@ function dispatcher(message, prefix, bot) {
                     Helper.getCommandInfos(message, words[1].toLowerCase())
                 }
                 else {
-                    message.channel.send('Veuillez écrire une commande existante.')
+                    message.channel.send('> Veuillez écrire une commande existante.')
                 }
 
             }
@@ -87,11 +96,11 @@ function dispatcher(message, prefix, bot) {
             Admin.controller(message, words, bot)
         }
         else {
-            message.channel.send('Cette commande n\'existe pas ! \n Tapez **' + prefix + 'help** pour afficher la liste des commandes.')
+            message.channel.send('> Cette commande n\'existe pas ! \n >  Tapez **' + prefix + 'help** pour afficher la liste des commandes.')
         }
     }
     else {
-        message.channel.send('Vous n\'avez pas écrit de commande !')
+        message.channel.send('> Vous n\'avez pas écrit de commande !')
     }
 }
 

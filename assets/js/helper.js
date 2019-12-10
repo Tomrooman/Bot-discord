@@ -83,14 +83,14 @@ function verifyBotLocation(message, userChannel, sendMessage = true) {
         }
         else {
             if (sendMessage) {
-                message.channel.send('Vous n\'êtes pas dans le même salon que le bot !')
+                message.channel.send('> Vous n\'êtes pas dans le même salon que le bot !')
             }
             return false
         }
     }
     else {
         if (sendMessage) {
-            message.channel.send('Je ne suis pas connecté dans un salon !')
+            message.channel.send('> Je ne suis pas connecté dans un salon !')
         }
         return false
     }
@@ -175,6 +175,15 @@ function availableCommand() {
                 'Affiche la liste des résultats des recherches ```' + config.prefix + 'search``` \n',
                 'Sélectionne une playlist dans les résultats de la recherche ```' + config.prefix + 'search pl CHOIX``````Ex: ' + config.prefix + 'search pl 4```\n',
                 'Supprime une/des musique(s) en file d\'attente ```' + config.prefix + 'play remove 15|15-20```'
+            ]
+        },
+        {
+            name: 'cancel',
+            showName: 'cancel',
+            command: '**cancel**',
+            exemple: '```' + config.prefix + 'cancel``` \n',
+            infos: [
+                'Annule la recherche par titre```' + config.prefix + 'cancel```'
             ]
         },
         {
@@ -287,19 +296,25 @@ function availableCommand() {
 
 function getCommandInfos(message, command) {
     const commandObj = availableCommand().filter(c => c.name === command)
-    let joinedInfos = ''
-    commandObj[0].infos.map(info => {
-        joinedInfos += info
-    })
-    message.channel.send({
-        'embed': {
-            'color': 3493780,
-            'description': joinedInfos,
-            'author': {
-                'name': commandObj[0].showName
+    if (commandObj && commandObj[0]) {
+        let joinedInfos = ''
+        commandObj[0].infos.map(info => {
+            joinedInfos += info
+        })
+        message.channel.send({
+            'embed': {
+                'color': 3493780,
+                'description': joinedInfos,
+                'author': {
+                    'name': commandObj[0].showName
+                }
             }
-        }
-    })
+        })
+    }
+    else {
+        message.channel.send('> La commande `' + command + '` n\'existe pas !')
+    }
+
 }
 
 exports.take_user_voiceChannel = take_user_voiceChannel

@@ -31,7 +31,7 @@ function sendMessageToAllServer(message, words, bot) {
         bot.guilds.map(guild => {
             if (guild.available) {
                 const channel = Helper.getFirstAuthorizedChannel(guild)
-                channel.send(words.join(' '))
+                channel.send('> ' + words.join(' ').trim())
             }
         })
     }
