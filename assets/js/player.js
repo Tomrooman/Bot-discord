@@ -507,10 +507,10 @@ function playSong(message) {
     streamsArray[message.guild.id].setVolumeDecibels(0.1)
     setTimeout(() => {
         // Check if player is playing when it must be, if not destroy stream and retry to play song
-        console.log('------------------')
-        console.log('timeout after 4500 in playsong - Check if music stop anormaly')
         if (streamsArray[message.guild.id] && !playlistInfos[message.guild.id]['error'] && !streamsArray[message.guild.id].player.voiceConnection.speaking.bitfield && !tryToNext[message.guild.id]) {
             if (playlistInfos[message.guild.id]) {
+                console.log('------------------')
+                console.log('timeout after 4500 in playsong')
                 console.log('titre : ', playlistInfos[message.guild.id][0].title)
                 console.log('STOP ANORMALY -> RETRY SONG')
                 retryArray[message.guild.id] = true
@@ -518,10 +518,10 @@ function playSong(message) {
                 // playlistArray[message.guild.id].splice(1, 0, playlistArray[message.guild.id][0])
                 streamsArray[message.guild.id].destroy()
                 playSong(message)
+                console.log('--------------------------')
                 // message.channel.send('Fais la commande next')
             }
         }
-        console.log('--------------------------')
     }, 4500)
     streamsArray[message.guild.id].on('error', (e) => {
         console.log('--------------------------------------')
