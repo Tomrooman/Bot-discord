@@ -510,7 +510,7 @@ function playSong(message) {
         if (streamsArray[message.guild.id] && !playlistInfos[message.guild.id]['error'] && !streamsArray[message.guild.id].player.voiceConnection.speaking.bitfield && !tryToNext[message.guild.id]) {
             if (playlistInfos[message.guild.id]) {
                 console.log('------------------')
-                console.log('timeout after 4500 in playsong')
+                console.log('timeout after 6000 in playsong')
                 console.log('titre : ', playlistInfos[message.guild.id][0].title)
                 console.log('STOP ANORMALY -> RETRY SONG')
                 retryArray[message.guild.id] = true
@@ -522,7 +522,7 @@ function playSong(message) {
                 // message.channel.send('Fais la commande next')
             }
         }
-    }, 4500)
+    }, 6000)
     streamsArray[message.guild.id].on('error', (e) => {
         console.log('--------------------------------------')
         console.log('Titre : ', playlistInfos[message.guild.id][0].title)
