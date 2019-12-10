@@ -9,6 +9,8 @@
         "start": "pm2 start index.js --name syxbot",
         "dev": "pm2 start index.js --watch --name syxbot",
         "log": "pm2 log --lines 100 syxbot ",
+        "docs:dev": "vuepress dev ./public/docs",
+        "docs:build": "vuepress build ./public/docs",
         "status": "pm2 status",
         "stop": "pm2 stop all",
         "mongodb": "sudo service mongod start"
