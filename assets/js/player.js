@@ -501,8 +501,8 @@ function playSong(message) {
     playlistInfos[message.guild.id]['error'] = false
     delete tryToNext[message.guild.id]
     // connectionsArray[userChannel.id] = connection
-    const stream = ytdl(playlistArray[message.guild.id][0], { filter: 'audio', liveBuffer: 10000 })
-    streamsArray[message.guild.id] = connectionsArray[message.guild.id].play(stream, { highWaterMark: 100 })
+    const stream = ytdl(playlistArray[message.guild.id][0], { filter: 'audio', liveBuffer: 10000, highWaterMark: 1000000 })
+    streamsArray[message.guild.id] = connectionsArray[message.guild.id].play(stream)
     // streamsArray[userChannel.id].setVolume(1)
     streamsArray[message.guild.id].setVolumeDecibels(0.1)
     setTimeout(() => {
@@ -574,9 +574,7 @@ function setArrays(message) {
                 delete nextSetLoop[message.guild.id]
             }
             streamsArray[message.guild.id].destroy()
-            setTimeout(() => {
-                playSong(message)
-            }, 500)
+            playSong(message)
         }
     }
 }

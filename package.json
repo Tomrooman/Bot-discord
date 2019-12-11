@@ -20,6 +20,7 @@
         "@discordjs/uws": "^10.149.0",
         "convert-svg-to-png": "^0.5.0",
         "discord.js": "github:discordjs/discord.js",
+        "ffmpeg-static": "2.7.0",
         "lodash": "^4.17.15",
         "mongoose": "^5.7.12",
         "node-opus": "^0.3.3",
