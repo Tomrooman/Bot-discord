@@ -510,7 +510,7 @@ function playSong(message) {
         if (streamsArray[message.guild.id] && !playlistInfos[message.guild.id]['error'] && !streamsArray[message.guild.id].player.voiceConnection.speaking.bitfield && !tryToNext[message.guild.id]) {
             if (playlistInfos[message.guild.id]) {
                 console.log('------------------')
-                console.log('timeout after 6000 in playsong')
+                console.log('timeout after 5000 in playsong')
                 console.log('titre : ', playlistInfos[message.guild.id][0].title)
                 console.log('STOP ANORMALY -> RETRY SONG')
                 retryArray[message.guild.id] = true
@@ -522,7 +522,7 @@ function playSong(message) {
                 // message.channel.send('Fais la commande next')
             }
         }
-    }, 6000)
+    }, 5000)
     streamsArray[message.guild.id].on('error', (e) => {
         console.log('--------------------------------------')
         console.log('Titre : ', playlistInfos[message.guild.id][0].title)
@@ -612,11 +612,11 @@ function sendMusicEmbed(message, embedObj, added = [false, 1], type = 'video') {
         .setColor(color)
         .setFooter('"' + config.prefix + 'p list" pour afficher la file d\'attente')
         .setThumbnail(embedObj.thumbnail)
-        .addBlankField(true)
         .addField('Titre', musicLink, true)
-        .addField('File d\'attente', queuedLength, true)
         .addBlankField(true)
+        .addField('File d\'attente', queuedLength, true)
         .addField('Durée', embedObj.duration, true)
+        .addBlankField(true)
         .addField('Durée en attente', formattedDuration, true)
     message.channel.send({ embed });
 }
