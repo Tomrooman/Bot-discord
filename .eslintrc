@@ -8,7 +8,8 @@
     "ecmaVersion": 2019
   },
   "ignorePatterns": [
-    "tests/"
+    "tests/",
+    "public/"
   ],
   "rules": {
     "brace-style": [
