@@ -501,8 +501,8 @@ function playSong(message) {
     playlistInfos[message.guild.id]['error'] = false
     delete tryToNext[message.guild.id]
     // connectionsArray[userChannel.id] = connection
-    const stream = ytdl(playlistArray[message.guild.id][0], { filter: 'audio', liveBuffer: 10000, highWaterMark: 1000000 })
-    streamsArray[message.guild.id] = connectionsArray[message.guild.id].play(stream)
+    const stream = ytdl(playlistArray[message.guild.id][0], { filter: 'audio', liveBuffer: 10000, highWaterMark: 512 })
+    streamsArray[message.guild.id] = connectionsArray[message.guild.id].play(stream, { highWaterMark: 512 })
     // streamsArray[userChannel.id].setVolume(1)
     streamsArray[message.guild.id].setVolumeDecibels(0.1)
     setTimeout(() => {
@@ -516,7 +516,7 @@ function playSong(message) {
                 retryArray[message.guild.id] = true
                 // playlistInfos[message.guild.id].splice(1, 0, playlistInfos[message.guild.id][0])
                 // playlistArray[message.guild.id].splice(1, 0, playlistArray[message.guild.id][0])
-                streamsArray[message.guild.id].destroy()
+                // streamsArray[message.guild.id].destroy()
                 playSong(message)
                 console.log('--------------------------')
                 // message.channel.send('Fais la commande next')
@@ -573,7 +573,7 @@ function setArrays(message) {
                 loopArray[message.guild.id] = true
                 delete nextSetLoop[message.guild.id]
             }
-            streamsArray[message.guild.id].destroy()
+            // streamsArray[message.guild.id].destroy()
             playSong(message)
         }
     }

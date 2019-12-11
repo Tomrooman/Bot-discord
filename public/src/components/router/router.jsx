@@ -18,11 +18,11 @@ export default class Router extends React.Component {
         const page_arg = url[4] ? url[4] : '';
         if (page === 'docs') {
             this.setState({
-                page: <Docs />
+                page: <Docs command={page_arg} />
             })
         }
-        console.log('page : ', page)
-        console.log('page 2 : ', page_arg)
+        // console.log('page : ', page)
+        // console.log('page 2 : ', page_arg)
     }
 
     render() {
