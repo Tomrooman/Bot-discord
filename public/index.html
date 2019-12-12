@@ -15,12 +15,9 @@
 </head>
 
 <body>
-    <script>window.__REACT_DEVTOOLS_GLOBAL_HOOK__ = {
-            supportsFiber: true,
-            inject: function () { },
-            onCommitFiberRoot: function () { },
-            onCommitFiberUnmount: function () { },
-        };</script>
+    <script>if (typeof window.__REACT_DEVTOOLS_GLOBAL_HOOK__ === 'object') {
+            __REACT_DEVTOOLS_GLOBAL_HOOK__.inject = function () { };
+        }</script>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="container"></div>
     <script src="/js/jquery-3.3.1.slim.min.js"></script>

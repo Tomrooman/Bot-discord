@@ -14,7 +14,6 @@ export default class Docs extends React.Component {
         if (props.command === 'play') {
             page = <Play />
         }
-        console.log('command : ', props.command)
         this.state = {
             command: props.command,
             page: page
