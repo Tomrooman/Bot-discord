@@ -1,8 +1,14 @@
 "use strict";
 
 import React from 'react';
+import PropTypes from "prop-types";
 import Play from './play/play.jsx';
 import Sidebar from './sidebar/sidebar.jsx';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBook } from '@fortawesome/free-solid-svg-icons';
+
+library.add(faBook);
 
 import './docs.css';
 
@@ -28,7 +34,9 @@ export default class Docs extends React.Component {
                     {this.state.page ?
                         this.state.page :
                         <div className="syx_container">
-                            <h1>Documentation syxbot</h1>
+                            <h1><FontAwesomeIcon icon="book" />
+                                Documentation syxbot
+                            </h1>
                         </div>
                     }
                 </div>
@@ -36,3 +44,7 @@ export default class Docs extends React.Component {
         )
     }
 }
+
+Docs.propTypes = {
+    command: PropTypes.string.isRequired
+};

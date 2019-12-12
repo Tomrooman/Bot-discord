@@ -1,26 +1,23 @@
 "use strict";
 
 import React from 'react';
+import PropTypes from "prop-types";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faBookmark, faListUl, faHome, faPenFancy } from '@fortawesome/free-solid-svg-icons'
+
+library.add(faBookmark);
+library.add(faListUl);
+library.add(faHome);
+library.add(faPenFancy);
 
 export default class Sidebar extends React.Component {
-
-    constructor(props) {
-        super()
-        let page = ''
-        if (props.command.substr(0, 4) === 'play') {
-            page = 'play'
-        }
-        this.state = {
-            page: page,
-        }
-    }
-
 
     render() {
         return (
             <nav id='sidebar'>
                 <div className='sidebar-header'>
-                    <h3>Documentation</h3>
+                    <h3><FontAwesomeIcon icon="bookmark" />Menu</h3>
                 </div>
                 <div className="toggleSideMenu">
                     <button type="button" id="sidebarCollapse" className="navbar-btn">
@@ -31,13 +28,13 @@ export default class Sidebar extends React.Component {
                 </div>
                 <ul className="list-unstyled components">
                     <li className={!this.props.command ? 'active' : ''}>
-                        <a href="/docs">Accueil</a>
+                        <a href="/docs"><FontAwesomeIcon icon="home" /> Accueil</a>
                     </li>
                     <li className={this.props.command === 'contact' ? 'active' : ''}>
-                        <a href="/docs/contact">Me contacter</a>
+                        <a href="/docs/contact"><FontAwesomeIcon icon="pen-fancy" />Me contacter</a>
                     </li>
 
-                    <h5 id='command_list_title'>Liste des commandes</h5>
+                    <h5 id='command_list_title'><FontAwesomeIcon icon="list-ul" />Liste des commandes</h5>
                     <li id='command_list'>
                         <a href="/docs/play" className={this.props.command === 'play' ? 'active' : ''}>Play</a>
                         <a href="/docs/playlist" className={this.props.command === 'playlist' ? 'active' : ''}>Playlist</a>
@@ -59,3 +56,7 @@ export default class Sidebar extends React.Component {
         )
     }
 }
+
+Sidebar.propTypes = {
+    command: PropTypes.string.isRequired
+};
