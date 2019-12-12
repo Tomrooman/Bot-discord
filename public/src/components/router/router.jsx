@@ -12,11 +12,11 @@ export default class Router extends React.Component {
         }
     }
 
-    componentWillMount() {
+    componentDidMount() {
         const url = window.location.href.split('/');
         const page = url[3] === '' || url[3] === '//' ? '/' : url[3];
         const page_arg = url[4] ? url[4] : '';
-        if (page === 'docs') {
+        if (page && page.substr(0, 4) === 'docs') {
             this.setState({
                 page: <Docs command={page_arg} />
             })
