@@ -22,9 +22,19 @@ export default class Sidebar extends React.Component {
                 <div className='sidebar-header'>
                     <h3>Documentation</h3>
                 </div>
+                <div className="toggleSideMenu">
+                    <button type="button" id="sidebarCollapse" className="navbar-btn">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                </div>
                 <ul className="list-unstyled components">
                     <li className={!this.props.command ? 'active' : ''}>
                         <a href="/docs">Accueil</a>
+                    </li>
+                    <li className={this.props.command === 'contact' ? 'active' : ''}>
+                        <a href="/contact">Me contacter</a>
                     </li>
 
                     <h5 id='command_list_title'>Liste des commandes</h5>

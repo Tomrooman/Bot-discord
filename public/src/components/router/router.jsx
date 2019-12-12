@@ -1,7 +1,8 @@
-"use strict"
+"use strict";
 
 import React from 'react';
-import Docs from './../docs/docs.jsx'
+import Docs from './../docs/docs.jsx';
+import Contact from './../contact/contact.jsx';
 
 export default class Router extends React.Component {
 
@@ -21,8 +22,11 @@ export default class Router extends React.Component {
                 page: <Docs command={page_arg} />
             })
         }
-        // console.log('page : ', page)
-        // console.log('page 2 : ', page_arg)
+        if (page && page.substr(0, 7) === 'contact') {
+            this.setState({
+                page: <Contact />
+            })
+        }
     }
 
     render() {
