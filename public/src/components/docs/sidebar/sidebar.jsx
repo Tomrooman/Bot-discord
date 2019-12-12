@@ -4,12 +4,17 @@ import React from 'react';
 import PropTypes from "prop-types";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faBookmark, faListUl, faHome, faPenFancy } from '@fortawesome/free-solid-svg-icons'
+import { faBookmark, faListUl, faHome, faPenFancy, faPause, faListOl, faHeadphonesAlt, faWindowClose, faQuestion } from '@fortawesome/free-solid-svg-icons'
 
 library.add(faBookmark);
 library.add(faListUl);
 library.add(faHome);
 library.add(faPenFancy);
+library.add(faPause);
+library.add(faListOl);
+library.add(faHeadphonesAlt);
+library.add(faWindowClose);
+library.add(faQuestion);
 
 export default class Sidebar extends React.Component {
 
@@ -36,14 +41,14 @@ export default class Sidebar extends React.Component {
 
                     <h5 id='command_list_title'><FontAwesomeIcon icon="list-ul" />Liste des commandes</h5>
                     <li id='command_list'>
-                        <a href="/docs/play" className={this.props.command === 'play' ? 'active' : ''}>Play</a>
-                        <a href="/docs/playlist" className={this.props.command === 'playlist' ? 'active' : ''}>Playlist</a>
-                        <a href="/docs/cancel" className={this.props.command === 'cancel' ? 'active' : ''}>Cancel</a>
+                        <a href="/docs/play" className={this.props.command === 'play' ? 'active' : ''}><FontAwesomeIcon icon="headphones-alt" />Play</a>
+                        <a href="/docs/playlist" className={this.props.command === 'playlist' ? 'active' : ''}><FontAwesomeIcon icon="list-ol" />Playlist</a>
+                        <a href="/docs/cancel" className={this.props.command === 'cancel' ? 'active' : ''}><FontAwesomeIcon icon="window-close" />Cancel</a>
                         <a href="/docs/go" className={this.props.command === 'go' ? 'active' : ''}>Go</a>
                         <a href="/docs/loop" className={this.props.command === 'loop' ? 'active' : ''}>Loop</a>
-                        <a href="/docs/help" className={this.props.command === 'help' ? 'active' : ''}>Help</a>
+                        <a href="/docs/help" className={this.props.command === 'help' ? 'active' : ''}><FontAwesomeIcon icon="question" />Help</a>
                         <a href="/docs/next" className={this.props.command === 'next' ? 'active' : ''}>Next</a>
-                        <a href="/docs/pause" className={this.props.command === 'pause' ? 'active' : ''}>Pause</a>
+                        <a href="/docs/pause" className={this.props.command === 'pause' ? 'active' : ''}><FontAwesomeIcon icon="pause" />Pause</a>
                         <a href="/docs/resume" className={this.props.command === 'resume' ? 'active' : ''}>Resume</a>
                         <a href="/docs/quit" className={this.props.command === 'quit' ? 'active' : ''}>Quit</a>
                         <a href="/docs/remove" className={this.props.command === 'remove' ? 'active' : ''}>Remove</a>
