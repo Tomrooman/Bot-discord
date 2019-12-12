@@ -24,7 +24,7 @@ a, a:hover, a:focus {
     min-width: 350px;
 }
 
-#content h1 {
+.syx_container h1 {
     text-align : center;
 }
 
@@ -115,6 +115,7 @@ a, a:hover, a:focus {
     color: rgb(93, 67, 126);
     background: #fff;
     box-shadow: -5px 0px 3px rgb(93, 67, 126);
+    border-left: 5px solid rgb(93, 67, 126);
 }
 
 #command_list a:first-child {
@@ -148,6 +149,7 @@ a, a:hover, a:focus {
     color : rgb(93, 67, 126);
     letter-spacing: 5px;
     background : #f0f0f0;
+    border-left: 5px solid rgba(93, 67, 126, 0.74);
 }
 
 #sidebar ul li.active > a, a[aria-expanded="true"] {
@@ -157,6 +159,7 @@ a, a:hover, a:focus {
     /* border-right : 4px solid rgb(93, 67, 126); */
     background: #fff;
     box-shadow: -5px 0px 3px rgb(93, 67, 126);
+    border-left: 5px solid rgb(93, 67, 126);
 }
 
 

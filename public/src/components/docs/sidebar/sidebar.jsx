@@ -34,7 +34,7 @@ export default class Sidebar extends React.Component {
                         <a href="/docs">Accueil</a>
                     </li>
                     <li className={this.props.command === 'contact' ? 'active' : ''}>
-                        <a href="/contact">Me contacter</a>
+                        <a href="/docs/contact">Me contacter</a>
                     </li>
 
                     <h5 id='command_list_title'>Liste des commandes</h5>

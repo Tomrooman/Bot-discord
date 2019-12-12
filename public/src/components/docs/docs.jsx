@@ -27,7 +27,9 @@ export default class Docs extends React.Component {
                 <div id="content" className="content">
                     {this.state.page ?
                         this.state.page :
-                        <h1>Documentation syxbot</h1>
+                        <div className="syx_container">
+                            <h1>Documentation syxbot</h1>
+                        </div>
                     }
                 </div>
             </div>

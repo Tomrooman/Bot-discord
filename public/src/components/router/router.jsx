@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Docs from './../docs/docs.jsx';
-import Contact from './../contact/contact.jsx';
 
 export default class Router extends React.Component {
 
@@ -20,11 +19,6 @@ export default class Router extends React.Component {
         if (page && page.substr(0, 4) === 'docs') {
             this.setState({
                 page: <Docs command={page_arg} />
-            })
-        }
-        if (page && page.substr(0, 7) === 'contact') {
-            this.setState({
-                page: <Contact />
             })
         }
     }

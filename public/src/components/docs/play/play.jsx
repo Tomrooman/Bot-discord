@@ -10,7 +10,9 @@ export default class Play extends React.Component {
 
     render() {
         return (
-            <h1>Commande play</h1>
+            <div className="syx_container">
+                <h1>Commande play</h1>
+            </div >
         )
     }
 
