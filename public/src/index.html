@@ -27,9 +27,9 @@
     <script src="/js/bootstrap-4.1.0.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function () {
-            $('#sidebarCollapse').on('click', function () {
+            $('.toggleSideMenu').on('click', function () {
                 $('#sidebar').toggleClass('active');
-                $(this).toggleClass('active');
+                $('#sidebarCollapse').toggleClass('active');
             });
         });
     </script>

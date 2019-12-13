@@ -9,8 +9,7 @@ body {
 p {
     font-family: 'Poppins', sans-serif;
     font-size: 1.1em;
-    font-weight: 300;
-    line-height: 1.7em;
+    font-weight: 350;
     color: #999;
 }
 
@@ -35,12 +34,12 @@ a, a:hover, a:focus {
 #sidebar {
     min-width: 300px;
     max-width: 300px;
-    height : 100vh;
+    height : auto;
     /* position : absolute; */
     background: #ebebeb;
     transition: all 0.6s cubic-bezier(0.945, 0.020, 0.270, 0.665);
     transform-origin: bottom left;
-    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 1px 1px 3px rgba(93, 67, 126, 0.493);
 }
 
 #sidebar.active {
@@ -49,8 +48,8 @@ a, a:hover, a:focus {
 
 #sidebar .sidebar-header {
     text-align: center;
-    padding-top : 30px;
-    padding-bottom : 20px;
+    padding-top : 20px;
+    padding-bottom : 10px;
     color: rgb(93, 67, 126);
     /* border-right : 4px solid rgb(93, 67, 126); */
     background: #fff;
@@ -85,9 +84,9 @@ a, a:hover, a:focus {
 
 #command_list {
     /* margin-top : 30px; */
-    /* box-shadow: 1px 1px 3px rgb(93, 67, 126); */
-    max-height : 60vh;
+    height : 60vh;
     overflow-y: scroll;
+    border-bottom : 1px solid rgba(128, 128, 128, 0.575);
 }
 
 #command_list a {
@@ -126,25 +125,21 @@ a, a:hover, a:focus {
     font-size: 1.1em;
     display: block;
     color: rgb(61, 61, 61);
+    border-left : 5px solid rgba(93, 67, 126, 0);
 }
 
 #sidebar ul li a:hover, #sidebar ul li a:focus {
-    /* color: #7386D5;
-    background: #fff; */
-    box-shadow: -5px 0px 3px rgb(93, 67, 126);
-    color : rgb(93, 67, 126);
-    letter-spacing: 5px;
-    background : #f0f0f0;
-    border-left: 5px solid rgba(93, 67, 126, 0.74);
+    box-shadow: -5px 0px 4px rgb(93, 67, 126) !important;
+    color : rgb(93, 67, 126) !important;
+    letter-spacing: 5px !important;
+    background : #f0f0f0 !important;
+    border-left: 5px solid rgba(93, 67, 126, 0.74) !important;
 }
 
 #sidebar ul li.active > a, a[aria-expanded="true"] {
-    /* color: #fff;
-    background: #6d7fcc; */
     color: rgb(93, 67, 126);
-    /* border-right : 4px solid rgb(93, 67, 126); */
     background: #fff;
-    box-shadow: -5px 0px 3px rgb(93, 67, 126);
+    box-shadow: -5px 0px 4px rgb(93, 67, 126);
     border-left: 5px solid rgb(93, 67, 126);
 }
 
@@ -189,22 +184,71 @@ a.article, a.article:hover, a.article:focus {
     min-width: 350px;
 }
 
-.syx_container {
-    background: #ebebeb;
-}
-
 .syx_container h1 {
     text-align : center;
-    padding-top : 23px;
-    padding-bottom : 20px;
-    color: #446085;
+    padding-top : 13px;
+    padding-bottom : 10px;
+    /* color: #446085; */
+    color: rgb(235, 233, 233);
+    opacity : 0;
     /* border-right : 4px solid rgb(93, 67, 126); */
-    background: #fff;
+    background: rgb(54, 54, 54);
     box-shadow: 0px 0px 3px #446085;
 }
 
+.docs_content {
+    margin-top : 1rem;
+    width : 75%;
+    margin-left : auto;
+    margin-right : auto;
+}
+
+.docs_content .docs_panel {
+    box-shadow: 0px 0px 3px #757575;
+    background: rgb(224, 224, 224);
+    border-radius: 5px;
+    width: 85%;
+    margin-left : auto;
+    margin-right : auto;
+    padding-top : 20px;
+    padding-bottom : 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    text-align: center;
+}
+
+.docs_content h4 {
+    margin-top : 2rem;
+    text-align: center;
+}
+
+.docs_content_command {
+    background: grey;
+    width: 40%;
+    max-width: 200px;
+    margin-top : 2rem;
+    margin-left : auto;
+    margin-right : auto;
+    text-align: center;
+    display: inline-block;
+    padding-top : 10px;
+    padding-bottom : 5px;
+    border-radius: 10px;
+    margin-left: 6%;
+    cursor: pointer;
+}
+
+.docs_panel p {
+    color: rgb(54, 54, 54);
+}
+
+.syx_container h1.load {
+    transition-duration: 1s;
+    opacity : 1;
+}
+
 .syx_container h1 svg {
-    margin-right : 30px;
+    margin-right : 20px;
 }
 
 .navbar-btn {
@@ -216,6 +260,7 @@ a.article, a.article:hover, a.article:focus {
 .toggleSideMenu {
     position : absolute;
     background: #fff;
+    cursor: pointer;
     height: 70px;
     width: 70px;
     margin-left : 300px;
@@ -267,7 +312,20 @@ a.article, a.article:hover, a.article:focus {
 /* ---------------------------------------------------
     MEDIA QUERIES
 ----------------------------------------------------- */
-@media screen and (max-width: 825px) {
+@media screen and (max-width: 1200px) {
+    .docs_content .docs_panel {
+        width: 90%;
+    }
+}
+@media screen and (max-width: 900px) {
+    .docs_content {
+        width: 90%;
+    }
+
+    .docs_content .docs_panel {
+        width : 70%;
+    }
+
     #sidebar {
         margin-left: -300px;
     }

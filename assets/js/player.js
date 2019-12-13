@@ -500,7 +500,6 @@ function playSong(message) {
     }
     playlistInfos[message.guild.id]['error'] = false
     delete tryToNext[message.guild.id]
-    // connectionsArray[userChannel.id] = connection
     const stream = ytdl(playlistArray[message.guild.id][0], { filter: 'audio', liveBuffer: 10000, highWaterMark: 512 })
     streamsArray[message.guild.id] = connectionsArray[message.guild.id].play(stream, { highWaterMark: 512 })
     // streamsArray[userChannel.id].setVolume(1)
@@ -514,12 +513,9 @@ function playSong(message) {
                 console.log('titre : ', playlistInfos[message.guild.id][0].title)
                 console.log('STOP ANORMALY -> RETRY SONG')
                 retryArray[message.guild.id] = true
-                // playlistInfos[message.guild.id].splice(1, 0, playlistInfos[message.guild.id][0])
-                // playlistArray[message.guild.id].splice(1, 0, playlistArray[message.guild.id][0])
                 // streamsArray[message.guild.id].destroy()
                 playSong(message)
                 console.log('--------------------------')
-                // message.channel.send('Fais la commande next')
             }
         }
     }, 5000)
@@ -529,7 +525,6 @@ function playSong(message) {
         playlistInfos[message.guild.id]['error'] = true
         console.log('e message : ', e.message)
         if (e.message.indexOf('This video contains content') !== -1) {
-            console.log('Droit d\'auteur')
             message.channel.send('> Vidéo bloquée par droit d\'auteur : `' + playlistInfos[message.guild.id][0].title + '`')
             next(message)
         }
@@ -942,6 +937,7 @@ function connectRadio(message, words) {
         if (!connectedGuild[message.guild.id]) {
             voiceChannel.join()
                 .then(connection => {
+                    sendRadioEmbed(message, words[1].toLowerCase())
                     connectionsArray[message.guild.id] = connection
                     connectedGuild[message.guild.id] = voiceChannel.id
                     streamsArray[message.guild.id] = connectionsArray[message.guild.id].play(radioLink)
@@ -949,6 +945,7 @@ function connectRadio(message, words) {
                 })
         }
         else if (Helper.verifyBotLocation(message, voiceChannel)) {
+            sendRadioEmbed(message, words[1].toLowerCase())
             delete playlistArray[message.guild.id]
             delete playlistInfos[message.guild.id]
             streamsArray[message.guild.id].destroy()
@@ -959,6 +956,17 @@ function connectRadio(message, words) {
     else {
         message.channel.send('> Vous devez être connecté dans un salon !')
     }
+}
+
+function sendRadioEmbed(message, radioTitle) {
+    // #543A99 | Mauve
+    const color = 5520025
+    const embed = new Discord.MessageEmbed()
+        .setAuthor("Radio", 'https://syxbot.com/img/radio_icon.png')
+        .setColor(color)
+        .setFooter('"' + config.prefix + 'radio list" pour afficher les radios disponibles')
+        .addField('Nom de la radio', radioTitle, true)
+    message.channel.send({ embed });
 }
 
 function getConnectedGuild(guildID) {
