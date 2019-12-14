@@ -84,7 +84,7 @@ export default class Docs extends React.Component {
                                     <p className="h5">Bienvenue sur la docs de syxbot</p>
                                     <p>N'hésitez pas à me contacter pour toute(s) question(s), idée(s) de modification(s), etc ...</p>
                                 </div>
-                                <h4>Toutes les commandes disponibles</h4>
+                                <h4>Les commandes disponibles</h4>
                                 <a
                                     href="/docs/play"
                                     className="docs_content_command"
@@ -95,7 +95,7 @@ export default class Docs extends React.Component {
                                         <p>Rajoute une musique avec l'URL, sélectionne une musique, recherche d'une musique par titre, ...</p>
                                         <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
                                     </div>
-                                    <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p>
+                                    {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
                                 <a
                                     href="/docs/playlist"
@@ -107,7 +107,7 @@ export default class Docs extends React.Component {
                                         <p>Rajoute une playlist avec l'URL, sélectionne une musique, recherche d'une playlist par titre, ...</p>
                                         <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
                                     </div>
-                                    <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p>
+                                    {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
                                 <a
                                     href="/docs/cancel"
@@ -119,7 +119,7 @@ export default class Docs extends React.Component {
                                         <p>Annule une recherche de musique ou playlist dans le cas où il ne trouverait pas de résultats.</p>
                                         <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
                                     </div>
-                                    <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p>
+                                    {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
                                 <a
                                     href="/docs/go"
@@ -131,7 +131,7 @@ export default class Docs extends React.Component {
                                         <p>Passe directement à la musique de la file d'attente sélectionnée.</p>
                                         <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
                                     </div>
-                                    <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p>
+                                    {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
                                 <a
                                     href="/docs/loop"
@@ -143,7 +143,7 @@ export default class Docs extends React.Component {
                                         <p>Active le mode répétition pour la musique en cours d'écoute.</p>
                                         <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
                                     </div>
-                                    <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p>
+                                    {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
                                 <a
                                     href="/docs/help"
@@ -155,7 +155,7 @@ export default class Docs extends React.Component {
                                         <p>Affiche les commandes disponibles ou les détails d'une commande en particulier.</p>
                                         <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
                                     </div>
-                                    <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p>
+                                    {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
                                 <a
                                     href="/docs/next"
@@ -164,10 +164,10 @@ export default class Docs extends React.Component {
                                     onMouseLeave={() => this.handleMouseLeave(6)}>
                                     <h5><FontAwesomeIcon icon="step-forward" />Next</h5>
                                     <div className="command_desc">
-                                        <p>Passe à la musique suivante.</p>
+                                        <p>Permet de passer à la musique suivante.</p>
                                         <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
                                     </div>
-                                    <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p>
+                                    {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
                                 <a
                                     href="/docs/pause"
@@ -176,10 +176,10 @@ export default class Docs extends React.Component {
                                     onMouseLeave={() => this.handleMouseLeave(7)}>
                                     <h5><FontAwesomeIcon icon="pause" />Pause</h5>
                                     <div className="command_desc">
-                                        <p>Met la musique en pause.</p>
+                                        <p>Met la musique en pause pour la reprendre plus tard.</p>
                                         <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
                                     </div>
-                                    <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p>
+                                    {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
                                 <a
                                     href="/docs/resume"
@@ -191,7 +191,7 @@ export default class Docs extends React.Component {
                                         <p>Reprend la musique là où vous l'aviez arrêtée.</p>
                                         <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
                                     </div>
-                                    <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p>
+                                    {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
                                 <a
                                     href="/docs/quit"
@@ -203,7 +203,7 @@ export default class Docs extends React.Component {
                                         <p>Se déconnecte du salon vocal et supprime les musiques en file d'attente.</p>
                                         <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
                                     </div>
-                                    <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p>
+                                    {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
                                 <a
                                     href="/docs/remove"
@@ -215,7 +215,7 @@ export default class Docs extends React.Component {
                                         <p>Supprime le nombre de message désiré.</p>
                                         <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
                                     </div>
-                                    <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p>
+                                    {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
                                 <a
                                     href="/docs/clear"
@@ -227,7 +227,7 @@ export default class Docs extends React.Component {
                                         <p>Supprime tout les messages chargés du salon.</p>
                                         <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
                                     </div>
-                                    <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p>
+                                    {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
                                 <a
                                     href="/docs/search"
@@ -239,7 +239,7 @@ export default class Docs extends React.Component {
                                         <p>Affiche la liste des résultats d'une recherche, sélectionne un des résultats.</p>
                                         <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
                                     </div>
-                                    <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p>
+                                    {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
                                 <a
                                     href="/docs/radio"
@@ -251,7 +251,7 @@ export default class Docs extends React.Component {
                                         <p>Permet d'écouter la radio en la sélectionnant par son nom.</p>
                                         <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
                                     </div>
-                                    <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p>
+                                    {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
                             </div>
                         </div>
