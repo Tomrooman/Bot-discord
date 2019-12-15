@@ -93,7 +93,7 @@ export default class Docs extends React.Component {
                                     <h5><FontAwesomeIcon icon="headphones-alt" />Play</h5>
                                     <div className="command_desc">
                                         <p>Rajoute une musique avec l'URL, sélectionne une musique, recherche d'une musique par titre, ...</p>
-                                        <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
+                                        {/* <p><FontAwesomeIcon icon="arrow-circle-up" /></p> */}
                                     </div>
                                     {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
@@ -105,7 +105,7 @@ export default class Docs extends React.Component {
                                     <h5><FontAwesomeIcon icon="list-ol" />Playlist</h5>
                                     <div className="command_desc">
                                         <p>Rajoute une playlist avec l'URL, sélectionne une musique, recherche d'une playlist par titre, ...</p>
-                                        <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
+                                        {/* <p><FontAwesomeIcon icon="arrow-circle-up" /></p> */}
                                     </div>
                                     {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
@@ -117,7 +117,7 @@ export default class Docs extends React.Component {
                                     <h5><FontAwesomeIcon icon="window-close" />Cancel</h5>
                                     <div className="command_desc">
                                         <p>Annule une recherche de musique ou playlist dans le cas où il ne trouverait pas de résultats.</p>
-                                        <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
+                                        {/* <p><FontAwesomeIcon icon="arrow-circle-up" /></p> */}
                                     </div>
                                     {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
@@ -129,7 +129,7 @@ export default class Docs extends React.Component {
                                     <h5><FontAwesomeIcon icon="forward" />Go</h5>
                                     <div className="command_desc">
                                         <p>Passe directement à la musique de la file d'attente sélectionnée.</p>
-                                        <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
+                                        {/* <p><FontAwesomeIcon icon="arrow-circle-up" /></p> */}
                                     </div>
                                     {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
@@ -141,7 +141,7 @@ export default class Docs extends React.Component {
                                     <h5><FontAwesomeIcon icon="sync-alt" />Loop</h5>
                                     <div className="command_desc">
                                         <p>Active le mode répétition pour la musique en cours d'écoute.</p>
-                                        <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
+                                        {/* <p><FontAwesomeIcon icon="arrow-circle-up" /></p> */}
                                     </div>
                                     {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
@@ -153,7 +153,7 @@ export default class Docs extends React.Component {
                                     <h5><FontAwesomeIcon icon="question" />Help</h5>
                                     <div className="command_desc">
                                         <p>Affiche les commandes disponibles ou les détails d'une commande en particulier.</p>
-                                        <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
+                                        {/* <p><FontAwesomeIcon icon="arrow-circle-up" /></p> */}
                                     </div>
                                     {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
@@ -165,7 +165,7 @@ export default class Docs extends React.Component {
                                     <h5><FontAwesomeIcon icon="step-forward" />Next</h5>
                                     <div className="command_desc">
                                         <p>Permet de passer à la musique suivante.</p>
-                                        <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
+                                        {/* <p><FontAwesomeIcon icon="arrow-circle-up" /></p> */}
                                     </div>
                                     {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
@@ -177,7 +177,7 @@ export default class Docs extends React.Component {
                                     <h5><FontAwesomeIcon icon="pause" />Pause</h5>
                                     <div className="command_desc">
                                         <p>Met la musique en pause pour la reprendre plus tard.</p>
-                                        <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
+                                        {/* <p><FontAwesomeIcon icon="arrow-circle-up" /></p> */}
                                     </div>
                                     {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
@@ -189,7 +189,7 @@ export default class Docs extends React.Component {
                                     <h5><FontAwesomeIcon icon="play" />Resume</h5>
                                     <div className="command_desc">
                                         <p>Reprend la musique là où vous l'aviez arrêtée.</p>
-                                        <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
+                                        {/* <p><FontAwesomeIcon icon="arrow-circle-up" /></p> */}
                                     </div>
                                     {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
@@ -201,7 +201,7 @@ export default class Docs extends React.Component {
                                     <h5><FontAwesomeIcon icon="sign-out-alt" />Quit</h5>
                                     <div className="command_desc">
                                         <p>Se déconnecte du salon vocal et supprime les musiques en file d'attente.</p>
-                                        <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
+                                        {/* <p><FontAwesomeIcon icon="arrow-circle-up" /></p> */}
                                     </div>
                                     {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
@@ -213,7 +213,7 @@ export default class Docs extends React.Component {
                                     <h5><FontAwesomeIcon icon="eraser" />Remove</h5>
                                     <div className="command_desc">
                                         <p>Supprime le nombre de message désiré.</p>
-                                        <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
+                                        {/* <p><FontAwesomeIcon icon="arrow-circle-up" /></p> */}
                                     </div>
                                     {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
@@ -225,7 +225,7 @@ export default class Docs extends React.Component {
                                     <h5><FontAwesomeIcon icon="trash-alt" />Clear</h5>
                                     <div className="command_desc">
                                         <p>Supprime tout les messages chargés du salon.</p>
-                                        <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
+                                        {/* <p><FontAwesomeIcon icon="arrow-circle-up" /></p> */}
                                     </div>
                                     {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
@@ -237,7 +237,7 @@ export default class Docs extends React.Component {
                                     <h5><FontAwesomeIcon icon="search" />Search</h5>
                                     <div className="command_desc">
                                         <p>Affiche la liste des résultats d'une recherche, sélectionne un des résultats.</p>
-                                        <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
+                                        {/* <p><FontAwesomeIcon icon="arrow-circle-up" /></p> */}
                                     </div>
                                     {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
@@ -249,7 +249,7 @@ export default class Docs extends React.Component {
                                     <h5><FontAwesomeIcon icon="rss" />Radio</h5>
                                     <div className="command_desc">
                                         <p>Permet d'écouter la radio en la sélectionnant par son nom.</p>
-                                        <p><FontAwesomeIcon icon="arrow-circle-up" /></p>
+                                        {/* <p><FontAwesomeIcon icon="arrow-circle-up" /></p> */}
                                     </div>
                                     {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                 </a>
