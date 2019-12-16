@@ -7,7 +7,7 @@ import Sidebar from './sidebar/sidebar.jsx';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBookmark, faListUl, faHome, faPenFancy, faPause, faListOl, faHeadphonesAlt, faWindowClose, faQuestion, faArrowCircleDown } from '@fortawesome/free-solid-svg-icons';
-import { faStepForward, faTrashAlt, faRss, faPlay, faSyncAlt, faEraser, faSignOutAlt, faSearch, faForward, faArrowCircleUp } from '@fortawesome/free-solid-svg-icons';
+import { faStepForward, faTrashAlt, faRss, faPlay, faSyncAlt, faEraser, faSignOutAlt, faSearch, faForward, faArrowCircleUp, faCheck } from '@fortawesome/free-solid-svg-icons';
 library.add(faBookmark);
 library.add(faListUl);
 library.add(faHome);
@@ -28,6 +28,7 @@ library.add(faSearch);
 library.add(faForward);
 library.add(faArrowCircleDown);
 library.add(faArrowCircleUp);
+library.add(faCheck);
 
 import './docs.css';
 
@@ -48,6 +49,7 @@ export default class Docs extends React.Component {
     componentDidMount() {
         setTimeout(() => {
             $('.syx_container h1').addClass('load')
+            $('.top_logo').addClass('load')
             if ($('.docs_panel')) {
                 setTimeout(() => {
                     $('.docs_panel').addClass('load')
@@ -77,6 +79,22 @@ export default class Docs extends React.Component {
         $('#command_list a')[command].style.letterSpacing = ''
     }
 
+    handleMouseEnterContactBtn() {
+        $('.components')[0].children[1].children[0].style.color = 'rgb(93, 67, 126)'
+        $('.components')[0].children[1].style.letterSpacing = '5px'
+        $('.components')[0].children[1].style.background = '#f0f0f0'
+        $('.components')[0].children[1].children[0].style.borderLeft = '5px solid rgba(93, 67, 126, 0.74)'
+        $('.components')[0].children[1].style.boxShadow = '-5px 0px 4px rgb(93, 67, 126, 1)'
+    }
+
+    handleMouseLeaveContactBtn() {
+        $('.components')[0].children[1].children[0].style.color = ''
+        $('.components')[0].children[1].style.letterSpacing = ''
+        $('.components')[0].children[1].style.background = ''
+        $('.components')[0].children[1].children[0].style.borderLeft = ''
+        $('.components')[0].children[1].style.boxShadow = ''
+    }
+
     render() {
         return (
             <div className='wrapper'>
@@ -88,13 +106,22 @@ export default class Docs extends React.Component {
                             <h1><FontAwesomeIcon icon="home" />
                                 Accueil
                             </h1>
+                            <div className="top_logo"><img src="/img/Syxbot_logo.png"></img></div>
                             <div className="docs_content">
                                 <div className="docs_panel">
                                     <p className="h5">Bienvenue sur la docs de syxbot</p>
                                     <p>N'hésitez pas à me contacter pour toute(s) question(s), idée(s) de modification(s), etc ...</p>
+                                    <a href="/docs/contact">
+                                        <button
+                                            className="contact-btn"
+                                            onMouseEnter={() => { this.handleMouseEnterContactBtn() }}
+                                            onMouseLeave={() => { this.handleMouseLeaveContactBtn() }}>
+                                            Me contacter
+                                    </button>
+                                    </a>
                                 </div>
                                 <div className="div_docs_content_command">
-                                    <h4>Les commandes disponibles</h4>
+                                    <h4><FontAwesomeIcon icon="check" /> Les commandes disponibles</h4>
                                     <a
                                         href="/docs/play"
                                         className="docs_content_command"
