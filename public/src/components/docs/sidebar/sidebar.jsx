@@ -95,11 +95,11 @@ export default class Sidebar extends React.Component {
                             <FontAwesomeIcon icon="forward" />Go
                         </a>
                         <a
-                            href="/docs/loop"
-                            className={this.props.command === 'loop' ? 'active' : ''}
+                            href="/docs/repeat"
+                            className={this.props.command === 'repeat' ? 'active' : ''}
                             onMouseEnter={() => this.handleMouseEnter(4)}
                             onMouseLeave={() => this.handleMouseLeave(4)}>
-                            <FontAwesomeIcon icon="sync-alt" />Loop
+                            <FontAwesomeIcon icon="sync-alt" />Repeat
                         </a>
                         <a
                             href="/docs/help"

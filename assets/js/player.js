@@ -324,11 +324,11 @@ function toggleLoop(message) {
         if (playlistArray[message.guild.id] && playlistArray[message.guild.id].length) {
             if (!loopArray[message.guild.id]) {
                 loopArray[message.guild.id] = true
-                message.channel.send('> Boucle activée !')
+                message.channel.send('> Mode répétition activé !')
             }
             else {
                 delete loopArray[message.guild.id]
-                message.channel.send('> Boucle désactivée !')
+                message.channel.send('> Mode répétition désactivée !')
             }
         }
         else {
@@ -558,7 +558,7 @@ function setArrays(message) {
             waitArray[message.guild.id] = true
             if (loopArray[message.guild.id]) {
                 delete loopArray[message.guild.id]
-                message.channel.send('> Boucle désactivée')
+                message.channel.send('> Mode répétition désactivé')
             }
             message.channel.send('> Plus de musique en file d\'attente')
         }

@@ -171,11 +171,11 @@ export default class Docs extends React.Component {
                                         {/* <p className="open_desc"><FontAwesomeIcon icon="arrow-circle-down" /></p> */}
                                     </a>
                                     <a
-                                        href="/docs/loop"
+                                        href="/docs/repeat"
                                         className="docs_content_command"
                                         onMouseEnter={() => this.handleMouseEnter(4)}
                                         onMouseLeave={() => this.handleMouseLeave(4)}>
-                                        <h5><FontAwesomeIcon icon="sync-alt" />Loop</h5>
+                                        <h5><FontAwesomeIcon icon="sync-alt" />Repeat</h5>
                                         <div className="command_desc">
                                             <p>Active le mode répétition pour la musique en cours d'écoute.</p>
                                             {/* <p><FontAwesomeIcon icon="arrow-circle-up" /></p> */}

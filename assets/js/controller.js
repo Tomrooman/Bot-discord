@@ -40,7 +40,7 @@ function dispatcher(message, prefix, bot) {
         else if (command === 'go') {
             Player.go(message, words)
         }
-        else if (command === 'loop') {
+        else if (command === 'repeat') {
             Player.toggleLoop(message)
         }
         else if (command === 'cancel') {
