@@ -29,7 +29,8 @@ export default class Sidebar extends React.Component {
 
     handleMouseEnter(command) {
         if ($('.docs_content_command')[command]) {
-            $('.docs_content_command')[command].children[0].style.background = 'rgb(95, 59, 109)'
+            $('.docs_content_command')[command].children[0].style.background = 'linear-gradient(45deg, rgba(121,75,139,1) 0%, rgba(134,31,43,1) 100%)'
+            $('.docs_content_command')[command].children[1].style.background = 'rgb(236, 236, 236)'
             $('.docs_content_command')[command].style.transform = 'translateY(-30px)'
         }
     }
@@ -37,6 +38,7 @@ export default class Sidebar extends React.Component {
     handleMouseLeave(command) {
         if ($('.docs_content_command')[command]) {
             $('.docs_content_command')[command].children[0].style.background = ''
+            $('.docs_content_command')[command].children[1].style.background = ''
             $('.docs_content_command')[command].style.transform = ''
         }
     }
