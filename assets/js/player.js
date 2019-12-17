@@ -575,25 +575,11 @@ function setArrays(message) {
 }
 
 function sendMusicEmbed(message, embedObj, added = [false, 1], type = 'video') {
-    let title = 'Musique'
-    let color = false
     const queuedLength = playlistArray[message.guild.id].length - 1
     let formattedDuration = 0
     const musicLink = type === 'video' ? `[${embedObj.title}](https://www.youtube.com/watch?v=${embedObj.id})` : `[${embedObj.title}](https://www.youtube.com/playlist?list=${embedObj.id})`
-    if (added[0]) {
-        if (added[1] > 1) {
-            title = 'Playlist ajoutée'
-        }
-        else {
-            title = 'Musique ajoutée'
-        }
-        // #398240 | Vert foncé
-        color = 3768896
-    }
-    else {
-        // #543A99 | Mauve
-        color = 5520025
-    }
+    const color = added[0] ? 3768896 : 5520025
+    const title = added[0] && added[1] > 1 ? 'Playlist ajoutée' : added[0] ? 'Musique ajoutée' : 'Musique'
     if (playlistArray[message.guild.id].length >= 2) {
         playlistInfos[message.guild.id].map((video, index) => {
             if (index >= 1) {
