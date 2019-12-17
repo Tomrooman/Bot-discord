@@ -561,7 +561,7 @@ class Player {
         streamsArray[message.guild.id].setVolume(0.4)
         musicTimes[message.guild.id] = Date.now()
         streamsArray[message.guild.id].on('error', (e) => {
-            this.handleError(e)
+            this.handleError(message, e)
         })
         streamsArray[message.guild.id].on('finish', () => {
             this.handleFinish(message)
@@ -569,10 +569,10 @@ class Player {
     }
 
     handleFinish(message) {
-        let diffSec = Math.floor((Date.now() - musicTimes[message.guild.id]) / 1000)
+        const diffSec = Math.floor((Date.now() - musicTimes[message.guild.id]) / 1000)
         if (diffSec < this.getSeconds(playlistInfos[message.guild.id][0].duration)) {
             console.log('Try to resume song')
-            let missingTime = this.getSeconds(playlistInfos[message.guild.id][0].duration) - diffSec
+            const missingTime = this.getSeconds(playlistInfos[message.guild.id][0].duration) - diffSec
             const beginAt = this.convertSecondsToFormattedDuration(this.getSeconds(playlistInfos[message.guild.id][0].duration) - missingTime)
             this.playSong(message, beginAt)
         }
@@ -583,7 +583,7 @@ class Player {
         }
     }
 
-    handleError(e) {
+    handleError(message, e) {
         console.log('--------------------------------------')
         console.log('Titre : ', playlistInfos[message.guild.id][0].title)
         playlistInfos[message.guild.id]['error'] = true

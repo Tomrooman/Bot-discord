@@ -188,7 +188,7 @@ class Radio {
         // #543A99 | Mauve
         const color = 5520025
         const embed = new Discord.MessageEmbed()
-            .setAuthor("Radio", 'https://syxbot.com/img/radio_icon.png')
+            .setAuthor('Radio', 'https://syxbot.com/img/radio_icon.png')
             .setColor(color)
             .setFooter('"' + config.prefix + 'radio list" pour afficher les radios disponibles')
             .addField('Nom de la radio', radioTitle, true)

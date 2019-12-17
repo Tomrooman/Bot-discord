@@ -1,4 +1,3 @@
-const Player = require('./player.js')
 const config = require('./../../config.json')
 
 class Helper {
