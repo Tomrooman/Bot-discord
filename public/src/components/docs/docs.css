@@ -262,6 +262,8 @@ a[data-toggle="collapse"] {
     background: rgb(95, 59, 109);
     text-align: center;
     box-shadow: 0px 0px 3px #757575;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
     padding-top : 0.75rem;
     padding-bottom : 0.5rem;
     margin: 0;
@@ -284,8 +286,6 @@ a[data-toggle="collapse"] {
 }
 
 .command_desc p:first-child {
-    border-bottom-left-radius: 20px;
-    border-bottom-right-radius: 20px;
     font-size: 0.9rem;
     color : black;
     padding-left: 0.5rem;
@@ -295,8 +295,8 @@ a[data-toggle="collapse"] {
 
 .command_desc {
     box-shadow: 0px 0px 3px #757575;
-    border-bottom-left-radius: 20px;
-    border-bottom-right-radius: 20px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
     background: rgb(224, 224, 224);
     transition: all 0.5s ease-in-out;
     width: auto;
