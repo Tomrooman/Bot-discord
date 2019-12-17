@@ -39,7 +39,7 @@ bot.on('messageReactionAdd', (reaction, user) => {
                     nextReaction(reaction, user, 'playlist')
                 }
                 else {
-                    Player.selectSongInSearchList(reaction.message, selection, 'playlist', [true, user])
+                    new Player().selectSongInSearchList(reaction.message, selection, 'playlist', [true, user])
                 }
             }
             else if (videoExist && !playlistExist) {
@@ -47,7 +47,7 @@ bot.on('messageReactionAdd', (reaction, user) => {
                     nextReaction(reaction, user, 'video')
                 }
                 else {
-                    Player.selectSongInSearchList(reaction.message, selection, 'musique', [true, user])
+                    new Player().selectSongInSearchList(reaction.message, selection, 'musique', [true, user])
                 }
             }
         }
@@ -57,7 +57,7 @@ bot.on('messageReactionAdd', (reaction, user) => {
 function nextReaction(reaction, user, type) {
     const userChannel = Helper.take_user_voiceChannel_by_reaction(reaction.message, user)
     if (userChannel) {
-        Player.youtubeResearch(reaction.message, null, type, false, [true, user])
+        new Player().youtubeResearch(reaction.message, null, type, false, [true, user])
     }
     else {
         reaction.message.channel.send('> Vous devez être connecté dans un salon !')
