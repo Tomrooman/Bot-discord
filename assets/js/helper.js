@@ -200,12 +200,12 @@ function availableCommand() {
             ]
         },
         {
-            name: 'loop',
-            showName: 'loop',
-            command: '**loop**',
-            exemple: '```' + config.prefix + 'loop``` \n',
+            name: 'repeat',
+            showName: 'repeat',
+            command: '**repeat**',
+            exemple: '```' + config.prefix + 'repeat``` \n',
             infos: [
-                'Active ou désactive le mode répétition pour la musique en écoute ```' + config.prefix + 'loop```'
+                'Active ou désactive le mode répétition pour la musique en écoute ```' + config.prefix + 'repeat```'
             ]
         },
         {
