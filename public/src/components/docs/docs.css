@@ -13,7 +13,7 @@ body {
 p {
     font-family: 'Poppins', sans-serif;
     font-size: 1.1em;
-    font-weight: 350;
+    font-weight: 375;
     color: #999;
 }
 
@@ -295,12 +295,6 @@ a[data-toggle="collapse"] {
     padding-left: 0.5rem;
     padding-right : 0.5rem; 
     padding-top : 1rem;
-}
-
-.command_desc p:nth-child(2) {
-    color: #fff;
-    background: rgb(71, 71, 71);
-    margin-bottom : 0;
 }
 
 .command_desc {
