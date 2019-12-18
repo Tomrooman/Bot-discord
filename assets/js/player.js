@@ -12,11 +12,7 @@ const playlistArray = []
 const playlistInfos = []
 const connectedGuild = []
 const radioPlayed = []
-const cancelArray = []
-const loopArray = []
-const waitArray = []
-const nextSetLoop = []
-const tryToNext = []
+const musicParams = { 'cancel': [], 'loop': [], 'wait': [], 'nextSetLoop': [], 'tryToNext': [] }
 const searchVideo = []
 const searchPlaylist = []
 const musicTimes = []
@@ -63,10 +59,10 @@ class Player {
     static removeArray(message, choice) {
         // Call without instance and REMOVE selected array
         if (choice === 'loop') {
-            delete loopArray[message.guild.id]
+            delete musicParams.loop[message.guild.id]
         }
         else if (choice === 'trytonext') {
-            delete tryToNext[message.guild.id]
+            delete musicParams.tryToNext[message.guild.id]
         }
         else if (choice === 'playlistArray') {
             delete playlistArray[message.guild.id]
@@ -160,11 +156,11 @@ class Player {
             const title = words.join(' ')
             // Delete cancel array who said to 'sendCurrentResultAndRecall()' to stop research
             if (command === 'playlist' || command === 'pl') {
-                delete cancelArray[message.guild.id]
+                delete musicParams.cancel[message.guild.id]
                 this.youtubeResearch(message, title, 'playlist')
             }
             else if (command === 'play' || command === 'p') {
-                delete cancelArray[message.guild.id]
+                delete musicParams.cancel[message.guild.id]
                 this.youtubeResearch(message, title, 'video')
             }
         }
@@ -201,18 +197,18 @@ class Player {
 
     static cancel(message) {
         // Set cancel array to tell the API to stop the research
-        cancelArray[message.guild.id] = true
+        musicParams.cancel[message.guild.id] = true
     }
 
     sendCurrentResultAndRecall(message, title, type, buildedArray, searchresults, byReaction) {
         message.channel.send('> ' + buildedArray.length + '/5 trouvé')
         setTimeout(() => {
             // If cancel is activate stop the research
-            if (!cancelArray[message.guild.id]) {
+            if (!musicParams.cancel[message.guild.id]) {
                 this.youtubeResearch(message, title, type, searchresults.nextpageRef, byReaction)
             }
             else {
-                delete cancelArray[message.guild.id]
+                delete musicParams.cancel[message.guild.id]
                 message.channel.send('> Recherche arrêtée !')
             }
         }, 1500)
@@ -410,12 +406,12 @@ class Player {
         const userChannel = Helper.take_user_voiceChannel(message)
         if (Helper.verifyBotLocation(message, connectedGuild[message.guild.id], userChannel)) {
             if (playlistArray[message.guild.id] && playlistArray[message.guild.id].length) {
-                if (!loopArray[message.guild.id]) {
-                    loopArray[message.guild.id] = true
+                if (!musicParams.loop[message.guild.id]) {
+                    musicParams.loop[message.guild.id] = true
                     message.channel.send('> Mode répétition activé !')
                 }
                 else {
-                    delete loopArray[message.guild.id]
+                    delete musicParams.loop[message.guild.id]
                     message.channel.send('> Mode répétition désactivée !')
                 }
             }
@@ -596,7 +592,7 @@ class Player {
             stream = ytdl(playlistArray[message.guild.id][0], { filter: 'audio', liveBuffer: 10000, highWaterMark: 512, beginAt: beginAt })
         }
         playlistInfos[message.guild.id]['error'] = false
-        delete tryToNext[message.guild.id]
+        delete musicParams.tryToNext[message.guild.id]
         streamsArray[message.guild.id] = connectionsArray[message.guild.id].play(stream, { highWaterMark: 512 })
         // CHECK IF SPEAKING --> !streamsArray[message.guild.id].player.voiceConnection.speaking.bitfield
         streamsArray[message.guild.id].setVolume(0.4)
@@ -647,7 +643,7 @@ class Player {
         // If still connected but the end callback is call to early (after few seconds of playing)
         if (playlistArray[message.guild.id]) {
             // If loop is desactivate
-            if (!loopArray[message.guild.id]) {
+            if (!musicParams.loop[message.guild.id]) {
                 delete playlistArray[message.guild.id][0]
                 delete playlistInfos[message.guild.id][0]
                 playlistArray[message.guild.id] = _.compact(playlistArray[message.guild.id])
@@ -655,18 +651,20 @@ class Player {
             }
             // If playlist is empty
             if (!playlistArray[message.guild.id][0]) {
-                waitArray[message.guild.id] = true
-                if (loopArray[message.guild.id]) {
-                    delete loopArray[message.guild.id]
+                musicParams.wait[message.guild.id] = true
+                // Use this condition if loop is activate and user try to go to the next song without queued songs
+                if (musicParams.loop[message.guild.id] || musicParams.nextSetLoop[message.guild.id]) {
+                    delete musicParams.loop[message.guild.id]
+                    delete musicParams.nextSetLoop[message.guild.id]
                     message.channel.send('> Mode répétition désactivé')
                 }
                 message.channel.send('> Plus de musique en file d\'attente')
             }
             else {
                 // If loop is activate and command 'next' is called
-                if (nextSetLoop[message.guild.id]) {
-                    loopArray[message.guild.id] = true
-                    delete nextSetLoop[message.guild.id]
+                if (musicParams.nextSetLoop[message.guild.id]) {
+                    musicParams.loop[message.guild.id] = true
+                    delete musicParams.nextSetLoop[message.guild.id]
                 }
                 this.playSong(message)
             }
@@ -749,8 +747,8 @@ class Player {
                 delete radioPlayed[message.guild.id]
                 this.playSong(message)
             }
-            else if (waitArray[message.guild.id]) {
-                delete waitArray[message.guild.id]
+            else if (musicParams.wait[message.guild.id]) {
+                delete musicParams.wait[message.guild.id]
                 this.playSong(message)
             }
         }
@@ -853,9 +851,9 @@ class Player {
     }
 
     setMusicArrayAndPlayMusic(infos, message, playSongParams, byReaction) {
-        if (playSongParams || waitArray[message.guild.id]) {
+        if (playSongParams || musicParams.wait[message.guild.id]) {
             // If must play or bot waiting so join channel
-            delete waitArray[message.guild.id]
+            delete musicParams.wait[message.guild.id]
             let voiceChannel = Helper.take_user_voiceChannel(message)
             if (byReaction[0]) {
                 voiceChannel = Helper.take_user_voiceChannel_by_reaction(message, byReaction[1])
@@ -1134,17 +1132,17 @@ class Player {
                 connectionsArray[message.guild.id].channel.leave()
                 delete connectedGuild[message.guild.id]
                 delete connectionsArray[message.guild.id]
-                delete waitArray[message.guild.id]
+                delete musicParams.wait[message.guild.id]
             }
             else {
-                waitArray[message.guild.id] = true
+                musicParams.wait[message.guild.id] = true
             }
             delete streamsArray[message.guild.id]
             delete playlistArray[message.guild.id]
             delete playlistInfos[message.guild.id]
             delete radioPlayed[message.guild.id]
-            delete loopArray[message.guild.id]
-            delete tryToNext[message.guild.id]
+            delete musicParams.loop[message.guild.id]
+            delete musicParams.tryToNext[message.guild.id]
         }
     }
 
@@ -1163,7 +1161,9 @@ class Player {
     static resume(message) {
         const userChannel = Helper.take_user_voiceChannel(message)
         if (Helper.verifyBotLocation(message, connectedGuild[message.guild.id], userChannel)) {
-            streamsArray[message.guild.id].resume()
+            if (streamsArray[message.guild.id]) {
+                streamsArray[message.guild.id].resume()
+            }
         }
     }
 
@@ -1171,10 +1171,10 @@ class Player {
         const userChannel = Helper.take_user_voiceChannel(message)
         if (Helper.verifyBotLocation(message, connectedGuild[message.guild.id], userChannel)) {
             if (playlistArray[message.guild.id]) {
-                tryToNext[message.guild.id] = true
-                if (loopArray[message.guild.id]) {
-                    delete loopArray[message.guild.id]
-                    nextSetLoop[message.guild.id] = true
+                musicParams.tryToNext[message.guild.id] = true
+                if (musicParams.loop[message.guild.id]) {
+                    delete musicParams.loop[message.guild.id]
+                    musicParams.nextSetLoop[message.guild.id] = true
                 }
                 streamsArray[message.guild.id].destroy()
                 this.setArrays(message, connectionsArray[message.guild.id])
