@@ -104,7 +104,7 @@ function disconnectBotFromOldChannel() {
             if (channel.type === 'voice') {
                 if (channel.members) {
                     channel.members.map(member => {
-                        if (member.user.bot) {
+                        if (member.user.bot && member.user.id === config.clientId) {
                             channel.join()
                                 .then(connection => {
                                     connection.channel.leave()

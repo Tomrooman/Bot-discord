@@ -55,6 +55,7 @@ class Radio {
 
     showRadioList(message) {
         let stringRadioList = ''
+        // Create radio list as string and send it
         radioAvailable.map(r => {
             stringRadioList += '> - **' + r + '**\n'
         })
@@ -63,6 +64,7 @@ class Radio {
 
     radioExist(radioCheck) {
         let checkExist = false
+        // Check radioAbailable array if wanted radio exist
         radioAvailable.map(r => {
             if (r.toLowerCase() === radioCheck) {
                 checkExist = true
@@ -72,6 +74,7 @@ class Radio {
     }
 
     getRadioLink(radioForLink) {
+        // Return link used for stream the selected radio
         if (radioForLink === 'nrj') {
             return 'http://cdn.nrjaudio.fm/audio1/fr/40125/aac_64.mp3'
         }
@@ -159,6 +162,7 @@ class Radio {
         const radioLink = this.getRadioLink(words[1].toLowerCase())
         const voiceChannel = Helper.take_user_voiceChannel(message)
         if (voiceChannel) {
+            // Call player setter/getter to save radio infos
             Player.removeArray(message, 'trytonext')
             Player.removeArray(message, 'loop')
             Player.setArray(message, 'radio', true)

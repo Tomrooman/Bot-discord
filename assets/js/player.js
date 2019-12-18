@@ -24,6 +24,7 @@ const musicTimes = []
 class Player {
 
     constructor(message, command, words) {
+        // Check command and call function if args in new instance
         if (message) {
             if (command === 'next') {
                 this.next(message)
@@ -60,6 +61,7 @@ class Player {
     }
 
     static removeArray(message, choice) {
+        // Call without instance and REMOVE selected array
         if (choice === 'loop') {
             delete loopArray[message.guild.id]
         }
@@ -75,6 +77,7 @@ class Player {
     }
 
     static getArray(message, choice) {
+        // Call without instance and RETURN selected array
         if (choice === 'connections') {
             return connectionsArray[message.guild.id]
         }
@@ -84,6 +87,7 @@ class Player {
     }
 
     static setArray(message, choice, value) {
+        // Call without instance and SET selected array with 'value'
         if (choice === 'radio') {
             radioPlayed[message.guild.id] = value
         }
@@ -99,19 +103,24 @@ class Player {
     }
 
     static streamDestroy(message) {
+        // Call without instance and DESTROY the stream
         streamsArray[message.guild.id].destroy()
     }
 
     playSongs(message, command, words, byReaction = [false, false]) {
         let voiceChannel = Helper.take_user_voiceChannel(message)
         if (byReaction[0]) {
+            // If call by reaction get voice channel with good function
             voiceChannel = Helper.take_user_voiceChannel_by_reaction(message, byReaction[1])
         }
         if (voiceChannel) {
+            // If user is connected in voice room
             if (!connectedGuild[message.guild.id]) {
+                // If bot is not connected in voice room
                 this.playSongsAndConnectOrNotBot(message, command, words, true, byReaction)
             }
             else if (connectedGuild[message.guild.id] === voiceChannel.id) {
+                // If bot is connected in the same voice room as the user
                 this.playSongsAndConnectOrNotBot(message, command, words, false, byReaction)
             }
             else {
@@ -125,8 +134,10 @@ class Player {
 
     playSongsAndConnectOrNotBot(message, command, words, playSongParams = true, byReaction) {
         if (words[1] && words[1].includes('youtu') && (words[1].includes('http://') || words[1].includes('https://'))) {
+            // If words[1] (element after the command) exist and contain 'youtu' + 'http://' or 'https://'
             if (command === 'playlist' || command === 'pl') {
                 if (ytpl.validateURL(words[1])) {
+                    // Check playlist url before continue
                     this.getPlaylist(message, words, playSongParams, byReaction)
                 }
                 else {
@@ -135,6 +146,7 @@ class Player {
             }
             else if (command === 'play' || command === 'p') {
                 if (ytdl.validateURL(words[1])) {
+                    // Check video url before continue
                     this.getVideo(message, words, playSongParams, byReaction)
                 }
                 else {
@@ -143,8 +155,10 @@ class Player {
             }
         }
         else if (words[1]) {
+            // If words[1] (element after the command) exist and DO NOT CONTAIN 'youtu' + 'http://' or 'https://'
             delete words[0];
             const title = words.join(' ')
+            // Delete cancel array who said to 'sendCurrentResultAndRecall()' to stop research
             if (command === 'playlist' || command === 'pl') {
                 delete cancelArray[message.guild.id]
                 this.youtubeResearch(message, title, 'playlist')
@@ -160,20 +174,25 @@ class Player {
     }
 
     youtubeResearch(message, title, type, nextPage = false, byReaction = [false, false]) {
+        // Create array if it doesn't exist
         if (!searchVideo[message.guild.id]) {
             searchVideo[message.guild.id] = []
         }
         if (!searchPlaylist[message.guild.id]) {
             searchPlaylist[message.guild.id] = []
         }
-        if (searchVideo[message.guild.id]['array']) {
+        // Save current result in 'old' array in case of no API results when try to go to the next page
+        if (type === 'video' && searchVideo[message.guild.id]['array']) {
             searchVideo[message.guild.id]['old'] = searchVideo[message.guild.id]['array']
         }
-        if (searchPlaylist[message.guild.id]['array']) {
+        if (type === 'playlist' && searchPlaylist[message.guild.id]['array']) {
             searchPlaylist[message.guild.id]['old'] = searchPlaylist[message.guild.id]['array']
         }
+        // Create search arrays and set options for the API call
         const options = this.setArrayWithChoice(message, title, type, nextPage, byReaction)
+        // Clear 'infos' and 'last' array
         this.clearSearchArrays(message, type, byReaction)
+        // Try to get 5 next results in last research array and call API if results < 5
         const oldArrayResult = this.verifyOldResearch(message, type, byReaction)
         if (!oldArrayResult) {
             this.getYoutubeResearch(message, title, type, options, byReaction)
@@ -181,12 +200,14 @@ class Player {
     }
 
     static cancel(message) {
+        // Set cancel array to tell the API to stop the research
         cancelArray[message.guild.id] = true
     }
 
     sendCurrentResultAndRecall(message, title, type, buildedArray, searchresults, byReaction) {
         message.channel.send('> ' + buildedArray.length + '/5 trouvé')
         setTimeout(() => {
+            // If cancel is activate stop the research
             if (!cancelArray[message.guild.id]) {
                 this.youtubeResearch(message, title, type, searchresults.nextpageRef, byReaction)
             }
@@ -202,9 +223,11 @@ class Player {
             if (searchresults) {
                 const buildedArray = this.makeSearchArray(message, searchresults.items, type)
                 if (buildedArray.length < 5 && searchresults.nextpageRef) {
+                    // If results is less than 5 so recall API
                     this.sendCurrentResultAndRecall(message, title, type, buildedArray, searchresults, byReaction)
                 }
                 else if (buildedArray.length === 5 || !searchresults.nextpageRef) {
+                    // If get 5 results send them
                     if (type === 'video') {
                         delete searchVideo[message.guild.id]['old']
                     }
@@ -216,6 +239,7 @@ class Player {
                 }
             }
             else {
+                // If no results send the last research results
                 if (type === 'video') {
                     searchVideo[message.guild.id]['array'] = searchVideo[message.guild.id]['old']
                 }
@@ -230,7 +254,9 @@ class Player {
 
     verifyOldResearch(message, type, byReaction) {
         if (byReaction[0]) {
+            // If activate by reaction (button next)
             if (type === 'video' && searchVideo[message.guild.id]['last'].length) {
+                // Delete current results and try to get 5 next results in saved results
                 delete searchVideo[message.guild.id]['array']
                 searchVideo[message.guild.id]['array'] = []
                 const lastArray = this.makeSearchArray(message, searchVideo[message.guild.id]['last'], 'video', true)
@@ -242,6 +268,7 @@ class Player {
                 return false
             }
             else if (type === 'playlist' && searchPlaylist[message.guild.id]['last'].length) {
+                // Delete current results and try to get 5 next results in saved results
                 delete searchPlaylist[message.guild.id]['array']
                 searchPlaylist[message.guild.id]['array'] = []
                 const lastPlaylistArray = this.makeSearchArray(message, searchPlaylist[message.guild.id]['last'], 'playlist', true)
@@ -257,6 +284,7 @@ class Player {
     }
 
     setArrayInfos(message, type, title, searchresults) {
+        // Set research number with title and nextPage token
         if (type === 'video') {
             if (searchresults.nextpageRef) {
                 searchVideo[message.guild.id]['array']['nextpage'] = searchresults.nextpageRef
@@ -285,6 +313,7 @@ class Player {
 
     clearSearchArrays(message, type, byReaction) {
         if (!byReaction[0]) {
+            // If by reaction clear 'infos' and 'last' array
             if (type === 'video') {
                 delete searchVideo[message.guild.id]['infos']
                 delete searchVideo[message.guild.id]['last']
@@ -307,6 +336,7 @@ class Player {
         }
         if (type === 'video' && !nextPage) {
             if (searchVideo[message.guild.id]['array']) {
+                // Don't have nextPage and have elements in video array so clear it and set nextPage token
                 if (byReaction[0]) {
                     nextPageVar = searchVideo[message.guild.id]['array']['nextpage']
                     message.channel.send('> Recherche de ' + type + ' : ' + '`' + searchVideo[message.guild.id]['infos']['title'].trim() + '` #' + searchVideo[message.guild.id]['infos']['count'])
@@ -317,6 +347,7 @@ class Player {
         }
         else if (type === 'playlist' && !nextPage) {
             if (searchPlaylist[message.guild.id]['array']) {
+                // Don't have nextPage and have elements in paylist array so clear it and set nextPage token
                 if (byReaction[0]) {
                     nextPageVar = searchPlaylist[message.guild.id]['array']['nextpage']
                     message.channel.send('> Recherche de ' + type + ' : ' + '`' + searchPlaylist[message.guild.id]['infos']['title'].trim() + '` #' + searchPlaylist[message.guild.id]['infos']['count'])
@@ -326,16 +357,19 @@ class Player {
             searchPlaylist[message.guild.id]['array'] = []
         }
         if (!byReaction[0] && !nextPage) {
+            // If no reaction and no nextPage send message
             const goodTitle = title ? title : type === 'video' ? searchVideo[message.guild.id]['infos']['title'] : searchPlaylist[message.guild.id]['infos']['title']
             message.channel.send('> Recherche de ' + type + ' : ' + '`' + goodTitle.trim() + '`')
         }
         if (nextPageVar) {
+            // Save the nextPage token if user use next reaction
             options.nextpageRef = nextPageVar
         }
         return options
     }
 
     makeSearchArray(message, searchresults, type, verify = false) {
+        // Get available results
         const filteredResult = searchresults.filter(i => i.type === type && i.title !== '[Deleted video]' && i.title !== '[Private video]')
         if (verify) {
             if (type === 'video') {
@@ -348,6 +382,7 @@ class Player {
             }
         }
         filteredResult.map(result => {
+            // If selected array length < 5 push element in it ELSE push in last array for the next page
             const resultObj = {
                 url: result.link,
                 title: result.title
@@ -371,6 +406,7 @@ class Player {
     }
 
     static toggleLoop(message) {
+        // Call without instance and activate or desactivate repeat mode
         const userChannel = Helper.take_user_voiceChannel(message)
         if (Helper.verifyBotLocation(message, connectedGuild[message.guild.id], userChannel)) {
             if (playlistArray[message.guild.id] && playlistArray[message.guild.id].length) {
@@ -390,6 +426,7 @@ class Player {
     }
 
     sendSearchResultsAsString(message, type) {
+        // Create string with search results array and send it
         const selectedArray = type === 'video' ? searchVideo[message.guild.id]['array'] : searchPlaylist[message.guild.id]['array']
         if (selectedArray && selectedArray.length) {
             let finalString = ''
@@ -463,6 +500,7 @@ class Player {
                 if (choiceArray && choiceArray.length) {
                     if (number >= 1 && number <= choiceArray.length) {
                         const command = type === 'musique' ? 'play' : 'playlist'
+                        // Play the selected song with verif number and not too low or higher
                         if (byReaction[0]) {
                             this.playSongs(message, command, ['useless', choiceArray[number - 1].url], byReaction)
                         }
@@ -507,6 +545,7 @@ class Player {
     makeAndSendSearchListArray(message, musicExist, playlistExist) {
         let resultChoices = ''
         if (musicExist && playlistExist) {
+            // Send music and playlist array as string
             resultChoices += '> **Musiques** \n'
             searchVideo[message.guild.id]['array'].map((song, index) => {
                 resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n'
@@ -520,6 +559,7 @@ class Player {
             message.channel.send(`> **Faites un choix parmi les ${countChoices} ci-dessous.** \n > **Ex: ${config.prefix}search p 2** \n > **Ex: ${config.prefix}search pl 1** \n > \n ${resultChoices}`)
         }
         else if (musicExist && !playlistExist) {
+            // Send music array as string and add reaction for selection
             resultChoices += '> **Musiques** \n'
             searchVideo[message.guild.id]['array'].map((song, index) => {
                 resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n'
@@ -528,6 +568,7 @@ class Player {
                 .then(newMessage => this.addSearchReactions(newMessage))
         }
         else {
+            // Send playlist array as string and add reaction for selection
             resultChoices += '> **Playlists** \n'
             searchPlaylist[message.guild.id]['array'].map((song, index) => {
                 if (song.plLength) {
@@ -543,22 +584,23 @@ class Player {
     }
 
     playSong(message, beginAt = false) {
+        let stream = null
+        // send music embed if it is not a recall
         if (!beginAt) {
             const embedObj = this.setEmbedObj(playlistInfos[message.guild.id][0].title, playlistInfos[message.guild.id][0].id, playlistInfos[message.guild.id][0].thumbnail, playlistInfos[message.guild.id][0].duration)
             this.sendMusicEmbed(message, embedObj, [false, 1])
-        }
-        playlistInfos[message.guild.id]['error'] = false
-        delete tryToNext[message.guild.id]
-        let stream = null
-        if (!beginAt) {
             stream = ytdl(playlistArray[message.guild.id][0], { filter: 'audio', liveBuffer: 10000, highWaterMark: 512 })
         }
+        // Don't send music embed and set beginAt params if it is a recall
         else {
             stream = ytdl(playlistArray[message.guild.id][0], { filter: 'audio', liveBuffer: 10000, highWaterMark: 512, beginAt: beginAt })
         }
+        playlistInfos[message.guild.id]['error'] = false
+        delete tryToNext[message.guild.id]
         streamsArray[message.guild.id] = connectionsArray[message.guild.id].play(stream, { highWaterMark: 512 })
         // CHECK IF SPEAKING --> !streamsArray[message.guild.id].player.voiceConnection.speaking.bitfield
         streamsArray[message.guild.id].setVolume(0.4)
+        // Save time at start to verify finish event isn't call too early
         musicTimes[message.guild.id] = Date.now()
         streamsArray[message.guild.id].on('error', (e) => {
             this.handleError(message, e)
@@ -571,6 +613,7 @@ class Player {
     handleFinish(message) {
         const diffSec = Math.floor((Date.now() - musicTimes[message.guild.id]) / 1000)
         if (diffSec < this.getSeconds(playlistInfos[message.guild.id][0].duration)) {
+            // If stream is stop too early recall stream at the end of the current
             console.log('Try to resume song')
             const missingTime = this.getSeconds(playlistInfos[message.guild.id][0].duration) - diffSec
             const beginAt = this.convertSecondsToFormattedDuration(this.getSeconds(playlistInfos[message.guild.id][0].duration) - missingTime)
@@ -625,7 +668,6 @@ class Player {
                     loopArray[message.guild.id] = true
                     delete nextSetLoop[message.guild.id]
                 }
-                // streamsArray[message.guild.id].destroy()
                 this.playSong(message)
             }
         }
@@ -637,6 +679,7 @@ class Player {
         const musicLink = type === 'video' ? `[${embedObj.title}](https://www.youtube.com/watch?v=${embedObj.id})` : `[${embedObj.title}](https://www.youtube.com/playlist?list=${embedObj.id})`
         const color = added[0] ? 3768896 : 5520025
         const title = added[0] && added[1] > 1 ? 'Playlist ajoutée' : added[0] ? 'Musique ajoutée' : 'Musique'
+        // Calculate the queued duration and save as formatted string
         if (playlistArray[message.guild.id].length >= 2) {
             playlistInfos[message.guild.id].map((video, index) => {
                 if (index >= 1) {
@@ -645,6 +688,7 @@ class Player {
             })
             formattedDuration = this.convertSecondsToFormattedDuration(playlistArray[message.guild.id]['currentDuration'])
         }
+        // Blank field used for set the third element in a lines and can use the next line
         const embed = new Discord.MessageEmbed()
             .setAuthor(title, 'https://syxbot.com/img/embed_music.png')
             .setColor(color)
@@ -661,6 +705,7 @@ class Player {
 
     getPlaylist(message, words, playSongParams, byReaction) {
         message.channel.send('> Ajout de la playlist en cours ...')
+        // Call playlist API
         ytpl(words[1], { limit: 0 }, (err, playlist) => {
             if (playlist) {
                 this.addPlaylistItems(message, playlist, playSongParams, byReaction)
@@ -677,11 +722,14 @@ class Player {
             voiceChannel = Helper.take_user_voiceChannel_by_reaction(message, byReaction[1])
         }
         if (radioPlayed[message.guild.id] || play) {
+            // If radio is active or if we tell us to play the songs now
             playlistArray[message.guild.id] = []
             playlistInfos[message.guild.id] = []
             delete radioPlayed[message.guild.id]
         }
+        // Push items in playlist array and tell us how many was removed
         this.pushPlaylistItems(message, playlist)
+        // Get new playlist formatted duration
         const formattedDuration = this.convertSecondsToFormattedDuration(playlistArray[message.guild.id]['newPlaylistDuration'])
         const embedObj = this.setEmbedObj(playlist.title, playlist.id, playlist.items[0].thumbnail, formattedDuration)
         if (play) {
@@ -694,6 +742,7 @@ class Player {
                 })
         }
         else {
+            // Send the added embed
             this.sendMusicEmbed(message, embedObj, [true, playlist.items.length], 'playlist')
             if (radioPlayed[message.guild.id]) {
                 streamsArray[message.guild.id].destroy()
@@ -712,6 +761,7 @@ class Player {
         let pushCount = 0;
         playlist.items.map(video => {
             if (video.title !== '[Deleted video]' && video.title !== '[Private video]') {
+                // Push elements and calculate how many elements was pushed
                 pushCount++
                 this.addDuration(message, pushCount, video.duration, 'new')
                 playlistArray[message.guild.id].push(videoURL + video.id)
@@ -739,6 +789,7 @@ class Player {
     }
 
     convertSecondsToFormattedDuration(duration) {
+        // Format duration as '5:08' | '1:05:08'
         const videoDate = new Date(duration * 1000)
         const hours = videoDate.getUTCHours()
         const minutes = videoDate.getUTCMinutes()
@@ -751,6 +802,7 @@ class Player {
     }
 
     addDuration(message, count, duration, type = 'new') {
+        // Increment seconds value
         if (count === 1) {
             if (type === 'new') {
                 playlistArray[message.guild.id]['newPlaylistDuration'] = this.getSeconds(duration)
@@ -768,6 +820,7 @@ class Player {
     }
 
     getSeconds(duration) {
+        // Convert and return a formatted time in seconds
         const splittedDuration = duration.split(':')
         let resultSeconds = 0
         if (splittedDuration.length === 3) {
@@ -783,6 +836,7 @@ class Player {
     }
 
     getVideo(message, words, playSongParams = true, byReaction) {
+        // Call video API
         ytdl.getBasicInfo(words[1], (err, infos) => {
             if (infos) {
                 if (infos.title !== '[Deleted video]' && infos.title !== '[Private video]') {
@@ -800,6 +854,7 @@ class Player {
 
     setMusicArrayAndPlayMusic(infos, message, playSongParams, byReaction) {
         if (playSongParams || waitArray[message.guild.id]) {
+            // If must play or bot waiting so join channel
             delete waitArray[message.guild.id]
             let voiceChannel = Helper.take_user_voiceChannel(message)
             if (byReaction[0]) {
@@ -814,11 +869,13 @@ class Player {
                 })
         }
         else if (radioPlayed[message.guild.id]) {
+            // if radio is active remove it and play song
             delete radioPlayed[message.guild.id]
             this.clearAndAddArrayInfos(message, infos)
             this.playSong(message)
         }
         else {
+            // If radio is inactive and song is playing so send the added embed
             const formattedDuration = this.clearAndAddArrayInfos(message, infos)
             const embedObj = this.setEmbedObj(infos.title, infos.video_id, infos.player_response.videoDetails.thumbnail.thumbnails[0].url, formattedDuration)
             this.sendMusicEmbed(message, embedObj, [true, 1])
@@ -835,6 +892,7 @@ class Player {
     }
 
     clearAndAddArrayInfos(message, infos) {
+        // Create queued array if needed and push item in it
         if (!playlistArray[message.guild.id]) {
             playlistArray[message.guild.id] = []
             playlistInfos[message.guild.id] = []
@@ -853,19 +911,26 @@ class Player {
     getSongInPlaylist(message, number) {
         const userChannel = Helper.take_user_voiceChannel(message)
         if (Helper.verifyBotLocation(message, connectedGuild[message.guild.id], userChannel)) {
-            if (playlistInfos[message.guild.id].length) {
+            if (playlistInfos[message.guild.id] && playlistInfos[message.guild.id].length) {
                 if (number > 0 && number <= playlistInfos[message.guild.id].length) {
+                    // Add the current music at the top of the list
+                    playlistInfos[message.guild.id].splice(1, 0, playlistInfos[message.guild.id][0])
+                    playlistArray[message.guild.id].splice(1, 0, playlistArray[message.guild.id][0])
                     // Add selected music at the top of the list
-                    playlistInfos[message.guild.id].splice(1, 0, playlistInfos[message.guild.id][number])
-                    playlistArray[message.guild.id].splice(1, 0, playlistArray[message.guild.id][number])
-                    // Remove selected music from where we copy it (+1 because we add an item before)
-                    delete playlistInfos[message.guild.id][number + 1]
-                    delete playlistArray[message.guild.id][number + 1]
-                    // Add the current music after the selected one
-                    playlistInfos[message.guild.id].splice(2, 0, playlistInfos[message.guild.id][0])
-                    playlistArray[message.guild.id].splice(2, 0, playlistArray[message.guild.id][0])
-                    // Destroy stream that call end callback (next song)
+                    playlistInfos[message.guild.id].splice(1, 0, playlistInfos[message.guild.id][number + 1])
+                    playlistArray[message.guild.id].splice(1, 0, playlistArray[message.guild.id][number + 1])
+                    // Remove selected music from where we copy it (+2 because we add 2 item before)
+                    delete playlistInfos[message.guild.id][number + 2]
+                    delete playlistArray[message.guild.id][number + 2]
+                    // Remove current music
+                    delete playlistInfos[message.guild.id][0]
+                    delete playlistArray[message.guild.id][0]
+                    // Compact who remove all falsey values
+                    playlistArray[message.guild.id] = _.compact(playlistArray[message.guild.id])
+                    playlistInfos[message.guild.id] = _.compact(playlistInfos[message.guild.id])
+                    // Destroy stream and start playing
                     streamsArray[message.guild.id].destroy()
+                    this.playSong(message)
                 }
                 else {
                     let howToSay = 'chiffre'
@@ -909,6 +974,7 @@ class Player {
     createSongsString(message) {
         const songsArray = []
         let songs = ''
+        // Create string with queued songs
         playlistInfos[message.guild.id].map((music, index) => {
             if (index !== 0) {
                 const newSong = '> **' + index + '**. ' + music.title + '\n'
@@ -935,6 +1001,7 @@ class Player {
                     if (words[2]) {
                         const selection = words[2].split('-')
                         if (selection.length <= 2) {
+                            // If there is a playlist and user are in the same channel as the bot
                             this.removeSelectedSongs(message, selection)
                         }
                         else {
@@ -962,6 +1029,7 @@ class Player {
             const selectOne = Number(selection[1])
             if (selectOne && selectZero && selectZero < selectOne) {
                 if (selectZero > 0 && selectOne < playlistArray[message.guild.id].length) {
+                    // If 2 index is number and beetwen 1 and the queued length
                     for (let i = selectZero; i <= selectOne; i++) {
                         delete playlistInfos[message.guild.id][i]
                         delete playlistArray[message.guild.id][i]
@@ -978,7 +1046,8 @@ class Player {
                 message.channel.send('> Le 2ème index doit être plus grand que le premier !')
             }
         }
-        else if (selectZero && selectZero > 0) {
+        else if (selectZero && selectZero > 0 && selectZero < playlistArray[message.guild.id].length) {
+            // If 1 index is number and beetwen 1 and the queued length
             delete playlistInfos[message.guild.id][selectZero]
             delete playlistArray[message.guild.id][selectZero]
             playlistArray[message.guild.id] = _.compact(playlistArray[message.guild.id])
@@ -998,6 +1067,7 @@ class Player {
                     const number = Number(words[1])
                     if (playlistArray[message.guild.id] && playlistArray[message.guild.id].length > 1) {
                         if (number > 0 && number < playlistArray[message.guild.id].length) {
+                            // If playlist exist and number is between 1 and queued length && verif user channel and bot location
                             streamsArray[message.guild.id].destroy()
                             for (let i = 0; i < number; i++) {
                                 delete playlistInfos[message.guild.id][i]
@@ -1057,18 +1127,23 @@ class Player {
     static stop(message, leave = true) {
         const userChannel = Helper.take_user_voiceChannel(message)
         if (Helper.verifyBotLocation(message, connectedGuild[message.guild.id], userChannel)) {
-            streamsArray[message.guild.id].destroy()
+            if (streamsArray[message.guild.id]) {
+                streamsArray[message.guild.id].destroy()
+            }
             if (leave) {
                 connectionsArray[message.guild.id].channel.leave()
+                delete connectedGuild[message.guild.id]
+                delete connectionsArray[message.guild.id]
+                delete waitArray[message.guild.id]
             }
-            delete connectedGuild[message.guild.id]
+            else {
+                waitArray[message.guild.id] = true
+            }
             delete streamsArray[message.guild.id]
-            delete connectionsArray[message.guild.id]
             delete playlistArray[message.guild.id]
             delete playlistInfos[message.guild.id]
             delete radioPlayed[message.guild.id]
             delete loopArray[message.guild.id]
-            delete waitArray[message.guild.id]
             delete tryToNext[message.guild.id]
         }
     }
