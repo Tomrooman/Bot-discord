@@ -10,7 +10,8 @@ function dispatcher(message, prefix, bot) {
     const words = message.content.substr(prefix.length, message.content.length - prefix.length).split(' ')
     const command = words[0].toLowerCase()
     if (message.content.length > prefix.length) {
-        if (command === 'play' || command === 'playlist' || command === 'p' || command === 'pl' || command === 'search' || command === 'go' || command === 'next') {
+        if (command === 'play' || command === 'playlist' || command === 'p' || command === 'pl' ||
+            command === 'search' || command === 'go' || command === 'next') {
             new Player(message, command, words)
         }
         else if (command === 'repeat') {

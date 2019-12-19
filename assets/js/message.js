@@ -1,3 +1,5 @@
+const removeInfos = []
+
 class Message {
 
     constructor(message, words, all = false) {
@@ -17,6 +19,7 @@ class Message {
             message.channel.send('> Écrivez un chiffre inférieur ou égal à 99')
         }
         else {
+            removeInfos[message.guild.id] = 0
             let limit = {}
             if (howMany !== 'all') {
                 limit = {
@@ -27,9 +30,16 @@ class Message {
                 .then(messages => {
                     message.channel.bulkDelete(messages)
                         .catch(() => messages.map(oneMessage => {
-                            oneMessage.delete()
-                                .catch(() => {
-                                    console.log('Erreur de suppression du message')
+                            oneMessage.delete({ timeout: 4000 })
+                                .then(() => {
+                                    removeInfos[message.guild.id]++
+                                    if (removeInfos[message.guild.id] === messages.size) {
+                                        message.channel.send('> **' + (removeInfos[message.guild.id] - 1) + '** messages supprimés')
+                                        delete removeInfos[message.guild.id]
+                                    }
+                                })
+                                .catch((e) => {
+                                    console.log('Erreur de suppression du message : ', e)
                                 })
                         }))
                 })

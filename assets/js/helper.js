@@ -27,12 +27,6 @@ class Helper {
         return voiceChannel
     }
 
-    static countConnectedGuilds(bot) {
-        let count = 0
-        bot.guilds.map(() => count++)
-        return count
-    }
-
     static take_user_voiceChannel_by_reaction(message, author) {
         let voiceChannel = false
         message.guild.channels.map(channel => {

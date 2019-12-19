@@ -195,6 +195,14 @@ a[data-toggle="collapse"] {
     color: #fff;
     background: linear-gradient(45deg, rgba(121,75,139,1) 0%, rgba(134,31,43,1) 100%);
     box-shadow : 0px 0px 3px rgb(37, 37, 37);
+    transition-duration: 0.5s;
+}
+
+.contact-btn:hover, .contact-btn:focus {
+    transition-duration: 0.5s;
+    letter-spacing: 2px;
+    padding-left: 2rem;
+    padding-right : 2rem;
 }
 
 .top_logo img {

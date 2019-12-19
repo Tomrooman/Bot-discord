@@ -15,7 +15,7 @@ const radioPlayed = []
 const musicParams = { 'cancel': [], 'loop': [], 'wait': [], 'nextSetLoop': [], 'tryToNext': [] }
 const searchVideo = []
 const searchPlaylist = []
-const musicTimes = []
+// const musicTimes = []
 
 class Player {
 
@@ -36,6 +36,9 @@ class Player {
             else if (command === 'go') {
                 this.go(message, words)
             }
+            // else if (command === 'seek') {
+            //     this.seek(message, words)
+            // }
             else if (words[1] === 'list') {
                 this.showQueuedSongs(message)
             }
@@ -579,25 +582,17 @@ class Player {
         }
     }
 
-    playSong(message, beginAt = false) {
-        let stream = null
-        // send music embed if it is not a recall
-        if (!beginAt) {
-            const embedObj = this.setEmbedObj(playlistInfos[message.guild.id][0].title, playlistInfos[message.guild.id][0].id, playlistInfos[message.guild.id][0].thumbnail, playlistInfos[message.guild.id][0].duration)
-            this.sendMusicEmbed(message, embedObj, [false, 1])
-            stream = ytdl(playlistArray[message.guild.id][0], { filter: 'audio', liveBuffer: 10000, highWaterMark: 512 })
-        }
-        // Don't send music embed and set beginAt params if it is a recall
-        else {
-            stream = ytdl(playlistArray[message.guild.id][0], { filter: 'audio', liveBuffer: 10000, highWaterMark: 512, beginAt: beginAt })
-        }
+    playSong(message) {
+        const embedObj = this.setEmbedObj(playlistInfos[message.guild.id][0].title, playlistInfos[message.guild.id][0].id, playlistInfos[message.guild.id][0].thumbnail, playlistInfos[message.guild.id][0].duration)
+        this.sendMusicEmbed(message, embedObj, [false, 1])
+        const stream = ytdl(playlistArray[message.guild.id][0], { filter: 'audio', liveBuffer: 10000, highWaterMark: 512 })
         playlistInfos[message.guild.id]['error'] = false
         delete musicParams.tryToNext[message.guild.id]
         streamsArray[message.guild.id] = connectionsArray[message.guild.id].play(stream, { highWaterMark: 512 })
         // CHECK IF SPEAKING --> !streamsArray[message.guild.id].player.voiceConnection.speaking.bitfield
         streamsArray[message.guild.id].setVolume(0.4)
         // Save time at start to verify finish event isn't call too early
-        musicTimes[message.guild.id] = Date.now()
+        // musicTimes[message.guild.id] = Date.now()
         streamsArray[message.guild.id].on('error', (e) => {
             this.handleError(message, e)
         })
@@ -607,19 +602,24 @@ class Player {
     }
 
     handleFinish(message) {
-        const diffSec = Math.floor((Date.now() - musicTimes[message.guild.id]) / 1000)
-        if (diffSec < this.getSeconds(playlistInfos[message.guild.id][0].duration)) {
-            // If stream is stop too early recall stream at the end of the current
-            console.log('Try to resume song')
-            const missingTime = this.getSeconds(playlistInfos[message.guild.id][0].duration) - diffSec
-            const beginAt = this.convertSecondsToFormattedDuration(this.getSeconds(playlistInfos[message.guild.id][0].duration) - missingTime)
-            this.playSong(message, beginAt)
-        }
-        else {
-            setTimeout(() => {
-                this.setArrays(message)
-            }, 1000)
-        }
+        // const diffSec = Math.floor((Date.now() - musicTimes[message.guild.id]) / 1000)
+        // if (diffSec < this.getSeconds(playlistInfos[message.guild.id][0].duration)) {
+        //     // If stream is stop too early recall stream at the end of the current
+        //     console.log('Try to resume song')
+        //     const missingTime = this.getSeconds(playlistInfos[message.guild.id][0].duration) - diffSec
+        //     console.log('missing times : ', missingTime)
+        //     console.log('music duration : ', this.getSeconds(playlistInfos[message.guild.id][0].duration))
+        //     const beginAt = this.convertSecondsToFormattedDuration(this.getSeconds(playlistInfos[message.guild.id][0].duration) - missingTime)
+        //     this.playSong(message, beginAt)
+        // }
+        // else {
+        //     setTimeout(() => {
+        //         this.setArrays(message)
+        //     }, 1000)
+        // }
+        setTimeout(() => {
+            this.setArrays(message)
+        }, 1000)
     }
 
     handleError(message, e) {
@@ -1056,6 +1056,51 @@ class Player {
             message.channel.send('> Sélectionnez une musique compris entre 1 et ' + playlistArray[message.guild.id].length - 1)
         }
     }
+
+    // seek(message, words) {
+    //     const userChannel = Helper.take_user_voiceChannel(message)
+    //     if (userChannel) {
+    //         if (Helper.verifyBotLocation(message, connectedGuild[message.guild.id], userChannel)) {
+    //             if (words[1]) {
+    //                 let allNumber = true
+    //                 words[1].split(':').map(e => {
+    //                     if (!Number(e) && Number(e) !== 0) {
+    //                         console.log('Not all number')
+    //                         allNumber = false
+    //                     }
+    //                 })
+    //                 if (allNumber) {
+    //                     if (playlistArray[message.guild.id] && playlistArray[message.guild.id].length) {
+    //                         if (this.getSeconds(playlistInfos[message.guild.id][0].duration) >= 30) {
+    //                             let seconds = this.getSeconds(words[1])
+    //                             if (seconds >= 6 && seconds < (this.getSeconds(playlistInfos[message.guild.id][0].duration) - 5)) {
+    //                                 this.playSong(message, this.getSeconds(words[1]))
+    //                             }
+    //                             else {
+    //                                 message.channel.send('> Vous ne pouvez pas démarrer une vidéo moins de 6s avant le début ou la fin')
+    //                             }
+    //                         }
+    //                         else {
+    //                             message.channel.send('> Action impossible sur une vidéo de moins de 30s')
+    //                         }
+    //                     }
+    //                     else {
+    //                         message.channel.send('> Aucune musique dans la file d\'attente')
+    //                     }
+    //                 }
+    //                 else {
+    //                     message.channel.send('> Erreur de format \n > Le format doit être `1:24` ou `1:03:45`')
+    //                 }
+    //             }
+    //             else {
+    //                 message.channel.send('> Veuillez écrire l\'endroit d\'où reprendre la lecture')
+    //             }
+    //         }
+    //     }
+    //     else {
+    //         message.channel.send('> Vous devez être connecté dans un salon !')
+    //     }
+    // }
 
     go(message, words) {
         const userChannel = Helper.take_user_voiceChannel(message)

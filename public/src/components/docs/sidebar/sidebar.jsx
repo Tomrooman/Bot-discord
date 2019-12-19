@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faBookmark, faListUl, faHome, faPenFancy, faPause, faListOl, faHeadphonesAlt, faWindowClose, faQuestion } from '@fortawesome/free-solid-svg-icons';
-import { faStepForward, faTrashAlt, faRss, faPlay, faSyncAlt, faEraser, faSignOutAlt, faSearch, faForward } from '@fortawesome/free-solid-svg-icons';
+import { faStepForward, faTrashAlt, faRss, faPlay, faSyncAlt, faEraser, faSignOutAlt, faSearch, faForward, faStop } from '@fortawesome/free-solid-svg-icons';
 library.add(faBookmark);
 library.add(faListUl);
 library.add(faHome);
@@ -24,6 +24,7 @@ library.add(faEraser);
 library.add(faSignOutAlt);
 library.add(faSearch);
 library.add(faForward);
+library.add(faStop);
 
 export default class Sidebar extends React.Component {
 
@@ -40,6 +41,22 @@ export default class Sidebar extends React.Component {
             $('.docs_content_command')[command].children[0].style.background = ''
             $('.docs_content_command')[command].children[1].style.background = ''
             $('.docs_content_command')[command].style.transform = ''
+        }
+    }
+
+    handleMouseEnterContactBtn() {
+        if ($('.contact-btn')[0]) {
+            $('.contact-btn')[0].style.paddingLeft = '2rem'
+            $('.contact-btn')[0].style.paddingRight = '2rem'
+            $('.contact-btn')[0].style.letterSpacing = '2px'
+        }
+    }
+
+    handleMouseLeaveContactBtn() {
+        if ($('.contact-btn')[0]) {
+            $('.contact-btn')[0].style.paddingLeft = ''
+            $('.contact-btn')[0].style.paddingRight = ''
+            $('.contact-btn')[0].style.letterSpacing = ''
         }
     }
 
@@ -61,7 +78,13 @@ export default class Sidebar extends React.Component {
                         <a href="/docs"><FontAwesomeIcon icon="home" /> Accueil</a>
                     </li>
                     <li className={this.props.command === 'contact' ? 'active' : ''}>
-                        <a href="/docs/contact"><FontAwesomeIcon icon="pen-fancy" />Me contacter</a>
+                        <a
+                            href="/docs/contact"
+                            onMouseEnter={() => this.handleMouseEnterContactBtn()}
+                            onMouseLeave={() => this.handleMouseLeaveContactBtn()}>
+                            <FontAwesomeIcon icon="pen-fancy" />
+                            Me contacter
+                        </a>
                     </li>
 
                     <h5 id='command_list_title'><FontAwesomeIcon icon="list-ul" />Liste des commandes</h5>
@@ -123,45 +146,52 @@ export default class Sidebar extends React.Component {
                             <FontAwesomeIcon icon="pause" />Pause
                         </a>
                         <a
-                            href="/docs/resume"
-                            className={this.props.command === 'resume' ? 'active' : ''}
+                            href="/docs/stop"
+                            className={this.props.command === 'stop' ? 'active' : ''}
                             onMouseEnter={() => this.handleMouseEnter(8)}
                             onMouseLeave={() => this.handleMouseLeave(8)}>
+                            <FontAwesomeIcon icon="stop" />Stop
+                        </a>
+                        <a
+                            href="/docs/resume"
+                            className={this.props.command === 'resume' ? 'active' : ''}
+                            onMouseEnter={() => this.handleMouseEnter(9)}
+                            onMouseLeave={() => this.handleMouseLeave(9)}>
                             <FontAwesomeIcon icon="play" />Resume
                         </a>
                         <a
                             href="/docs/quit"
                             className={this.props.command === 'quit' ? 'active' : ''}
-                            onMouseEnter={() => this.handleMouseEnter(9)}
-                            onMouseLeave={() => this.handleMouseLeave(9)}>
+                            onMouseEnter={() => this.handleMouseEnter(10)}
+                            onMouseLeave={() => this.handleMouseLeave(10)}>
                             <FontAwesomeIcon icon="sign-out-alt" />Quit
                         </a>
                         <a
                             href="/docs/remove"
                             className={this.props.command === 'remove' ? 'active' : ''}
-                            onMouseEnter={() => this.handleMouseEnter(10)}
-                            onMouseLeave={() => this.handleMouseLeave(10)}>
+                            onMouseEnter={() => this.handleMouseEnter(11)}
+                            onMouseLeave={() => this.handleMouseLeave(11)}>
                             <FontAwesomeIcon icon="eraser" />Remove
                         </a>
                         <a
                             href="/docs/clear"
                             className={this.props.command === 'clear' ? 'active' : ''}
-                            onMouseEnter={() => this.handleMouseEnter(11)}
-                            onMouseLeave={() => this.handleMouseLeave(11)}>
+                            onMouseEnter={() => this.handleMouseEnter(12)}
+                            onMouseLeave={() => this.handleMouseLeave(12)}>
                             <FontAwesomeIcon icon="trash-alt" />Clear
                         </a>
                         <a
                             href="/docs/search"
                             className={this.props.command === 'search' ? 'active' : ''}
-                            onMouseEnter={() => this.handleMouseEnter(12)}
-                            onMouseLeave={() => this.handleMouseLeave(12)}>
+                            onMouseEnter={() => this.handleMouseEnter(13)}
+                            onMouseLeave={() => this.handleMouseLeave(13)}>
                             <FontAwesomeIcon icon="search" />Search
                         </a>
                         <a
                             href="/docs/radio"
                             className={this.props.command === 'radio' ? 'active' : ''}
-                            onMouseEnter={() => this.handleMouseEnter(13)}
-                            onMouseLeave={() => this.handleMouseLeave(13)}>
+                            onMouseEnter={() => this.handleMouseEnter(14)}
+                            onMouseLeave={() => this.handleMouseLeave(14)}>
                             <FontAwesomeIcon icon="rss" />Radio
                         </a>
                     </li>

@@ -13,8 +13,7 @@ class Admin {
                     this.sendMessageToAllServer(message, words, bot)
                 }
                 else if (words[1] === 'count') {
-                    const count = Helper.countConnectedGuilds(bot)
-                    message.channel.send('> Connected guilds : **' + count + '**')
+                    message.channel.send('> Connected guilds : **' + bot.guilds.size + '**')
                 }
                 else {
                     message.channel.send('> Cette commande admin n\'existe pas')
