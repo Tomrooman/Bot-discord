@@ -1182,12 +1182,18 @@ class Player {
             else {
                 musicParams.wait[message.guild.id] = true
             }
-            delete streamsArray[message.guild.id]
-            delete playlistArray[message.guild.id]
-            delete playlistInfos[message.guild.id]
-            delete radioPlayed[message.guild.id]
-            delete musicParams.loop[message.guild.id]
-            delete musicParams.tryToNext[message.guild.id]
+            if (leave || playlistArray[message.guild.id] && playlistArray[message.guild.id].lengh) {
+                delete streamsArray[message.guild.id]
+                delete playlistArray[message.guild.id]
+                delete playlistInfos[message.guild.id]
+                delete radioPlayed[message.guild.id]
+                delete musicParams.loop[message.guild.id]
+                delete musicParams.tryToNext[message.guild.id]
+            }
+            else {
+                message.channel.send('> Aucune musique en file d\'attente')
+            }
+
         }
     }
 
