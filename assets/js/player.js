@@ -412,7 +412,7 @@ class Player {
                 }
                 else {
                     delete musicParams.loop[message.guild.id]
-                    message.channel.send('> Mode répétition désactivée !')
+                    message.channel.send('> Mode répétition désactivé !')
                 }
             }
             else {
