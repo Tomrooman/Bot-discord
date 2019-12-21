@@ -3,6 +3,7 @@
 import React from 'react';
 import PropTypes from "prop-types";
 import Play from './play/play.jsx';
+import Contact from './contact/contact.jsx';
 import Sidebar from './sidebar/sidebar.jsx';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -20,6 +21,9 @@ export default class Docs extends React.Component {
         if (props.command === 'play') {
             page = <Play />
         }
+        else if (props.command === 'contact') {
+            page = <Contact />
+        }
         this.state = {
             command: props.command,
             page: page
@@ -28,18 +32,26 @@ export default class Docs extends React.Component {
 
     componentDidMount() {
         // Appear effect
+        let time = 0;
         setTimeout(() => {
             $('.syx_container h1').addClass('load')
             $('.top_logo').addClass('load')
             if ($('.docs_panel')) {
                 setTimeout(() => {
                     $('.docs_panel').addClass('load')
-                    if ($('.div_docs_content_command')) {
-                        setTimeout(() => {
-                            $('.div_docs_content_command').addClass('load')
-                        }, 200)
-                    }
                 }, 200)
+            }
+            if ($('.div_docs_content_command')) {
+                setTimeout(() => {
+                    $('.div_docs_content_command').addClass('load')
+                }, 400)
+            }
+            if (this.state.command === 'contact') {
+                if ($('.docs-contact')) {
+                    setTimeout(() => {
+                        $('.docs-contact').addClass('load')
+                    }, 400)
+                }
             }
         }, 200)
     }
