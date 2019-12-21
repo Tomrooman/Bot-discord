@@ -4,10 +4,31 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import TextField from '@material-ui/core/TextField';
 
 library.add(faInfoCircle);
 
 export default class Contact extends React.Component {
+
+    constructor() {
+        super()
+        this.state = {
+            mail: '',
+            object: '',
+            message: ''
+        }
+    }
+
+    sendMessage() {
+        console.log('all data to send')
+    }
+
+    handleOnChange(type, e) {
+        console.log(type + ' : ', e.target.value)
+        this.setState({
+            [type]: e.target.value
+        })
+    }
 
     render() {
         return (
@@ -20,18 +41,30 @@ export default class Contact extends React.Component {
                     </div>
                     <div className='docs-contact'>
                         <h3>Formulaire</h3>
-                        <div className='contact-label'>
-                            <label htmlFor='email'>Votre adresse mail</label><br />
-                            <label htmlFor='object'>Objet</label>
-                            <label htmlFor='message'>Message</label>
+                        <div className="contact-mail">
+                            <TextField
+                                required
+                                id="required-mail"
+                                label="Votre adresse mail"
+                                placeholder="Exemple@hotmail.com"
+                                variant="outlined"
+                                onChange={(e) => this.handleOnChange('mail', e)}
+                            />
                         </div>
-                        <div className='contact-input'>
-                            <input type='email' id='email'></input><br />
-                            <input type='text' id='object'></input>
-                            <textarea type='text' rows='7' cols='20' id='message'></textarea>
+                        <div className="contact-object">
+                            <TextField
+                                required
+                                id="required-object"
+                                label="Objet"
+                                variant="outlined"
+                            />
+                        </div>
+                        <div className="contact-message">
+                            <label htmlFor='message'>Écrivez votre message ci-dessous *</label><br />
+                            <textarea type='text' rows='4' cols='30' id='message'></textarea>
                         </div>
                         <div className="contact-submit-div">
-                            <button>Envoyer mon message</button>
+                            <button onClick={() => this.sendMessage()}>Envoyer mon message</button>
                         </div>
                     </div>
                 </div>
