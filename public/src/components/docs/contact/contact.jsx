@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import TextField from '@material-ui/core/TextField';
+import axios from 'axios';
 
 library.add(faInfoCircle);
 
@@ -21,12 +22,30 @@ export default class Contact extends React.Component {
 
     sendMessage() {
         console.log('all data to send')
+        if (this.state.mail.length >= 1 && this.state.object.length >= 1 && this.state.message.length >= 1) {
+            axios.post('/api/docs/contact', { mail: 'Mail de test' })
+                .then(res => {
+                    console.log('Respond to contact api : ', res)
+                })
+        }
     }
 
     handleOnChange(type, e) {
-        console.log(type + ' : ', e.target.value)
         this.setState({
             [type]: e.target.value
+        }, () => {
+            if (this.state.mail.length >= 1 && this.state.object.length >= 1 && this.state.message.length >= 1) {
+                if ($('.contact-submit-div button')[0].style.opacity === '') {
+                    $('.contact-submit-div button')[0].style.opacity = '1'
+                    $('.contact-submit-div button')[0].style.cursor = 'pointer'
+                }
+            }
+            else {
+                if ($('.contact-submit-div button')[0].style.opacity === '1') {
+                    $('.contact-submit-div button')[0].style.opacity = ''
+                    $('.contact-submit-div button')[0].style.cursor = ''
+                }
+            }
         })
     }
 
@@ -57,11 +76,18 @@ export default class Contact extends React.Component {
                                 id="required-object"
                                 label="Objet"
                                 variant="outlined"
+                                onChange={(e) => this.handleOnChange('object', e)}
                             />
                         </div>
                         <div className="contact-message">
                             <label htmlFor='message'>Écrivez votre message ci-dessous *</label><br />
-                            <textarea type='text' rows='4' cols='30' id='message'></textarea>
+                            <textarea
+                                type='text'
+                                rows='4'
+                                cols='30'
+                                id='message'
+                                onChange={(e) => this.handleOnChange('message', e)}
+                            />
                         </div>
                         <div className="contact-submit-div">
                             <button onClick={() => this.sendMessage()}>Envoyer mon message</button>

@@ -10,7 +10,8 @@
         "dev": "pm2 start index.js --watch --name syxbot",
         "log": "pm2 log --lines 100 syxbot ",
         "status": "pm2 status",
-        "stop": "pm2 stop all",
+        "stop": "pm2 stop syxbot",
+        "stopall": "pm2 stop all",
         "mongodb": "sudo service mongod start"
     },
     "private": true,

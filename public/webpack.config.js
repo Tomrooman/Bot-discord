@@ -1,5 +1,6 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const path = require("path");
+const config = require('./../config.json')
 
 module.exports = {
     output: {
@@ -8,7 +9,16 @@ module.exports = {
         path: path.resolve(__dirname, '')
     },
     devServer: {
-        historyApiFallback: true
+        historyApiFallback: true,
+        https: true,
+        proxy: {
+            "/api": {
+                target: config.API.URL,
+                pathRewrite: { "^/api": "" },
+                changeOrigin: true,
+                secure: false
+            }
+        }
     },
     module: {
         rules: [
