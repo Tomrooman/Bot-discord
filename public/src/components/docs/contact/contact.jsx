@@ -21,9 +21,12 @@ export default class Contact extends React.Component {
     }
 
     sendMessage() {
-        console.log('all data to send')
         if (this.state.mail.length >= 1 && this.state.object.length >= 1 && this.state.message.length >= 1) {
-            axios.post('/api/docs/contact', { mail: 'Mail de test' })
+            axios.post('/api/docs/contact', {
+                mail: this.state.mail,
+                object: this.state.object,
+                message: this.state.message
+            })
                 .then(res => {
                     console.log('Respond to contact api : ', res)
                 })

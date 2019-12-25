@@ -16,7 +16,7 @@
     },
     "private": true,
     "author": "Tom Rooman",
-    "license": "ISC",
+    "license": "GPL-3.0-only",
     "dependencies": {
         "@discordjs/uws": "^10.149.0",
         "convert-svg-to-png": "^0.5.0",
