@@ -1,5 +1,5 @@
-const HtmlWebPackPlugin = require("html-webpack-plugin");
-const path = require("path");
+const HtmlWebPackPlugin = require('html-webpack-plugin')
+const path = require('path')
 const config = require('./../config.json')
 
 module.exports = {
@@ -12,9 +12,9 @@ module.exports = {
         historyApiFallback: true,
         https: true,
         proxy: {
-            "/api": {
+            '/api': {
                 target: config.API.URL,
-                pathRewrite: { "^/api": "" },
+                pathRewrite: { '^/api': '' },
                 changeOrigin: true,
                 secure: false
             }
@@ -24,20 +24,17 @@ module.exports = {
         rules: [
             {
                 test: /\.(js|jsx)$/,
-                loader: "babel-loader",
-                exclude: /node_modules/,
-                options: {
-                    presets: [
-                        '@babel/preset-env',
-                        '@babel/preset-react',
-                    ]
-                }
+                use: [
+                    { loader: 'babel-loader' },
+                    { loader: 'eslint-loader' }
+                ],
+                exclude: /node_modules/
             },
             {
                 test: /\.html$/,
                 use: [
                     {
-                        loader: "html-loader"
+                        loader: 'html-loader'
                     }
                 ]
             },
@@ -45,10 +42,10 @@ module.exports = {
                 test: /\.css$/,
                 use: [
                     {
-                        loader: "style-loader"
+                        loader: 'style-loader'
                     },
                     {
-                        loader: "css-loader"
+                        loader: 'css-loader'
                     }
                 ]
             },
@@ -62,8 +59,8 @@ module.exports = {
     },
     plugins: [
         new HtmlWebPackPlugin({
-            template: "./src/index.html",
-            filename: "index.html"
+            template: './src/index.html',
+            filename: 'index.html'
         })
     ]
 };

@@ -4,6 +4,7 @@
     "node": true,
     "es6": true
   },
+  "root": true,
   "parserOptions": {
     "ecmaVersion": 2019
   },
