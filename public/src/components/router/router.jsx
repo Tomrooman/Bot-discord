@@ -1,30 +1,30 @@
-'use strict'
+'use strict';
 
-import React from 'react'
-import Docs from './../docs/docs.jsx'
+import React from 'react';
+import Docs from './../docs/docs.jsx';
 
 export default class Router extends React.Component {
     constructor() {
-        super()
+        super();
         this.state = {
             page: null
-        }
+        };
     }
 
     componentDidMount() {
-        const url = window.location.href.split('/')
-        const page = url[3] === '' || url[3] === '//' ? '/' : url[3]
-        const pageArg = url[4] ? url[4] : ''
+        const url = window.location.href.split('/');
+        const page = url[3] === '' || url[3] === '//' ? '/' : url[3];
+        const pageArg = url[4] ? url[4] : '';
         if (page && page.substr(0, 4) === 'docs') {
             this.setState({
                 page: <Docs command={pageArg} />
-            })
+            });
         }
     }
 
     render() {
         return (
             this.state.page
-        )
+        );
     }
 }

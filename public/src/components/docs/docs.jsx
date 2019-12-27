@@ -1,32 +1,32 @@
-'use strict'
+'use strict';
 
-import React from 'react'
-import $ from 'jquery'
-import PropTypes from 'prop-types'
-import Play from './play/play.jsx'
-import Contact from './contact/contact.jsx'
-import Sidebar from './sidebar/sidebar.jsx'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheck } from '@fortawesome/free-solid-svg-icons'
-import './docs.css'
-library.add(faCheck)
+import React from 'react';
+import $ from 'jquery';
+import PropTypes from 'prop-types';
+import Play from './play/play.jsx';
+import Contact from './contact/contact.jsx';
+import Sidebar from './sidebar/sidebar.jsx';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import './docs.css';
+library.add(faCheck);
 
 export default class Docs extends React.Component {
     constructor(props) {
-        super()
-        let page = null
+        super();
+        let page = null;
         if (props.command === 'play') {
-            page = <Play />
+            page = <Play />;
         }
         else if (props.command === 'contact') {
-            page = <Contact />
+            page = <Contact />;
         }
         this.state = {
             command: props.command,
             page: page
-        }
-        this.createCommandsArray()
+        };
+        this.createCommandsArray();
     }
 
     createCommandsArray() {
@@ -46,68 +46,68 @@ export default class Docs extends React.Component {
             { name: 'Clear', icon: 'trash-alt', description: 'Supprime tout les messages chargés du salon.' },
             { name: 'Search', icon: 'search', description: 'Affiche la liste des résultats d\'une recherche, sélectionne un des résultats.' },
             { name: 'Radio', icon: 'rss', description: 'Permet d\'écouter la radio en la sélectionnant par son nom.' }
-        ]
+        ];
     }
 
     componentDidMount() {
         // Appear effect
         setTimeout(() => {
-            $('.syx_container h1').addClass('load')
-            $('.top_logo').addClass('load')
+            $('.syx_container h1').addClass('load');
+            $('.top_logo').addClass('load');
             if ($('.docs_panel')) {
                 setTimeout(() => {
-                    $('.docs_panel').addClass('load')
-                }, 200)
+                    $('.docs_panel').addClass('load');
+                }, 200);
             }
             if ($('.div_docs_content_command')) {
                 setTimeout(() => {
-                    $('.div_docs_content_command').addClass('load')
-                }, 400)
+                    $('.div_docs_content_command').addClass('load');
+                }, 400);
             }
             if (this.state.command === 'contact') {
                 if ($('.docs-contact')) {
                     setTimeout(() => {
-                        $('.docs-contact').addClass('load')
-                    }, 400)
+                        $('.docs-contact').addClass('load');
+                    }, 400);
                 }
             }
-        }, 200)
+        }, 200);
     }
 
     handleMouseEnter(index) {
         // Set hover effect for sidebar element
-        $('#command_list a')[index].style.color = 'rgb(93, 67, 126)'
-        $('#command_list a')[index].style.letterSpacing = '5px'
-        $('#command_list a')[index].style.background = '#f0f0f0'
-        $('#command_list a')[index].style.borderLeft = '5px solid rgba(93, 67, 126, 0.74)'
-        $('#command_list a')[index].style.boxShadow = '-5px 0px 4px rgb(93, 67, 126, 1)'
+        $('#command_list a')[index].style.color = 'rgb(93, 67, 126)';
+        $('#command_list a')[index].style.letterSpacing = '5px';
+        $('#command_list a')[index].style.background = '#f0f0f0';
+        $('#command_list a')[index].style.borderLeft = '5px solid rgba(93, 67, 126, 0.74)';
+        $('#command_list a')[index].style.boxShadow = '-5px 0px 4px rgb(93, 67, 126, 1)';
     }
 
     handleMouseLeave(index) {
         // Remove hover effect for sidebar element
-        $('#command_list a')[index].style.color = ''
-        $('#command_list a')[index].style.background = ''
-        $('#command_list a')[index].style.borderLeft = ''
-        $('#command_list a')[index].style.boxShadow = ''
-        $('#command_list a')[index].style.letterSpacing = ''
+        $('#command_list a')[index].style.color = '';
+        $('#command_list a')[index].style.background = '';
+        $('#command_list a')[index].style.borderLeft = '';
+        $('#command_list a')[index].style.boxShadow = '';
+        $('#command_list a')[index].style.letterSpacing = '';
     }
 
     handleMouseEnterContactBtn() {
         // Set hover effect for sidebar contact element
-        $('.components')[0].children[1].children[0].style.color = 'rgb(93, 67, 126)'
-        $('.components')[0].children[1].style.letterSpacing = '5px'
-        $('.components')[0].children[1].style.background = '#f0f0f0'
-        $('.components')[0].children[1].children[0].style.borderLeft = '5px solid rgba(93, 67, 126, 0.74)'
-        $('.components')[0].children[1].style.boxShadow = '-5px 0px 4px rgb(93, 67, 126, 1)'
+        $('.components')[0].children[1].children[0].style.color = 'rgb(93, 67, 126)';
+        $('.components')[0].children[1].style.letterSpacing = '5px';
+        $('.components')[0].children[1].style.background = '#f0f0f0';
+        $('.components')[0].children[1].children[0].style.borderLeft = '5px solid rgba(93, 67, 126, 0.74)';
+        $('.components')[0].children[1].style.boxShadow = '-5px 0px 4px rgb(93, 67, 126, 1)';
     }
 
     handleMouseLeaveContactBtn() {
         // Remove hover effect for sidebar contact element
-        $('.components')[0].children[1].children[0].style.color = ''
-        $('.components')[0].children[1].style.letterSpacing = ''
-        $('.components')[0].children[1].style.background = ''
-        $('.components')[0].children[1].children[0].style.borderLeft = ''
-        $('.components')[0].children[1].style.boxShadow = ''
+        $('.components')[0].children[1].children[0].style.color = '';
+        $('.components')[0].children[1].style.letterSpacing = '';
+        $('.components')[0].children[1].style.background = '';
+        $('.components')[0].children[1].children[0].style.borderLeft = '';
+        $('.components')[0].children[1].style.boxShadow = '';
     }
 
     render() {
@@ -119,7 +119,7 @@ export default class Docs extends React.Component {
                         {this.state.page}
                     </div>
                 </div>
-            )
+            );
         }
         else {
             return (
@@ -161,18 +161,18 @@ export default class Docs extends React.Component {
                                                     <p>{obj.description}</p>
                                                 </div>
                                             </a>
-                                        )
+                                        );
                                     })}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            )
+            );
         }
     }
 }
 
 Docs.propTypes = {
     command: PropTypes.string.isRequired
-}
+};

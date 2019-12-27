@@ -1,35 +1,47 @@
-'use strict'
+'use strict';
 
-import React from 'react'
-import $ from 'jquery'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faInfoCircle } from '@fortawesome/free-solid-svg-icons'
-import TextField from '@material-ui/core/TextField'
-import axios from 'axios'
+import React from 'react';
+import $ from 'jquery';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import TextField from '@material-ui/core/TextField';
+import axios from 'axios';
 
-library.add(faInfoCircle)
+library.add(faInfoCircle);
 
 export default class Contact extends React.Component {
     constructor() {
-        super()
+        super();
         this.state = {
             mail: '',
             object: '',
             message: ''
-        }
+        };
     }
 
     sendMessage() {
         if (this.state.mail.length >= 1 && this.state.object.length >= 1 && this.state.message.length >= 1) {
+            this.setState({
+                mail: '',
+                object: '',
+                message: ''
+            });
+            $('.contact-submit-div button')[0].style.opacity = '';
+            $('.contact-submit-div button')[0].style.cursor = '';
+            $('input')[0].value = '';
+            $('input')[1].value = '';
+            $('textarea')[0].value = '';
+            $('.contact-submit-div')[0].children[0].innerHTML = 'Envoi du message en cours ...';
             axios.post('/api/docs/contact', {
                 mail: this.state.mail,
                 object: this.state.object,
                 message: this.state.message
             })
                 .then(res => {
-                    console.log('Respond : ', res)
-                })
+                    $('.contact-submit-div')[0].children[0].innerHTML = 'Envoyer mon message';
+                    console.log('Respond : ', res);
+                });
         }
     }
 
@@ -39,15 +51,15 @@ export default class Contact extends React.Component {
         }, () => {
             if (this.state.mail.length >= 1 && this.state.object.length >= 1 && this.state.message.length >= 1) {
                 if ($('.contact-submit-div button')[0].style.opacity === '') {
-                    $('.contact-submit-div button')[0].style.opacity = '1'
-                    $('.contact-submit-div button')[0].style.cursor = 'pointer'
+                    $('.contact-submit-div button')[0].style.opacity = '1';
+                    $('.contact-submit-div button')[0].style.cursor = 'pointer';
                 }
             }
             else if ($('.contact-submit-div button')[0].style.opacity === '1') {
-                $('.contact-submit-div button')[0].style.opacity = ''
-                $('.contact-submit-div button')[0].style.cursor = ''
+                $('.contact-submit-div button')[0].style.opacity = '';
+                $('.contact-submit-div button')[0].style.cursor = '';
             }
-        })
+        });
     }
 
     render() {
@@ -96,6 +108,6 @@ export default class Contact extends React.Component {
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 }
