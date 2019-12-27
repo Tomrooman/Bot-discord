@@ -6,13 +6,12 @@
     ],
     "env": {
         "browser": true,
-        "es6": true
+        "es2020": true
     },
     "root": true,
+    "parser": "babel-eslint",
     "parserOptions": {
-        "es2020": true,
-        "sourceType": "module",
-        "parser": "babel-eslint"
+        "sourceType": "module"
     },
     "ignorePatterns": [
         "serviceWorker.js",
@@ -58,12 +57,12 @@
             "error",
             4
         ],
-        // "max-len": [
-        //   "error",
-        //   {
-        //     "code": 100
-        //   }
-        // ],
+        "max-len": [
+            "error",
+            {
+                "code": 100
+            }
+        ],
         "max-nested-callbacks": [
             "error",
             {
@@ -113,10 +112,10 @@
             "error",
             "single"
         ],
-        // "semi": [
-        //     "error",
-        //     "always"
-        // ],
+        "semi": [
+            "error",
+            "always"
+        ],
         "space-before-blocks": "error",
         "space-before-function-paren": "off",
         "space-in-parens": "error",

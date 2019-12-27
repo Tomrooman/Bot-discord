@@ -1,71 +1,70 @@
-const config = require('./../../config.json')
+import config from './../../config.json';
 
-class Helper {
-
+export class Helper {
     constructor(message, words) {
         if (words[1]) {
-            this.getCommandInfos(message, words[1].toLowerCase())
+            this.getCommandInfos(message, words[1].toLowerCase());
         }
         else {
-            this.showCommandlist(message)
+            this.showCommandlist(message);
         }
     }
 
     static take_user_voiceChannel(message) {
-        let voiceChannel = false
+        let voiceChannel = false;
         message.guild.channels.map(channel => {
             if (channel.type === 'voice') {
                 if (channel.members) {
                     channel.members.map(member => {
                         if (member.user.id === message.author.id) {
-                            voiceChannel = channel
+                            voiceChannel = channel;
                         }
-                    })
+                    });
                 }
             }
-        })
-        return voiceChannel
+        });
+        return voiceChannel;
     }
 
     static take_user_voiceChannel_by_reaction(message, author) {
-        let voiceChannel = false
+        let voiceChannel = false;
         message.guild.channels.map(channel => {
             if (channel.type === 'voice') {
                 if (channel.members) {
                     channel.members.map(member => {
                         if (member.user.id === author.id) {
-                            voiceChannel = channel
+                            voiceChannel = channel;
                         }
-                    })
+                    });
                 }
             }
-        })
-        return voiceChannel
+        });
+        return voiceChannel;
     }
 
     static getBot(message, choice) {
-        let botMember = false
+        let botMember = false;
         message.guild.channels.map(channel => {
             if (channel.type === 'voice') {
                 if (channel.members) {
                     channel.members.map(member => {
                         if (member.user.bot && member.user.id === config.clientId) {
                             if (choice === 'bot') {
-                                botMember = member
+                                botMember = member;
                             }
                             else if (choice === 'channel') {
-                                botMember = channel
+                                botMember = channel;
                             }
                         }
-                    })
+                    });
                 }
             }
-        })
-        return botMember
+        });
+        return botMember;
     }
 
     static getFirstAuthorizedChannel(guild) {
-        if (guild.channels.has(guild.id)) return guild.channels.get(guild.id)
+        if (guild.channels.has(guild.id)) return guild.channels.get(guild.id);
 
         // Check for a "general" channel
         const generalChannel = guild.channels.find(channel => channel.name === 'general');
@@ -82,28 +81,28 @@ class Helper {
     static verifyBotLocation(message, connectedGuild, userChannel, sendMessage = true) {
         if (connectedGuild) {
             if (connectedGuild === userChannel.id) {
-                return true
+                return true;
             }
             else {
                 if (sendMessage) {
-                    message.channel.send('> Vous n\'êtes pas dans le même salon que le bot !')
+                    message.channel.send('> Vous n\'êtes pas dans le même salon que le bot !');
                 }
-                return false
+                return false;
             }
         }
         else {
             if (sendMessage) {
-                message.channel.send('> Je ne suis pas connecté dans un salon !')
+                message.channel.send('> Je ne suis pas connecté dans un salon !');
             }
-            return false
+            return false;
         }
     }
 
     showCommandlist(message) {
-        let embedDescription = ''
+        let embedDescription = '';
         this.availableCommand().map(item => {
-            embedDescription += item.command + item.exemple
-        })
+            embedDescription += item.command + item.exemple;
+        });
         message.channel.send({
             'embed': {
                 'color': 3493780,
@@ -115,7 +114,7 @@ class Helper {
                     'text': 'Veuillez remplacer "+ MAJUSCULE" par votre choix.'
                 }
             }
-        })
+        });
     }
 
     availableCommand() {
@@ -307,16 +306,16 @@ class Helper {
                     'Sélectionne une musique de la liste par son nom ```' + config.prefix + 'radio nrj```'
                 ]
             }
-        ]
+        ];
     }
 
     getCommandInfos(message, command) {
-        const commandObj = this.availableCommand().filter(c => c.name === command)
+        const commandObj = this.availableCommand().filter(c => c.name === command);
         if (commandObj && commandObj[0]) {
-            let joinedInfos = ''
+            let joinedInfos = '';
             commandObj[0].infos.map(info => {
-                joinedInfos += info
-            })
+                joinedInfos += info;
+            });
             message.channel.send({
                 'embed': {
                     'color': 3493780,
@@ -325,12 +324,11 @@ class Helper {
                         'name': commandObj[0].showName
                     }
                 }
-            })
+            });
         }
         else {
-            message.channel.send('> La commande `' + command + '` n\'existe pas !')
+            message.channel.send('> La commande `' + command + '` n\'existe pas !');
         }
 
     }
 }
-module.exports = Helper

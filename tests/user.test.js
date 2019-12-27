@@ -1,6 +1,6 @@
-const assert = require('assert');
-const mongoose = require('mongoose')
-const userSchema = require('../models/user.js');
+import assert from 'assert'
+import mongoose from 'mongoose'
+import userSchema from '../models/user.js'
 
 describe('User', function () {
     it('Users should be empty', function (done) {

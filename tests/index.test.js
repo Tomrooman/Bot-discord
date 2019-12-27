@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 
 describe('Index', function () {
     it('Connect to database', function (done) {

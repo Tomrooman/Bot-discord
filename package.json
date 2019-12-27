@@ -5,9 +5,9 @@
     "main": "index.js",
     "scripts": {
         "eslint": "./node_modules/.bin/eslint ./",
-        "test": "mocha ./tests/index.test.js --exit",
-        "start": "pm2 start index.js --name syxbot",
-        "dev": "pm2 start index.js --watch --name syxbot",
+        "test": "mocha --require @babel/register ./tests/index.test.js --exit",
+        "start": "pm2 start index.js --interpreter babel-node --name syxbot",
+        "dev": "pm2 start index.js --interpreter babel-node --watch --name syxbot",
         "log": "pm2 log --lines 100 syxbot ",
         "status": "pm2 status",
         "stop": "pm2 stop syxbot",
@@ -31,6 +31,11 @@
         "ytsr": "^0.1.10"
     },
     "devDependencies": {
+        "@babel/cli": "^7.7.7",
+        "@babel/core": "^7.7.7",
+        "@babel/node": "^7.7.7",
+        "@babel/preset-env": "^7.7.7",
+        "@babel/register": "^7.7.7",
         "eslint": "^6.7.1",
         "mocha": "^6.2.2"
     }

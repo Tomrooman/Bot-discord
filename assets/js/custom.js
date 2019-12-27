@@ -1,13 +1,9 @@
-class Custom {
-
+export class Custom {
     static pioupiou(message) {
         message.member.guild.members.map(member => {
             if (member.user.username + member.user.discriminator === 'Tam3534') {
-                message.channel.send('<@' + member.user.id + '> pas cher pas cher !')
+                message.channel.send('<@' + member.user.id + '> pas cher pas cher !');
             }
-        })
+        });
     }
-
 }
-
-module.exports = Custom
