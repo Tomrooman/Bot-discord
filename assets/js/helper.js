@@ -1,6 +1,6 @@
 import config from './../../config.json';
 
-export class Helper {
+export default class Helper {
     constructor(message, words) {
         if (words[1]) {
             this.getCommandInfos(message, words[1].toLowerCase());

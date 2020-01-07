@@ -2,7 +2,7 @@
 // const fs = require('fs')
 import userModel from './../../models/user.js';
 
-export class Level {
+export default class Level {
     static addXp(message) {
         userModel.checkExist(message.author.id, message.guild.id)
             .then(user => {

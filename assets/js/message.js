@@ -1,6 +1,6 @@
 const removeInfos = [];
 
-export class Message {
+export default class Message {
     constructor(message, words, all = false) {
         if (all) {
             this.remove(message, 'all');

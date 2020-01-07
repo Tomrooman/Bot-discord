@@ -1,4 +1,4 @@
-export class Custom {
+export default class Custom {
     static pioupiou(message) {
         message.member.guild.members.map(member => {
             if (member.user.username + member.user.discriminator === 'Tam3534') {

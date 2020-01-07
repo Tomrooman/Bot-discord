@@ -33,7 +33,7 @@ const radioAvailable = [
     'France-Bleu'
 ];
 
-export class Radio {
+export default class Radio {
     constructor(message, words) {
         if (words[1]) {
             if (words[1].toLowerCase() === 'list') {

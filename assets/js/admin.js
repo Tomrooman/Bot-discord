@@ -1,6 +1,6 @@
 import Helper from './helper.js';
 
-export class Admin {
+export default class Admin {
     constructor(message, words, bot) {
         this.controller(message, words, bot);
     }

@@ -16,7 +16,7 @@ const musicParams = { 'cancel': [], 'loop': [], 'wait': [], 'nextSetLoop': [], '
 const searchVideo = [];
 const searchPlaylist = [];
 
-export class Player {
+export default class Player {
     constructor(message, command, words) {
         // Check command and call function if args in new instance
         if (message) {

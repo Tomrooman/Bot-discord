@@ -6,7 +6,7 @@ import Helper from './helper.js';
 import Custom from './custom.js';
 import Admin from './admin.js';
 
-export function dispatcher(message, prefix, bot) {
+export default function controller(message, prefix, bot) {
     const words = message.content.substr(prefix.length, message.content.length - prefix.length).split(' ');
     const command = words[0].toLowerCase();
     if (message.content.length > prefix.length) {

@@ -1,13 +1,14 @@
-const Discord = require('discord.js');
-const Controller = require('./assets/js/controller.js');
-const Level = require('./assets/js/level.js');
-const config = require('./config.json');
-const Helper = require('./assets/js/helper.js');
-const Player = require('./assets/js/player.js');
-const mongoose = require('mongoose');
+import Discord from 'discord.js';
+import Controller from './assets/js/controller.js';
+import Level from './assets/js/level.js';
+import config from './config.json';
+import Helper from './assets/js/helper.js';
+import Player from './assets/js/player.js';
+// const mongoose = require('mongoose');
 const bot = new Discord.Client();
 
-connectToDatabase();
+// connectToDatabase();
+bot.login(config.token);
 
 bot.on('ready', () => {
     disconnectBotFromOldChannel();
@@ -20,7 +21,7 @@ bot.on('message', (message) => {
         message.channel.send('> Mon préfix est : `' + config.prefix + '` \n > Pour afficher la liste des commandes faites : `' + config.prefix + 'help`');
     }
     else if (message.content.toLowerCase().startsWith(config.prefix) && message.content.indexOf('!!!') === -1) {
-        Controller.dispatcher(message, config.prefix, bot);
+        Controller(message, config.prefix, bot);
     }
     else if (message.author.id !== config.clientId) {
         Level.addXp(message);
@@ -82,19 +83,19 @@ function getSelectionByReaction(reaction) {
     return false;
 }
 
-function connectToDatabase() {
-    console.log('Connecting to database ...');
-    mongoose.connect('mongodb://localhost/syxbot-database', {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        autoIndex: false,
-        useFindAndModify: false
-    });
-    mongoose.connection.once('open', () => {
-        console.log('Connected to database !');
-        bot.login(config.token);
-    });
-}
+// function connectToDatabase() {
+//     console.log('Connecting to database ...');
+//     mongoose.connect('mongodb://localhost/syxbot-database', {
+//         useNewUrlParser: true,
+//         useUnifiedTopology: true,
+//         autoIndex: false,
+//         useFindAndModify: false
+//     });
+//     mongoose.connection.once('open', () => {
+//         console.log('Connected to database !');
+//         bot.login(config.token);
+//     });
+// }
 
 function disconnectBotFromOldChannel() {
     console.log('Disconnecting from all channels ...');
