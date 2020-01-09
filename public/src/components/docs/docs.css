@@ -219,6 +219,10 @@ a[data-toggle="collapse"] {
     margin-bottom : 4rem;
 }
 
+.docs_panel p {
+    color: rgb(44, 44, 44);
+}
+
 .docs-contact {
     opacity : 0;
     transform: translateY(-40px) ;
@@ -226,7 +230,7 @@ a[data-toggle="collapse"] {
     color: rgb(44, 44, 44);
     border-radius: 5px;
     box-shadow : 0px 0px 3px rgb(85, 85, 85);
-    margin-top : 3rem;
+    margin-top : 1rem;
     max-width: 768px;
     width: auto;
     margin-left : auto;
@@ -318,18 +322,17 @@ a[data-toggle="collapse"] {
     outline: 0;
 }
 
-.docs_panel p {
-    color : rgb(43, 43, 43);
+.contact.alert {
+    width : 50%;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    transition-duration: 0.5;
 }
 
-.docs_panel.warning {
-    background: rgb(235, 226, 240);
-    border: 1px solid rgb(151, 95, 179);
-    box-shadow: none;
-}
-
-.docs_panel.warning p {
-    color : rgb(122, 63, 151);
+.contact.alert-success {
+    border: 1px solid rgb(95, 146, 107);
+    transition-duration: 0.5;
 }
 
 .docs_content h4 {
@@ -489,12 +492,6 @@ a[data-toggle="collapse"] {
     }
 }
 @media screen and (max-width: 900px) {
-    .contact-mail, .contact-object {
-        margin-top : 2rem;
-        width: 100%;
-        text-align: center;
-    }
-
     .contact-submit-div button {
         max-width: 80%;
     }
@@ -538,5 +535,13 @@ a[data-toggle="collapse"] {
         transform: none;
         opacity: 1;
         margin: 5px auto;
+    }
+}
+
+@media screen and (max-width: 545px) {
+    .contact-mail, .contact-object {
+        margin-top : 2rem;
+        width: 100%;
+        text-align: center;
     }
 }
