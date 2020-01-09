@@ -211,6 +211,79 @@ a[data-toggle="collapse"] {
     width : 50px;
 }
 
+.radio_player {
+    background : rgb(230, 230, 230);
+    text-align :center;
+    max-height : 80px;
+}
+
+.radio_select {
+    margin-bottom : 40px;
+    text-align: center;
+    margin-left : 1rem;
+}
+
+.radio_select::after {
+    display: none;
+}
+
+#radio_choices {
+    max-height: 70vh;
+    overflow-y: scroll;
+    border-radius: 5px;
+}
+
+#radio_choices button {
+    padding-top : 10px;
+    padding-bottom : 10px;
+    padding-left : 1rem;
+    margin-right: 3rem;
+    border-radius: 5px;
+    border-left: 5px solid rgba(93, 67, 126, 0);
+    border-bottom : 1px solid rgb(223, 223, 223);
+    transition-duration: 0.2s;
+}
+
+#radio_choices button:hover {
+    box-shadow: -5px 0px 4px rgb(93, 67, 126);
+    color : rgb(93, 67, 126);
+    background : #f0f0f0;
+    border-left: 5px solid rgba(93, 67, 126, 0.74);
+    transition-duration: 0.2s;
+}
+
+audio:focus, audio:active {
+    border: none;
+    outline: 0;
+}
+
+.radio_figure{
+    margin-top : 10px;
+    text-align: center;
+}
+
+.icon_figure {
+    text-align: right;
+}
+
+.icon_figure img {
+    max-height : 50px;
+    max-width: 80px;
+    margin-right : 1rem;
+    margin-bottom : 1rem;
+}
+
+.radio_figure audio, .radio_figure figcaption {
+    display: inline-block;
+}
+
+.icon_figure, .radio_figure {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+    margin-bottom : 5px;
+}
+
 .docs_content {
     margin-top : 1rem;
     width : 75%;
@@ -538,10 +611,24 @@ a[data-toggle="collapse"] {
     }
 }
 
-@media screen and (max-width: 545px) {
+@media screen and (max-width: 600px) {
     .contact-mail, .contact-object {
         margin-top : 2rem;
         width: 100%;
         text-align: center;
+    }
+
+    .icon_figure {
+        display: none;
+    }
+
+    .radio_figure {
+        width : 100%;
+    }
+}
+
+@media screen and (max-width: 522px) {
+    .radio_player {
+        max-height : 120px;
     }
 }

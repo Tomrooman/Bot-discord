@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import Play from './play/play.jsx';
 import Contact from './contact/contact.jsx';
 import Sidebar from './sidebar/sidebar.jsx';
+import RadioPlayer from './radio/radio.jsx';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
@@ -116,6 +117,7 @@ export default class Docs extends React.Component {
                 <div className='wrapper'>
                     <Sidebar command={this.state.command} />
                     <div id='content' className='content'>
+                        <RadioPlayer />
                         {this.state.page}
                     </div>
                 </div>
@@ -126,6 +128,7 @@ export default class Docs extends React.Component {
                 <div className='wrapper'>
                     <Sidebar command={this.state.command} />
                     <div id='content' className='content'>
+                        <RadioPlayer />
                         <div className='syx_container'>
                             <h1><FontAwesomeIcon icon='home' />
                                 Accueil
