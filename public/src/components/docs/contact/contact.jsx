@@ -95,7 +95,6 @@ export default class Contact extends React.Component {
         return (
             <div className='syx_container'>
                 <h1><FontAwesomeIcon icon='pen-fancy' /> Me contacter</h1>
-                <div className='top_logo'><img src='/img/Syxbot_logo.png' /></div>
                 <div className='docs_content'>
                     <div className='contact alert'>
                         <span className='success-icon'><FontAwesomeIcon icon='check' /></span>

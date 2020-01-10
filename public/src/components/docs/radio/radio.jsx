@@ -11,7 +11,6 @@ export default class RadioPlayer extends React.Component {
         super();
         this.state = {
             dropdown_title: 'Radios disponibles',
-            radio_args: '',
             index: '',
             radioName: ''
         };
@@ -21,40 +20,75 @@ export default class RadioPlayer extends React.Component {
         $('.icon_figure')[0].style.display = 'none';
         for (let i = 0; i < $('#radio_choices').children().length; i++) {
             $('#radio_choices')[0].children[i].addEventListener('click', (e) => {
-                $('.icon_figure')[0].style.display = '';
-                $('audio')[0].volume = 0.2;
-                const radioImg = document.createElement('img');
-                radioImg.src = e.target.getAttribute('image');
-                $('.icon_figure')[0].innerHTML = '';
-                $('.icon_figure').append(radioImg);
-                $('audio')[0].src = e.target.value;
-                this.setState({
-                    dropdown_title: 'Chargement ...',
-                    index: e.target.getAttribute('index'),
-                    radioName: e.target.innerHTML
-                });
+                const imagePath = e.target.getAttribute('image');
+                const radioUrl = e.target.value;
+                const index = e.target.getAttribute('index');
+                const radioName = e.target.innerHTML;
+                this.props.setRadioArgs('?radio=' + index + '&play=true&volume=' + $('audio')[0].volume);
+                this.setRadioSourceAndInfos(imagePath, radioUrl, index, radioName, $('audio')[0].volume);
             });
         }
         this.setPauseHandler();
         this.setPlayHandler();
+        this.setVolumeHandler();
+        const parsedUrl = new URL(window.location.href);
+        const index = parsedUrl.searchParams.get('radio');
+        const playArg = parsedUrl.searchParams.get('play');
+        if (index && playArg) {
+            const imagePath = $('#radio_choices')[0].children[index].getAttribute('image');
+            const radioUrl = $('#radio_choices')[0].children[index].value;
+            const radioName = $('#radio_choices')[0].children[index].innerHTML;
+            const volume = parsedUrl.searchParams.get('volume') || 0;
+            this.setRadioSourceAndInfos(imagePath, radioUrl, index, radioName, volume);
+            this.props.setRadioArgs('?radio=' + index + '&play=true&volume=' + volume);
+            if (playArg === 'false') {
+                $('audio')[0].removeAttribute('autoPlay');
+                this.setState({
+                    dropdown_title: radioName
+                });
+            }
+        }
+    }
+
+    setRadioSourceAndInfos(imagePath, radioUrl, index, radioName, volume) {
+        $('.icon_figure')[0].style.display = '';
+        $('audio')[0].volume = volume === 0 ? 0.2 : volume;
+        const radioImg = document.createElement('img');
+        radioImg.src = imagePath;
+        $('.icon_figure')[0].innerHTML = '';
+        $('.icon_figure').append(radioImg);
+        $('audio')[0].src = radioUrl;
+        this.setState({
+            dropdown_title: 'Chargement ...',
+            index: index,
+            radioName: radioName,
+            volume: volume
+        });
+    }
+
+    setVolumeHandler() {
+        $('audio')[0].addEventListener('volumechange', () => {
+            if ($('audio')[0].paused) {
+                this.props.setRadioArgs('?radio=' + this.state.index + '&play=false&volume=' + $('audio')[0].volume);
+            }
+            else {
+                this.props.setRadioArgs('?radio=' + this.state.index + '&play=true&volume=' + $('audio')[0].volume);
+            }
+        });
     }
 
     setPauseHandler() {
         $('audio')[0].addEventListener('pause', () => {
-            this.setState({
-                radio_args: '?radio=' + this.state.index + '&play=false'
-            });
-            this.props.setRadioArgs('?radio=' + this.state.index + '&play=false');
+            this.props.setRadioArgs('?radio=' + this.state.index + '&play=false&volume=' + $('audio')[0].volume);
         });
     }
 
     setPlayHandler() {
         $('audio')[0].addEventListener('play', () => {
             this.setState({
-                radio_args: '?radio=' + this.state.index + '&play=true',
                 dropdown_title: this.state.radioName
             });
-            this.props.setRadioArgs('?radio=' + this.state.index + '&play=true');
+            this.props.setRadioArgs('?radio=' + this.state.index + '&play=true&volume=' + $('audio')[0].volume);
         });
     }
 

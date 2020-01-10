@@ -41,8 +41,8 @@ a, a:hover, a:focus {
 
 #sidebar .sidebar-header {
     text-align: center;
-    padding-top : 20px;
-    padding-bottom : 10px;
+    padding-top : 17px;
+    padding-bottom : 7px;
     color: #fff;
     background: linear-gradient(45deg, rgba(121,75,139,1) 0%, rgba(134,31,43,1) 100%);
 }
@@ -53,8 +53,8 @@ a, a:hover, a:focus {
 
 #command_list_title {
     margin-top : 20px;
-    padding-top : 15px;
-    padding-bottom : 15px;
+    padding-top : 12px;
+    padding-bottom : 12px;
     color : #fff;
     text-align: center;
     font-weight: bold;
@@ -160,33 +160,17 @@ a[data-toggle="collapse"] {
     padding-bottom : 10px;
     opacity : 0;
     transform: translateY(-40px);
-    background: rgb(57, 21, 66);
-    color: rgb(235, 235, 235);
-    box-shadow : -1px 0px 3px rgb(37, 37, 37);
+    color: rgb(44, 44, 44);
+    /* box-shadow : -1px 0px 3px rgb(37, 37, 37); */
     margin-top : 2rem;
     width: 85%;
-    z-index: 1;
+    z-index: 3;
     font-weight: 700;
-    letter-spacing: 0.3rem;
+    letter-spacing: 5px;
     margin-left : auto;
     margin-right: auto;
     border-radius: 5px;
     margin-bottom : 0;
-}
-
-.top_logo {
-    text-align : center;
-    padding-bottom : 10px;
-    background: rgb(57, 21, 66);
-    color: rgb(235, 235, 235);
-    box-shadow : 0px 1px 3px rgb(37, 37, 37);
-    width: 75px;
-    opacity: 0;
-    transform: translateY(-40px);
-    margin-left : auto;
-    margin-right: auto;
-    border-bottom-left-radius: 50%;
-    border-bottom-right-radius: 50%;
 }
 
 .contact-btn {
@@ -207,18 +191,18 @@ a[data-toggle="collapse"] {
     padding-right : 2rem;
 }
 
-.top_logo img {
-    width : 50px;
+audio {
+    max-height : 40px;
 }
 
 .radio_player {
-    background : rgb(230, 230, 230);
+    background : rgb(80, 80, 80);
     text-align :center;
-    max-height : 80px;
+    max-height : 65px;
 }
 
 .radio_select {
-    margin-bottom : 40px;
+    margin-bottom : 30px;
     text-align: center;
     margin-left : 1rem;
 }
@@ -491,7 +475,7 @@ audio:focus, audio:active {
     text-align: center;
 }
 
-.syx_container h1.load, .docs_panel.load, .div_docs_content_command.load, .top_logo.load, .docs-contact.load {
+.syx_container h1.load, .docs_panel.load, .div_docs_content_command.load, .docs-contact.load {
     transform: translateY(0);
     transition-duration: 1s;
     opacity : 1;
@@ -513,7 +497,7 @@ audio:focus, audio:active {
     cursor: pointer;
     height: 70px;
     width: 70px;
-    z-index: 2;
+    z-index: 5;
     margin-left : 300px;
     margin-top : 70px;
     border-top-right-radius: 30px;
@@ -633,6 +617,6 @@ audio:focus, audio:active {
 
 @media screen and (max-width: 522px) {
     .radio_player {
-        max-height : 120px;
+        max-height : 110px;
     }
 }

@@ -18,14 +18,14 @@ export default class Docs extends React.Component {
         super();
         let page = null;
         let goodCommand = props.command;
-        if (props.command === 'play') {
-            page = <Play />;
-        }
-        else if (props.command === 'contact') {
-            page = <Contact />;
-        }
         if (props.command.indexOf('?') !== -1) {
             goodCommand = props.command.substr(0, props.command.indexOf('?'));
+        }
+        if (goodCommand === 'play') {
+            page = <Play />;
+        }
+        else if (goodCommand === 'contact') {
+            page = <Contact />;
         }
         this.state = {
             command: goodCommand,
@@ -70,7 +70,7 @@ export default class Docs extends React.Component {
             if ($('.docs_panel')) {
                 setTimeout(() => {
                     $('.docs_panel').addClass('load');
-                }, 200);
+                }, 300);
             }
             if ($('.div_docs_content_command')) {
                 setTimeout(() => {
@@ -145,7 +145,6 @@ export default class Docs extends React.Component {
                             <h1><FontAwesomeIcon icon='home' />
                                 Accueil
                             </h1>
-                            <div className='top_logo'><img src='/img/Syxbot_logo.png' /></div>
                             <div className='docs_content'>
                                 <div className='docs_panel'>
                                     <p className='h5'>Bienvenue sur la docs de syxbot</p>
