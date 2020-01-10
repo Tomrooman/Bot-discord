@@ -223,6 +223,10 @@ a[data-toggle="collapse"] {
     margin-left : 1rem;
 }
 
+.radio_select svg {
+    margin-left: 0.5rem;
+}
+
 .radio_select::after {
     display: none;
 }

@@ -6,6 +6,13 @@ import { faCaretSquareDown } from '@fortawesome/free-solid-svg-icons';
 library.add(faCaretSquareDown);
 
 export default class RadioPlayer extends React.Component {
+    constructor() {
+        super();
+        this.state = {
+            dropdown_title: 'Radios disponibles'
+        };
+    }
+
     componentDidMount() {
         $('.icon_figure')[0].style.display = 'none';
         for (let i = 0; i < $('#radio_choices').children().length; i++) {
@@ -16,6 +23,9 @@ export default class RadioPlayer extends React.Component {
                 $('.icon_figure')[0].innerHTML = '';
                 $('.icon_figure').append(radioImg);
                 $('audio')[0].src = e.target.value;
+                this.setState({
+                    dropdown_title: e.target.innerHTML
+                });
             });
         }
     }
@@ -31,7 +41,7 @@ export default class RadioPlayer extends React.Component {
                     <figcaption>
                         <div className='dropdown'>
                             <button type='button' className='radio_select btn btn-secondary dropdown-toggle' id='dropdownMenu2' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                                Radios disponibles <FontAwesomeIcon icon='caret-square-down' />
+                                {this.state.dropdown_title} <FontAwesomeIcon icon='caret-square-down' />
                             </button>
                             <div id='radio_choices' className='dropdown-menu' aria-labelledby='dropdownMenu2'>
                                 <button
