@@ -259,6 +259,7 @@ audio:focus, audio:active {
     max-width: 80px;
     margin-right : 1rem;
     margin-bottom : 1rem;
+    border-radius: 10px;
 }
 
 .radio_figure audio, .radio_figure figcaption {
