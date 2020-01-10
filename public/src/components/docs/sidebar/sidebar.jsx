@@ -30,7 +30,7 @@ library.add(faForward);
 library.add(faStop);
 
 export default class Sidebar extends React.Component {
-    constructor() {
+    constructor(props) {
         super();
         this.commands = [
             { name: 'Play', icon: 'headphones-alt' },
@@ -106,11 +106,11 @@ export default class Sidebar extends React.Component {
                 </div>
                 <ul className='list-unstyled components'>
                     <li className={!this.props.command ? 'active' : ''}>
-                        <a href='/docs'><FontAwesomeIcon icon='home' /> Accueil</a>
+                        <a href={`/docs${this.props.radio_args}`}><FontAwesomeIcon icon='home' /> Accueil</a>
                     </li>
                     <li className={this.props.command === 'contact' ? 'active' : ''}>
                         <a
-                            href='/docs/contact'
+                            href={`/docs/contact${this.props.radio_args}`}
                             onMouseEnter={this.handleMouseEnterContactBtn}
                             onMouseLeave={this.handleMouseLeaveContactBtn}
                         >
@@ -124,7 +124,7 @@ export default class Sidebar extends React.Component {
                         {this.commands.map((obj, index) => {
                             return (
                                 <a
-                                    href={`/docs/${obj.name.toLowerCase()}`}
+                                    href={`/docs/${obj.name.toLowerCase()}${this.props.radio_args}`}
                                     className={this.props.command === obj.name.toLowerCase() ? 'active' : ''}
                                     key={index}
                                     onMouseEnter={() => this.handleMouseEnter(index)}
@@ -142,5 +142,6 @@ export default class Sidebar extends React.Component {
 }
 
 Sidebar.propTypes = {
-    command: PropTypes.string.isRequired
+    command: PropTypes.string.isRequired,
+    radio_args: PropTypes.string
 };

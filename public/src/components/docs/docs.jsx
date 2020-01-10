@@ -17,17 +17,29 @@ export default class Docs extends React.Component {
     constructor(props) {
         super();
         let page = null;
+        let goodCommand = props.command;
         if (props.command === 'play') {
             page = <Play />;
         }
         else if (props.command === 'contact') {
             page = <Contact />;
         }
+        if (props.command.indexOf('?') !== -1) {
+            goodCommand = props.command.substr(0, props.command.indexOf('?'));
+        }
         this.state = {
-            command: props.command,
-            page: page
+            command: goodCommand,
+            page: page,
+            radio_args: ''
         };
         this.createCommandsArray();
+        this.setRadioArgs = this.setRadioArgs.bind(this);
+    }
+
+    setRadioArgs(args) {
+        this.setState({
+            radio_args: args
+        });
     }
 
     createCommandsArray() {
@@ -115,9 +127,9 @@ export default class Docs extends React.Component {
         if (this.state.page) {
             return (
                 <div className='wrapper'>
-                    <Sidebar command={this.state.command} />
+                    <Sidebar command={this.state.command} radio_args={this.state.radio_args} />
                     <div id='content' className='content'>
-                        <RadioPlayer />
+                        <RadioPlayer setRadioArgs={this.setRadioArgs} />
                         {this.state.page}
                     </div>
                 </div>
@@ -126,9 +138,9 @@ export default class Docs extends React.Component {
         else {
             return (
                 <div className='wrapper'>
-                    <Sidebar command={this.state.command} />
+                    <Sidebar command={this.state.command} radio_args={this.state.radio_args} />
                     <div id='content' className='content'>
-                        <RadioPlayer />
+                        <RadioPlayer setRadioArgs={this.setRadioArgs} />
                         <div className='syx_container'>
                             <h1><FontAwesomeIcon icon='home' />
                                 Accueil
@@ -138,7 +150,7 @@ export default class Docs extends React.Component {
                                 <div className='docs_panel'>
                                     <p className='h5'>Bienvenue sur la docs de syxbot</p>
                                     <p>N'hésitez pas à me contacter pour toute(s) question(s), idée(s) de modification(s), etc ...</p>
-                                    <a href='/docs/contact'>
+                                    <a href={`/docs/contact${this.state.radio_args}`}>
                                         <button
                                             className='contact-btn'
                                             onMouseEnter={this.handleMouseEnterContactBtn}
@@ -153,7 +165,7 @@ export default class Docs extends React.Component {
                                     {this.commands.map((obj, index) => {
                                         return (
                                             <a
-                                                href={`/docs/${obj.name.toLowerCase()}`}
+                                                href={`/docs/${obj.name.toLowerCase()}${this.state.radio_args}`}
                                                 className='docs_content_command'
                                                 key={index}
                                                 onMouseEnter={() => this.handleMouseEnter(index)}

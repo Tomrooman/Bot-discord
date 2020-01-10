@@ -1,5 +1,6 @@
 import React from 'react';
 import $ from 'jquery';
+import PropTypes from 'prop-types';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretSquareDown } from '@fortawesome/free-solid-svg-icons';
@@ -9,7 +10,10 @@ export default class RadioPlayer extends React.Component {
     constructor() {
         super();
         this.state = {
-            dropdown_title: 'Radios disponibles'
+            dropdown_title: 'Radios disponibles',
+            radio_args: '',
+            index: '',
+            radioName: ''
         };
     }
 
@@ -25,24 +29,33 @@ export default class RadioPlayer extends React.Component {
                 $('.icon_figure').append(radioImg);
                 $('audio')[0].src = e.target.value;
                 this.setState({
-                    dropdown_title: 'Chargement ...'
+                    dropdown_title: 'Chargement ...',
+                    index: e.target.getAttribute('index'),
+                    radioName: e.target.innerHTML
                 });
-                this.checkIfPlaying(e.target.innerHTML);
             });
         }
+        this.setPauseHandler();
+        this.setPlayHandler();
     }
 
-    checkIfPlaying(innerHTML) {
-        setTimeout(() => {
-            if ($('audio')[0].duration > 0 && !$('audio')[0].paused) {
-                this.setState({
-                    dropdown_title: innerHTML
-                });
-            }
-            else {
-                this.checkIfPlaying(innerHTML);
-            }
-        }, 500);
+    setPauseHandler() {
+        $('audio')[0].addEventListener('pause', () => {
+            this.setState({
+                radio_args: '?radio=' + this.state.index + '&play=false'
+            });
+            this.props.setRadioArgs('?radio=' + this.state.index + '&play=false');
+        });
+    }
+
+    setPlayHandler() {
+        $('audio')[0].addEventListener('play', () => {
+            this.setState({
+                radio_args: '?radio=' + this.state.index + '&play=true',
+                dropdown_title: this.state.radioName
+            });
+            this.props.setRadioArgs('?radio=' + this.state.index + '&play=true');
+        });
     }
 
     render() {
@@ -63,6 +76,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://cdn.nrjaudio.fm/audio1/fr/40125/aac_64.mp3'
                                     image='/img/nrj.png'
+                                    index='0'
                                 >
                                     Nrj
                                 </button>
@@ -70,6 +84,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://listen.radionomy.com/subarashii.mp3'
                                     image='/img/subarashii.png'
+                                    index='1'
                                 >
                                     Subarashii
                                 </button>
@@ -77,6 +92,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://belrtl.ice.infomaniak.ch/belrtl-mp3-128.mp3'
                                     image='/img/bel-rtl.png'
+                                    index='2'
                                 >
                                     Bel RTL
                                 </button>
@@ -84,6 +100,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://broadcast.infomaniak.ch/radiocontact-mp3-192.mp3'
                                     image='/img/contact.jpg'
+                                    index='3'
                                 >
                                     Contact
                                 </button>
@@ -91,6 +108,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://streamingp.shoutcast.com/NostalgiePremium-mp3'
                                     image='/img/nostalgie-be.jpg'
+                                    index='4'
                                 >
                                     Nostalgie BE
                                 </button>
@@ -98,6 +116,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://cdn.nrjaudio.fm/audio1/fr/30601/mp3_128.mp3?origine=fluxradios'
                                     image='/img/nostalgie-fr.png'
+                                    index='5'
                                 >
                                     Nostalgie FR
                                 </button>
@@ -105,6 +124,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://radios.rtbf.be/classic21-128.mp3'
                                     image='/img/classic21.jpg'
+                                    index='6'
                                 >
                                     Classic 21
                                 </button>
@@ -112,6 +132,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://radios.rtbf.be/pure-128.mp3'
                                     image='/img/pure-fm.png'
+                                    index='7'
                                 >
                                     Pure FM
                                 </button>
@@ -119,6 +140,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://radios.rtbf.be/musiq3-128.mp3'
                                     image='/img/musiq3.jpg'
+                                    index='8'
                                 >
                                     Musiq'3
                                 </button>
@@ -126,6 +148,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://radios.rtbf.be/vivabxl-128.mp3'
                                     image='/img/vivacite.png'
+                                    index='9'
                                 >
                                     VivaCité
                                 </button>
@@ -133,6 +156,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://streaming.radio.funradio.fr/fun-1-44-128'
                                     image='/img/fun-radio.png'
+                                    index='10'
                                 >
                                     Fun Radio
                                 </button>
@@ -140,6 +164,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://cdn.nrjaudio.fm/audio1/fr/30401/mp3_128.mp3?origine=fluxradios'
                                     image='/img/rire&chansons.png'
+                                    index='11'
                                 >
                                     Rire & Chansons
                                 </button>
@@ -147,6 +172,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://vr-live-mp3-128.scdn.arkena.com/virginradio.mp3'
                                     image='/img/virgin.png'
+                                    index='12'
                                 >
                                     Virgin
                                 </button>
@@ -154,6 +180,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://rfm-live-mp3-128.scdn.arkena.com/rfm.mp3'
                                     image='/img/rfm.png'
+                                    index='13'
                                 >
                                     RFM
                                 </button>
@@ -161,6 +188,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://rmc.bfmtv.com/rmcinfo-mp3'
                                     image='/img/rmc.jpg'
+                                    index='14'
                                 >
                                     RMC
                                 </button>
@@ -168,6 +196,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://chai5she.cdn.dvmr.fr/bfmbusiness'
                                     image='/img/bfm-business.png'
+                                    index='15'
                                 >
                                     BFM Business
                                 </button>
@@ -175,6 +204,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://jazzradio.ice.infomaniak.ch/jazzradio-high.mp3'
                                     image='/img/jazz.png'
+                                    index='16'
                                 >
                                     Jazz
                                 </button>
@@ -182,6 +212,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://cdn.nrjaudio.fm/audio1/fr/30201/mp3_128.mp3?origine=fluxradios'
                                     image='/img/cherie-fm.png'
+                                    index='17'
                                 >
                                     Chérie FM
                                 </button>
@@ -189,6 +220,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://mp3lg4.tdf-cdn.com/9240/lag_180945.mp3'
                                     image='/img/europe1.jpg'
+                                    index='18'
                                 >
                                     Europe 1
                                 </button>
@@ -196,6 +228,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://streaming.radio.rtl.fr/rtl-1-44-128'
                                     image='/img/rtl.jpg'
+                                    index='19'
                                 >
                                     RTL
                                 </button>
@@ -203,6 +236,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://streaming.radio.rtl2.fr/rtl2-1-44-128'
                                     image='/img/rtl2.jpg'
+                                    index='20'
                                 >
                                     RTL2
                                 </button>
@@ -210,6 +244,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://radioclassique.ice.infomaniak.ch/radioclassique-high.mp3'
                                     image='/img/classique.png'
+                                    index='21'
                                 >
                                     Classique
                                 </button>
@@ -217,6 +252,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://www.skyrock.fm/stream.php/tunein16_128mp3.mp3'
                                     image='/img/skyrock.png'
+                                    index='22'
                                 >
                                     Skyrock
                                 </button>
@@ -224,6 +260,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://direct.franceinter.fr/live/franceinter-midfi.mp3'
                                     image='/img/france-inter.png'
+                                    index='23'
                                 >
                                     France Inter
                                 </button>
@@ -231,6 +268,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://direct.franceculture.fr/live/franceculture-midfi.mp3'
                                     image='/img/france-culture.png'
+                                    index='24'
                                 >
                                     France Culture
                                 </button>
@@ -238,6 +276,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://direct.francemusique.fr/live/francemusique-midfi.mp3'
                                     image='/img/france-musique.png'
+                                    index='25'
                                 >
                                     France Musique
                                 </button>
@@ -245,6 +284,7 @@ export default class RadioPlayer extends React.Component {
                                     className='dropdown-item'
                                     value='http://direct.francebleu.fr/live/fbpicardie-midfi.mp3'
                                     image='/img/france-bleu.png'
+                                    index='26'
                                 >
                                     France Bleu
                                 </button>
@@ -256,3 +296,7 @@ export default class RadioPlayer extends React.Component {
         );
     }
 }
+
+RadioPlayer.propTypes = {
+    setRadioArgs: PropTypes.func.isRequired
+};
