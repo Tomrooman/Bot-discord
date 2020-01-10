@@ -25,10 +25,24 @@ export default class RadioPlayer extends React.Component {
                 $('.icon_figure').append(radioImg);
                 $('audio')[0].src = e.target.value;
                 this.setState({
-                    dropdown_title: e.target.innerHTML
+                    dropdown_title: 'Chargement ...'
                 });
+                this.checkIfPlaying(e.target.innerHTML);
             });
         }
+    }
+
+    checkIfPlaying(innerHTML) {
+        setTimeout(() => {
+            if ($('audio')[0].duration > 0 && !$('audio')[0].paused) {
+                this.setState({
+                    dropdown_title: innerHTML
+                });
+            }
+            else {
+                this.checkIfPlaying(innerHTML);
+            }
+        }, 500);
     }
 
     render() {
@@ -38,7 +52,7 @@ export default class RadioPlayer extends React.Component {
                     <img src='/img/nrj.png' alt='radio_img' />
                 </figure>
                 <figure className='radio_figure'>
-                    <audio controls />
+                    <audio controls autoPlay />
                     <figcaption>
                         <div className='dropdown'>
                             <button type='button' className='radio_select btn btn-secondary dropdown-toggle' id='dropdownMenu2' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
