@@ -18,6 +18,7 @@ export default class RadioPlayer extends React.Component {
         for (let i = 0; i < $('#radio_choices').children().length; i++) {
             $('#radio_choices')[0].children[i].addEventListener('click', (e) => {
                 $('.icon_figure')[0].style.display = '';
+                $('audio')[0].volume = 0.2;
                 const radioImg = document.createElement('img');
                 radioImg.src = e.target.getAttribute('image');
                 $('.icon_figure')[0].innerHTML = '';
