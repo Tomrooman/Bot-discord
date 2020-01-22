@@ -59,4 +59,4 @@ userSchema.methods.updateExp = (user) => {
     return user.save();
 };
 
-module.exports = mongoose.model('User', userSchema);
+export default mongoose.model('User', userSchema);

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
 
 describe('Index', function () {
     it('Connect to database', function (done) {
@@ -7,11 +7,11 @@ describe('Index', function () {
             useUnifiedTopology: true,
             autoIndex: false,
             useFindAndModify: false
-        })
+        });
         mongoose.connection.once('open', () => {
-            done()
-        })
+            done();
+        });
     });
 });
 
-require('./user.test.js')
+require('./user.test.js');
