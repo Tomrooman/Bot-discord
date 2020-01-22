@@ -28,12 +28,16 @@ export default class Message {
             message.channel.messages.fetch(limit)
                 .then(messages => {
                     message.channel.bulkDelete(messages)
+                        .then(() => {
+                            message.channel.send('>❌ **' + (messages.size - 1) + '** messages supprimés');
+                            delete removeInfos[message.guild.id];
+                        })
                         .catch(() => messages.map(oneMessage => {
                             oneMessage.delete({ timeout: 4000 })
                                 .then(() => {
                                     removeInfos[message.guild.id]++;
                                     if (removeInfos[message.guild.id] === messages.size) {
-                                        message.channel.send('> **' + (removeInfos[message.guild.id] - 1) + '** messages supprimés');
+                                        message.channel.send('>❌ **' + (removeInfos[message.guild.id] - 1) + '** messages supprimés');
                                         delete removeInfos[message.guild.id];
                                     }
                                 })

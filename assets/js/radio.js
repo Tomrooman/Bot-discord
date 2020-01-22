@@ -15,7 +15,7 @@ const radioAvailable = [
     'Musiq3',
     'VivaCite',
     'Fun-radio',
-    'Rire&chanson',
+    'Rire&chansons',
     'Virgin',
     'RFM',
     'RMC',
@@ -107,7 +107,7 @@ export default class Radio {
         else if (radioForLink === 'fun-radio') {
             return 'http://streaming.radio.funradio.fr/fun-1-44-128';
         }
-        else if (radioForLink === 'rire&chanson') {
+        else if (radioForLink === 'rire&chansons') {
             return 'http://cdn.nrjaudio.fm/audio1/fr/30401/mp3_128.mp3?origine=fluxradios';
         }
         else if (radioForLink === 'virgin') {
@@ -188,14 +188,20 @@ export default class Radio {
     }
 
     sendRadioEmbed(message, radioTitle) {
+        let radioName = '';
+        radioAvailable.map(r => {
+            if (r.toLowerCase() === radioTitle) {
+                radioName = r.split('-').join(' ');
+            }
+        });
         // #543A99 | Mauve
         const color = 5520025;
         const embed = new Discord.MessageEmbed()
-            .setAuthor('Radio', 'https://syxbot.com/img/radio_icon.png')
+            .setAuthor('Radio', '/public/img/radio_icon.png')
             .setColor(color)
             .setFooter('"' + config.prefix + 'radio list" pour afficher les radios disponibles')
-            .addField('Nom de la radio', radioTitle, true);
+            .setThumbnail(`/public/img/radio/${radioTitle}.png`)
+            .addField('Nom de la radio', radioName, true);
         message.channel.send({ embed });
     }
-
 }

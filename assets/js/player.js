@@ -675,6 +675,7 @@ export default class Player {
         const musicLink = type === 'video' ? `[${embedObj.title}](https://www.youtube.com/watch?v=${embedObj.id})` : `[${embedObj.title}](https://www.youtube.com/playlist?list=${embedObj.id})`;
         const color = added[0] ? 3768896 : 5520025;
         const title = added[0] && added[1] > 1 ? 'Playlist ajoutée' : added[0] ? 'Musique ajoutée' : 'Musique';
+        const authorUrl = title.indexOf('ajoutée') !== -1 ? '/public/img/music_add.png' : '/public/mg/embed_music.png';
         // Calculate the queued duration and save as formatted string
         if (playlistArray[message.guild.id].length >= 2) {
             playlistInfos[message.guild.id].map((video, index) => {
@@ -686,7 +687,7 @@ export default class Player {
         }
         // Blank field used for set the third element in a lines and can use the next line
         const embed = new Discord.MessageEmbed()
-            .setAuthor(title, 'https://syxbot.com/img/embed_music.png')
+            .setAuthor(title, authorUrl)
             .setColor(color)
             .setFooter('"' + config.prefix + 'p list" pour afficher la file d\'attente')
             .setThumbnail(embedObj.thumbnail)
@@ -718,7 +719,7 @@ export default class Player {
             voiceChannel = Helper.take_user_voiceChannel_by_reaction(message, byReaction[1]);
         }
         if (radioPlayed[message.guild.id] || play) {
-            // If radio is active or if we tell us to play the songs now
+            // If radio is active or if we tell us to play the song now
             playlistArray[message.guild.id] = [];
             playlistInfos[message.guild.id] = [];
             delete radioPlayed[message.guild.id];
