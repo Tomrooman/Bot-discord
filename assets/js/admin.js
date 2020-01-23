@@ -15,15 +15,15 @@ export default class Admin {
                     message.channel.send('> Connected guilds : **' + bot.guilds.size + '**');
                 }
                 else {
-                    message.channel.send('> Cette commande admin n\'existe pas');
+                    message.channel.send('❌ Cette commande admin n\'existe pas');
                 }
             }
             else {
-                message.channel.send('> Ecrit la commande admin a éxécutée, pour l\'instant juste : message');
+                message.channel.send('❌ Ecrit la commande admin a éxécutée, pour l\'instant juste : message');
             }
         }
         else {
-            message.channel.send('> Vous ne faites pas partit des admins');
+            message.channel.send('❌ Vous ne faites pas partit des admins');
         }
     }
 
@@ -40,7 +40,7 @@ export default class Admin {
             });
         }
         else {
-            message.channel.send('> Tu n\'as pas écrit de message !');
+            message.channel.send('❌ Tu n\'as pas écrit de message !');
         }
     }
 

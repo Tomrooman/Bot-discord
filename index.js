@@ -8,6 +8,7 @@ import Player from './assets/js/player.js';
 const bot = new Discord.Client();
 
 // connectToDatabase();
+console.log('----- Starting -----');
 bot.login(config.token);
 
 bot.on('ready', () => {

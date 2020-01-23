@@ -54,10 +54,10 @@ export default function controller(message, prefix, bot) {
             new Admin(message, words, bot);
         }
         else {
-            message.channel.send('> Cette commande n\'existe pas ! \n >  Tapez **' + prefix + 'help** pour afficher la liste des commandes.');
+            message.channel.send('❌ Cette commande n\'existe pas ! \nTapez **' + prefix + 'help** pour afficher la liste des commandes.');
         }
     }
     else {
-        message.channel.send('> Vous n\'avez pas écrit de commande !');
+        message.channel.send('❌ Vous n\'avez pas écrit de commande !');
     }
 }

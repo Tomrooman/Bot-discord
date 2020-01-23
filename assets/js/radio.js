@@ -20,7 +20,7 @@ const radioAvailable = [
     'RFM',
     'RMC',
     'BFM-Business',
-    'jazz',
+    'Jazz',
     'Cherie-FM',
     'Europe1',
     'RTL',
@@ -44,11 +44,11 @@ export default class Radio {
                 this.connectRadio(message, words);
             }
             else {
-                message.channel.send('> **Cette radio n\'existe pas !** \n > Tapez **' + config.prefix + 'radio list** pour obtenir la liste des radios disponibles.');
+                message.channel.send('❌ **Cette radio n\'existe pas !** \nTapez **' + config.prefix + 'radio list** pour obtenir la liste des radios disponibles.');
             }
         }
         else {
-            message.channel.send('> Choisir une radio, c\'est mieux !');
+            message.channel.send('❌ Choisir une radio, c\'est mieux !');
         }
     }
 
@@ -183,7 +183,7 @@ export default class Radio {
             }
         }
         else {
-            message.channel.send('> Vous devez être connecté dans un salon !');
+            message.channel.send('❌ Vous devez être connecté dans un salon !');
         }
     }
 
@@ -197,7 +197,7 @@ export default class Radio {
         // #543A99 | Mauve
         const color = 5520025;
         const embed = new Discord.MessageEmbed()
-            .setAuthor('Radio', '/public/img/radio_icon.png')
+            .setAuthor('Radio', 'https://syxbot.com/img/radio_icon.png')
             .setColor(color)
             .setFooter('"' + config.prefix + 'radio list" pour afficher les radios disponibles')
             .setThumbnail(`/public/img/radio/${radioTitle}.png`)

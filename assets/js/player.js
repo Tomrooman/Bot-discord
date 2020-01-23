@@ -121,11 +121,11 @@ export default class Player {
                 this.playSongsAndConnectOrNotBot(message, command, words, false, byReaction);
             }
             else {
-                message.channel.send('> Vous n\'êtes pas dans le même canal que le bot !');
+                message.channel.send('❌ Vous n\'êtes pas dans le même canal que le bot !');
             }
         }
         else {
-            message.channel.send('> Vous devez être connecté dans un salon !');
+            message.channel.send('❌ Vous devez être connecté dans un salon !');
         }
     }
 
@@ -138,7 +138,7 @@ export default class Player {
                     this.getPlaylist(message, words, playSongParams, byReaction);
                 }
                 else {
-                    message.channel.send('> Vous devez renseigner une URL de playlist valide !');
+                    message.channel.send('❌ Vous devez renseigner une URL de playlist valide !');
                 }
             }
             else if (command === 'play' || command === 'p') {
@@ -147,7 +147,7 @@ export default class Player {
                     this.getVideo(message, words, playSongParams, byReaction);
                 }
                 else {
-                    message.channel.send('> Ce n\'est pas une URL de vidéo valide !');
+                    message.channel.send('❌ Ce n\'est pas une URL de vidéo valide !');
                 }
             }
         }
@@ -166,7 +166,7 @@ export default class Player {
             }
         }
         else {
-            message.channel.send('> Vous n\'avez pas écrit de recherche !');
+            message.channel.send('❌ Vous n\'avez pas écrit de recherche !');
         }
     }
 
@@ -202,7 +202,7 @@ export default class Player {
     }
 
     sendCurrentResultAndRecall(message, title, type, buildedArray, searchresults, byReaction) {
-        message.channel.send('> ' + buildedArray.length + '/5 trouvé');
+        message.channel.send('✅ ' + buildedArray.length + '/5 trouvé');
         setTimeout(() => {
             // If cancel is activate stop the research
             if (!musicParams.cancel[message.guild.id]) {
@@ -210,7 +210,7 @@ export default class Player {
             }
             else {
                 delete musicParams.cancel[message.guild.id];
-                message.channel.send('> Recherche arrêtée !');
+                message.channel.send('❌ Recherche arrêtée !');
             }
         }, 1500);
     }
@@ -243,7 +243,7 @@ export default class Player {
                 else if (type === 'playlist') {
                     searchPlaylist[message.guild.id]['array'] = searchPlaylist[message.guild.id]['old'];
                 }
-                message.channel.send('> Aucun résultat obtenu');
+                message.channel.send('❌ Aucun résultat obtenu');
                 this.sendSearchResultsAsString(message, type);
             }
         });
@@ -331,32 +331,22 @@ export default class Player {
         const options = {
             limit: 20
         };
-        if (type === 'video' && !nextPage) {
-            if (searchVideo[message.guild.id]['array']) {
+        if (!nextPage) {
+            const selectedArray = type === 'video' ? searchVideo[message.guild.id] : searchPlaylist[message.guild.id];
+            if (selectedArray['array']) {
                 // Don't have nextPage and have elements in video array so clear it and set nextPage token
                 if (byReaction[0]) {
-                    nextPageVar = searchVideo[message.guild.id]['array']['nextpage'];
-                    message.channel.send('> Recherche de ' + type + ' : ' + '`' + searchVideo[message.guild.id]['infos']['title'].trim() + '` #' + searchVideo[message.guild.id]['infos']['count']);
+                    nextPageVar = selectedArray['array']['nextpage'];
+                    message.channel.send('🔎 Recherche de ' + type + ' : ' + '`' + selectedArray['infos']['title'].trim() + '` #' + selectedArray['infos']['count']);
                 }
-                delete searchVideo[message.guild.id]['array'];
+                delete selectedArray['array'];
             }
-            searchVideo[message.guild.id]['array'] = [];
-        }
-        else if (type === 'playlist' && !nextPage) {
-            if (searchPlaylist[message.guild.id]['array']) {
-                // Don't have nextPage and have elements in paylist array so clear it and set nextPage token
-                if (byReaction[0]) {
-                    nextPageVar = searchPlaylist[message.guild.id]['array']['nextpage'];
-                    message.channel.send('> Recherche de ' + type + ' : ' + '`' + searchPlaylist[message.guild.id]['infos']['title'].trim() + '` #' + searchPlaylist[message.guild.id]['infos']['count']);
-                }
-                delete searchPlaylist[message.guild.id]['array'];
-            }
-            searchPlaylist[message.guild.id]['array'] = [];
+            selectedArray['array'] = [];
         }
         if (!byReaction[0] && !nextPage) {
             // If no reaction and no nextPage send message
             const goodTitle = title ? title : type === 'video' ? searchVideo[message.guild.id]['infos']['title'] : searchPlaylist[message.guild.id]['infos']['title'];
-            message.channel.send('> Recherche de ' + type + ' : ' + '`' + goodTitle.trim() + '`');
+            message.channel.send('🔎 Recherche de ' + type + ' : ' + '`' + goodTitle.trim() + '`');
         }
         if (nextPageVar) {
             // Save the nextPage token if user use next reaction
@@ -409,15 +399,15 @@ export default class Player {
             if (playlistArray[message.guild.id] && playlistArray[message.guild.id].length) {
                 if (!musicParams.loop[message.guild.id]) {
                     musicParams.loop[message.guild.id] = true;
-                    message.channel.send('> Mode répétition activé !');
+                    message.channel.send('🔄 Mode répétition activé !');
                 }
                 else {
                     delete musicParams.loop[message.guild.id];
-                    message.channel.send('> Mode répétition désactivé !');
+                    message.channel.send('▶️ Mode répétition désactivé !');
                 }
             }
             else {
-                message.channel.send('> Vous n\'écoutez pas de musique !');
+                message.channel.send('❌ Vous n\'écoutez pas de musique !');
             }
         }
     }
@@ -427,27 +417,18 @@ export default class Player {
         const selectedArray = type === 'video' ? searchVideo[message.guild.id]['array'] : searchPlaylist[message.guild.id]['array'];
         if (selectedArray && selectedArray.length) {
             let finalString = '';
-            let resultChoices = '';
-            selectedArray.map((item, index) => {
-                if (item.plLength) {
-                    resultChoices += '> **' + (index + 1) + '**. ' + item.title + ' (' + item.plLength + ')\n';
-                }
-                else {
-                    resultChoices += '> **' + (index + 1) + '**. ' + item.title + '\n';
-                }
-
-            });
+            const resultChoices = this.makeSearchVideoOrPlaylistString(message, type);
             if (type === 'video') {
-                finalString = `> **Écrivez ou sélectionnez une musique parmi les ${selectedArray.length} ci-dessous.** \n > **Ex: ${config.prefix}search p 2** \n > \n ${resultChoices}`;
+                finalString = `> **Écrivez ou sélectionnez une musique ci-dessous.** \n > **Ex: ${config.prefix}search p 2** \n > \n ${resultChoices}`;
             }
             else {
-                finalString = `> **Écrivez ou sélectionnez une playlist parmi les ${selectedArray.length} ci-dessous.** \n > **Ex: ${config.prefix}search pl 1** \n > \n ${resultChoices}`;
+                finalString = `> **Écrivez ou sélectionnez une playlist ci-dessous.** \n > **Ex: ${config.prefix}search pl 1** \n > \n ${resultChoices}`;
             }
             message.channel.send(finalString)
                 .then(newMessage => this.addSearchReactions(newMessage));
         }
         else {
-            message.channel.send('> Aucune ' + type + ' dans la liste des recherches');
+            message.channel.send('❌ Aucune ' + type + ' dans la liste des recherches');
         }
 
     }
@@ -482,7 +463,7 @@ export default class Player {
             }
         }
         else {
-            message.channel.send('> Vous devez écrire le type de sélection.```Ex: ' + config.prefix + 'search p```');
+            message.channel.send('❌ Vous devez écrire le type de sélection.```Ex: ' + config.prefix + 'search p```');
         }
     }
 
@@ -506,19 +487,19 @@ export default class Player {
                         }
                     }
                     else {
-                        message.channel.send(`> Choisissez un chiffre compris entre 1 et ${choiceArray.length}`);
+                        message.channel.send(`❌ Choisissez un chiffre compris entre 1 et ${choiceArray.length}`);
                     }
                 }
                 else {
-                    message.channel.send(`> Aucune ${type} enregistrée dans la recherche`);
+                    message.channel.send(`❌ Aucune ${type} enregistrée dans la recherche`);
                 }
             }
             else {
-                message.channel.send('> Vous devez écrire un chiffre après le mot search !');
+                message.channel.send('❌ Vous devez écrire un chiffre après le mot search !');
             }
         }
         else {
-            message.channel.send('> Vous devez être connecté dans un salon !');
+            message.channel.send('❌ Vous devez être connecté dans un salon !');
         }
     }
 
@@ -531,11 +512,11 @@ export default class Player {
                 this.makeAndSendSearchListArray(message, musicExist, playlistExist);
             }
             else {
-                message.channel.send('> Aucune musique enregistrée dans la recherche');
+                message.channel.send('❌ Aucune musique enregistrée dans la recherche');
             }
         }
         else {
-            message.channel.send('> Vous devez être connecté dans un salon !');
+            message.channel.send('❌ Vous devez être connecté dans un salon !');
         }
     }
 
@@ -543,41 +524,41 @@ export default class Player {
         let resultChoices = '';
         if (musicExist && playlistExist) {
             // Send music and playlist array as string
-            resultChoices += '> **Musiques** \n';
-            searchVideo[message.guild.id]['array'].map((song, index) => {
-                resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n';
-            });
+            resultChoices += this.makeSearchVideoOrPlaylistString(message, 'video');
             resultChoices += '> \n';
-            resultChoices += '> **Playlists** \n';
-            searchPlaylist[message.guild.id]['array'].map((song, index) => {
-                resultChoices += '> **' + (index + 1) + '**. ' + song.title + '(' + song.plLength + ')\n';
-            });
+            resultChoices += this.makeSearchVideoOrPlaylistString(message, 'playlist');
             const countChoices = searchPlaylist[message.guild.id]['array'].length + searchVideo[message.guild.id]['array'].length;
             message.channel.send(`> **Faites un choix parmi les ${countChoices} ci-dessous.** \n > **Ex: ${config.prefix}search p 2** \n > **Ex: ${config.prefix}search pl 1** \n > \n ${resultChoices}`);
         }
         else if (musicExist && !playlistExist) {
             // Send music array as string and add reaction for selection
-            resultChoices += '> **Musiques** \n';
-            searchVideo[message.guild.id]['array'].map((song, index) => {
-                resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n';
-            });
+            resultChoices += this.makeSearchVideoOrPlaylistString(message, 'video');
             message.channel.send(`> **Écrivez ou sélectionnez une musique parmi les ${searchVideo[message.guild.id]['array'].length} ci-dessous.** \n > **Ex: ${config.prefix}search p 2** \n > \n ${resultChoices}`)
                 .then(newMessage => this.addSearchReactions(newMessage));
         }
         else {
             // Send playlist array as string and add reaction for selection
-            resultChoices += '> **Playlists** \n';
-            searchPlaylist[message.guild.id]['array'].map((song, index) => {
-                if (song.plLength) {
-                    resultChoices += '> **' + (index + 1) + '**. ' + song.title + ' (' + song.plLength + ')\n';
-                }
-                else {
-                    resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n';
-                }
-            });
+            resultChoices += this.makeSearchVideoOrPlaylistString(message, 'playlist');
             message.channel.send(`> **Écrivez ou sélectionnez une playlist parmi les ${searchPlaylist[message.guild.id]['array'].length} ci-dessous.** \n > **Ex: ${config.prefix}search pl 1** \n > \n ${resultChoices}`)
                 .then(newMessage => this.addSearchReactions(newMessage));
         }
+    }
+
+    makeSearchVideoOrPlaylistString(message, type) {
+        let resultChoices = '';
+        if (type === 'video') {
+            resultChoices += '> **Musiques** \n';
+            searchVideo[message.guild.id]['array'].map((song, index) => {
+                resultChoices += '> **' + (index + 1) + '**. ' + song.title + '\n';
+            });
+        }
+        else {
+            resultChoices += '> **Playlists** \n';
+            searchPlaylist[message.guild.id]['array'].map((song, index) => {
+                resultChoices += '> **' + (index + 1) + '**. ' + song.title + ' (' + song.plLength + ')\n';
+            });
+        }
+        return resultChoices;
     }
 
     playSong(message) {
@@ -626,7 +607,7 @@ export default class Player {
         playlistInfos[message.guild.id]['error'] = true;
         console.log('e message : ', e.message);
         if (e.message.indexOf('This video contains content') !== -1) {
-            message.channel.send('> Vidéo bloquée par droit d\'auteur : `' + playlistInfos[message.guild.id][0].title + '`');
+            message.channel.send('❌ Vidéo bloquée par droit d\'auteur : `' + playlistInfos[message.guild.id][0].title + '`');
             this.next(message);
         }
         else {
@@ -654,9 +635,9 @@ export default class Player {
                 if (musicParams.loop[message.guild.id] || musicParams.nextSetLoop[message.guild.id]) {
                     delete musicParams.loop[message.guild.id];
                     delete musicParams.nextSetLoop[message.guild.id];
-                    message.channel.send('> Mode répétition désactivé');
+                    message.channel.send('▶️ Mode répétition désactivé');
                 }
-                message.channel.send('> Plus de musique en file d\'attente');
+                message.channel.send('🎵 Plus de musique en file d\'attente');
             }
             else {
                 // If loop is activate and command 'next' is called
@@ -675,7 +656,7 @@ export default class Player {
         const musicLink = type === 'video' ? `[${embedObj.title}](https://www.youtube.com/watch?v=${embedObj.id})` : `[${embedObj.title}](https://www.youtube.com/playlist?list=${embedObj.id})`;
         const color = added[0] ? 3768896 : 5520025;
         const title = added[0] && added[1] > 1 ? 'Playlist ajoutée' : added[0] ? 'Musique ajoutée' : 'Musique';
-        const authorUrl = title.indexOf('ajoutée') !== -1 ? '/public/img/music_add.png' : '/public/mg/embed_music.png';
+        const authorUrl = title.indexOf('ajoutée') !== -1 ? 'https://syxbot.com/img/music_add.png' : 'https://syxbot.com/img/embed_music.png';
         // Calculate the queued duration and save as formatted string
         if (playlistArray[message.guild.id].length >= 2) {
             playlistInfos[message.guild.id].map((video, index) => {
@@ -701,14 +682,14 @@ export default class Player {
     }
 
     getPlaylist(message, words, playSongParams, byReaction) {
-        message.channel.send('> Ajout de la playlist en cours ...');
+        message.channel.send('🛠 Ajout de la playlist en cours ...');
         // Call playlist API
         ytpl(words[1], { limit: 0 }, (err, playlist) => {
             if (playlist) {
                 this.addPlaylistItems(message, playlist, playSongParams, byReaction);
             }
             else {
-                message.channel.send('> Une erreur s\'est produite #2');
+                message.channel.send('❌ Une erreur s\'est produite #2');
             }
         });
     }
@@ -776,12 +757,7 @@ export default class Player {
         });
         const deletedVideo = playlist.total_items - pushCount;
         if (deletedVideo >= 1) {
-            if (deletedVideo === 1) {
-                message.channel.send('> ' + deletedVideo + ' vidéo supprimée');
-            }
-            else {
-                message.channel.send('> ' + deletedVideo + ' vidéos supprimées');
-            }
+            message.channel.send('❓ ' + deletedVideo + (deletedVideo === 1 ? ' vidéo supprimée' : ' vidéos supprimées'));
         }
     }
 
@@ -840,11 +816,11 @@ export default class Player {
                     this.setMusicArrayAndPlayMusic(infos, message, playSongParams, byReaction);
                 }
                 else {
-                    message.channel.send('> Cette vidéo n\'est pas disponible !');
+                    message.channel.send('❌ Cette vidéo n\'est pas disponible !');
                 }
             }
             else {
-                message.channel.send('> Une erreur s\'est produite');
+                message.channel.send('❌ Une erreur s\'est produite');
             }
         });
     }
@@ -934,11 +910,11 @@ export default class Player {
                     if (playlistInfos[message.guild.id].length >= 10) {
                         howToSay = 'nombre';
                     }
-                    message.channel.send(`> Choisissez un ${howToSay} compris entre 1 et ${playlistInfos[message.guild.id].length - 1}`);
+                    message.channel.send(`❌ Choisissez un ${howToSay} compris entre 1 et ${playlistInfos[message.guild.id].length - 1}`);
                 }
             }
             else {
-                message.channel.send('> Aucune musique dans la file d\'attente');
+                message.channel.send('❌ Aucune musique dans la file d\'attente');
             }
         }
     }
@@ -963,7 +939,7 @@ export default class Player {
                 });
             }
             else {
-                message.channel.send('> Aucune musique dans la file d\'attente');
+                message.channel.send('❌ Aucune musique dans la file d\'attente');
             }
         }
     }
@@ -1002,20 +978,20 @@ export default class Player {
                             this.removeSelectedSongs(message, selection);
                         }
                         else {
-                            message.channel.send('> Veuillez n\'écrire que 2 index maximum.```Ex: ' + config.prefix + 'p remove 15-20```');
+                            message.channel.send('❌ Veuillez n\'écrire que 2 index maximum.```Ex: ' + config.prefix + 'p remove 15-20```');
                         }
                     }
                     else {
-                        message.channel.send('> Vous devez sélectionner la/les musique(s) à supprimé');
+                        message.channel.send('❌ Vous devez sélectionner la/les musique(s) à supprimé');
                     }
                 }
                 else {
-                    message.channel.send('> Aucune musique dans la file d\'attente');
+                    message.channel.send('❌ Aucune musique dans la file d\'attente');
                 }
             }
         }
         else {
-            message.channel.send('> Vous devez être connecté dans un salon !');
+            message.channel.send('❌ Vous devez être connecté dans un salon !');
         }
 
     }
@@ -1036,11 +1012,11 @@ export default class Player {
                     this.sendRemoveEmbed(message, (selectOne - selectZero) + 1);
                 }
                 else {
-                    message.channel.send('> Sélectionnez des musiques compris entre 1 et ' + playlistArray[message.guild.id].length - 1);
+                    message.channel.send('❌ Sélectionnez des musiques compris entre 1 et ' + playlistArray[message.guild.id].length - 1);
                 }
             }
             else {
-                message.channel.send('> Le 2ème index doit être plus grand que le premier !');
+                message.channel.send('❌ Le 2ème index doit être plus grand que le premier !');
             }
         }
         else if (selectZero && selectZero > 0 && selectZero < playlistArray[message.guild.id].length) {
@@ -1052,7 +1028,7 @@ export default class Player {
             this.sendRemoveEmbed(message, 1);
         }
         else {
-            message.channel.send('> Sélectionnez une musique compris entre 1 et ' + playlistArray[message.guild.id].length - 1);
+            message.channel.send('❌ Sélectionnez une musique compris entre 1 et ' + playlistArray[message.guild.id].length - 1);
         }
     }
 
@@ -1121,20 +1097,20 @@ export default class Player {
                             this.playSong(message);
                         }
                         else {
-                            message.channel.send('> Sélectionnez une musique compris entre 1 et ' + (playlistArray[message.guild.id].length - 1));
+                            message.channel.send('❌ Sélectionnez une musique compris entre 1 et ' + (playlistArray[message.guild.id].length - 1));
                         }
                     }
                     else {
-                        message.channel.send('> Aucune musique dans la file d\'attente');
+                        message.channel.send('❌ Aucune musique dans la file d\'attente');
                     }
                 }
                 else {
-                    message.channel.send('> Sélectionnez l\'index d\'une musique.```Ex: ' + config.prefix + 'go 12```');
+                    message.channel.send('❌ Sélectionnez l\'index d\'une musique.```Ex: ' + config.prefix + 'go 12```');
                 }
             }
         }
         else {
-            message.channel.send('> Vous devez être connecté dans un salon !');
+            message.channel.send('❌ Vous devez être connecté dans un salon !');
         }
     }
 
@@ -1143,27 +1119,14 @@ export default class Player {
         const queuedLength = playlistArray[message.guild.id].length - 1;
         // #952716 | Rouge | Decimal value
         const color = 9774870;
-        message.channel.send({
-            'embed': {
-                'color': color,
-                'author': {
-                    'name': title,
-                    'icon_url': 'https://syxbot.com/img/removed_music.png'
-                },
-                'fields': [
-                    {
-                        'name': 'Nombre',
-                        'value': number,
-                        'inline': true
-                    },
-                    {
-                        'name': 'File d\'attente',
-                        'value': queuedLength,
-                        'inline': true
-                    }
-                ]
-            }
-        });
+        const embed = new Discord.MessageEmbed()
+            .setAuthor(title, 'https://syxbot.com/img/removed_music.png')
+            .setColor(color)
+            .setFooter('"' + config.prefix + 'p list" pour afficher la file d\'attente')
+            .addField('Nombre', number, true)
+            .addBlankField(true)
+            .addField('File d\'attente', queuedLength, true);
+        message.channel.send({ embed });
     }
 
     static stop(message, leave = true) {
@@ -1190,7 +1153,7 @@ export default class Player {
                 delete musicParams.tryToNext[message.guild.id];
             }
             else {
-                message.channel.send('> Aucune musique en file d\'attente');
+                message.channel.send('❌ Aucune musique en file d\'attente');
             }
 
         }
@@ -1203,7 +1166,7 @@ export default class Player {
                 streamsArray[message.guild.id].pause(true);
             }
             else {
-                message.channel.send('> Aucune musique en cours d\'écoute');
+                message.channel.send('❌ Aucune musique en cours d\'écoute');
             }
         }
     }

@@ -85,14 +85,14 @@ export default class Helper {
             }
             else {
                 if (sendMessage) {
-                    message.channel.send('> Vous n\'êtes pas dans le même salon que le bot !');
+                    message.channel.send('❌ Vous n\'êtes pas dans le même salon que le bot !');
                 }
                 return false;
             }
         }
         else {
             if (sendMessage) {
-                message.channel.send('> Je ne suis pas connecté dans un salon !');
+                message.channel.send('❌ Je ne suis pas connecté dans un salon !');
             }
             return false;
         }
