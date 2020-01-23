@@ -670,7 +670,7 @@ export default class Player {
         const embed = new Discord.MessageEmbed()
             .setAuthor(title, authorUrl)
             .setColor(color)
-            .setFooter('"' + config.prefix + 'p list" pour afficher la file d\'attente')
+            .setFooter('🎶 "' + config.prefix + 'p list" pour afficher la file d\'attente')
             .setThumbnail(embedObj.thumbnail)
             .addField('Titre', musicLink, true)
             .addBlankField(true)
@@ -1122,7 +1122,7 @@ export default class Player {
         const embed = new Discord.MessageEmbed()
             .setAuthor(title, 'https://syxbot.com/img/removed_music.png')
             .setColor(color)
-            .setFooter('"' + config.prefix + 'p list" pour afficher la file d\'attente')
+            .setFooter('🎶 "' + config.prefix + 'p list" pour afficher la file d\'attente')
             .addField('Nombre', number, true)
             .addBlankField(true)
             .addField('File d\'attente', queuedLength, true);
@@ -1144,7 +1144,7 @@ export default class Player {
             else {
                 musicParams.wait[message.guild.id] = true;
             }
-            if (leave || playlistArray[message.guild.id] && playlistArray[message.guild.id].lengh) {
+            if (leave || playlistArray[message.guild.id] && playlistArray[message.guild.id].length) {
                 delete streamsArray[message.guild.id];
                 delete playlistArray[message.guild.id];
                 delete playlistInfos[message.guild.id];
@@ -1152,21 +1152,20 @@ export default class Player {
                 delete musicParams.loop[message.guild.id];
                 delete musicParams.tryToNext[message.guild.id];
             }
-            else {
+            else if (!playlistArray[message.guild.id] && !radioPlayed[message.guild.id]) {
                 message.channel.send('❌ Aucune musique en file d\'attente');
             }
-
         }
     }
 
     static pause(message) {
         const userChannel = Helper.take_user_voiceChannel(message);
         if (Helper.verifyBotLocation(message, connectedGuild[message.guild.id], userChannel)) {
-            if (streamsArray[message.guild.id]) {
-                streamsArray[message.guild.id].pause(true);
-            }
-            else {
+            if (!playlistArray[message.guild.id] && !radioPlayed[message.guild.id]) {
                 message.channel.send('❌ Aucune musique en cours d\'écoute');
+            }
+            else if (streamsArray[message.guild.id]) {
+                streamsArray[message.guild.id].pause(true);
             }
         }
     }
@@ -1174,7 +1173,10 @@ export default class Player {
     static resume(message) {
         const userChannel = Helper.take_user_voiceChannel(message);
         if (Helper.verifyBotLocation(message, connectedGuild[message.guild.id], userChannel)) {
-            if (streamsArray[message.guild.id]) {
+            if (!playlistArray[message.guild.id] && !radioPlayed[message.guild.id]) {
+                message.channel.send('❌ Aucune musique en cours d\'écoute');
+            }
+            else if (streamsArray[message.guild.id]) {
                 streamsArray[message.guild.id].resume();
             }
         }
@@ -1191,6 +1193,9 @@ export default class Player {
                 }
                 streamsArray[message.guild.id].destroy();
                 this.setArrays(message, connectionsArray[message.guild.id]);
+            }
+            else {
+                message.channel.send('❌ Aucune musique en file d\'attente');
             }
         }
     }

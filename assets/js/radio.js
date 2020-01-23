@@ -157,7 +157,7 @@ export default class Radio {
         }
     }
 
-    connectRadio(message, words) {
+    connectRadio(message, words, retry = false) {
         const radioLink = this.getRadioLink(words[1].toLowerCase());
         const voiceChannel = Helper.take_user_voiceChannel(message);
         if (voiceChannel) {
@@ -166,25 +166,42 @@ export default class Radio {
             Player.removeArray(message, 'loop');
             Player.setArray(message, 'radio', true);
             if (!Player.getArray(message, 'connected')) {
-                voiceChannel.join()
-                    .then(connection => {
-                        this.sendRadioEmbed(message, words[1].toLowerCase());
-                        Player.setArray(message, 'connections', connection);
-                        Player.setArray(message, 'connected', voiceChannel.id);
-                        Player.setArray(message, 'streams', Player.getArray(message, 'connections').play(radioLink).setVolume(0.4));
-                    });
+                this.joinChannelAndPlayRadio(message, words, voiceChannel, radioLink, retry);
             }
             else if (Helper.verifyBotLocation(message, Player.getArray(message, 'connected'), voiceChannel)) {
-                this.sendRadioEmbed(message, words[1].toLowerCase());
+                if (!retry) {
+                    this.sendRadioEmbed(message, words[1].toLowerCase());
+                }
                 Player.removeArray(message, 'playlistArray');
                 Player.removeArray(message, 'playlistInfos');
                 Player.streamDestroy(message);
-                Player.setArray(message, 'streams', Player.getArray(message, 'connections').play(radioLink).setVolume(0.4));
+                const radioStream = Player.getArray(message, 'connections').play(radioLink);
+                radioStream.setVolume(0.4);
+                Player.setArray(message, 'streams', radioStream);
             }
         }
         else {
             message.channel.send('❌ Vous devez être connecté dans un salon !');
         }
+    }
+
+    joinChannelAndPlayRadio(message, words, voiceChannel, radioLink, retry) {
+        voiceChannel.join()
+            .then(connection => {
+                if (!retry) {
+                    this.sendRadioEmbed(message, words[1].toLowerCase());
+                }
+                Player.setArray(message, 'connections', connection);
+                Player.setArray(message, 'connected', voiceChannel.id);
+                const radioStream = Player.getArray(message, 'connections').play(radioLink);
+                radioStream.setVolume(0.4);
+                Player.setArray(message, 'streams', radioStream);
+            })
+            .catch(() => {
+                setTimeout(() => {
+                    this.connectRadio(message, words, true);
+                }, 1500);
+            });
     }
 
     sendRadioEmbed(message, radioTitle) {
@@ -199,8 +216,8 @@ export default class Radio {
         const embed = new Discord.MessageEmbed()
             .setAuthor('Radio', 'https://syxbot.com/img/radio_icon.png')
             .setColor(color)
-            .setFooter('"' + config.prefix + 'radio list" pour afficher les radios disponibles')
-            .setThumbnail(`/public/img/radio/${radioTitle}.png`)
+            .setFooter('📻 "' + config.prefix + 'radio list" pour afficher les radios disponibles')
+            .setThumbnail(`https://syxbot.com/img/radio/${radioTitle}.png`)
             .addField('Nom de la radio', radioName, true);
         message.channel.send({ embed });
     }

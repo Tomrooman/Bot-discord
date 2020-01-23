@@ -109,6 +109,9 @@ function disconnectBotFromOldChannel() {
                             channel.join()
                                 .then(connection => {
                                     connection.channel.leave();
+                                })
+                                .catch(e => {
+                                    console.log('error while disconnecting at start : ', e.message);
                                 });
                         }
                     });
