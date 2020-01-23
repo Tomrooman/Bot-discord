@@ -978,7 +978,7 @@ export default class Player {
                             this.removeSelectedSongs(message, selection);
                         }
                         else {
-                            message.channel.send('❌ Veuillez n\'écrire que 2 index maximum.```Ex: ' + config.prefix + 'p remove 15-20```');
+                            message.channel.send('❌ Écrivez 2 index maximum.```Ex: ' + config.prefix + 'p remove 15-20```');
                         }
                     }
                     else {
