@@ -5,6 +5,7 @@ import Level from './level.js';
 import Helper from './helper.js';
 import Custom from './custom.js';
 import Admin from './admin.js';
+import Settings from './settings.js';
 
 export default function controller(message, prefix, bot) {
     const words = message.content.substr(prefix.length, message.content.length - prefix.length).split(' ');
@@ -13,6 +14,9 @@ export default function controller(message, prefix, bot) {
         if (command === 'play' || command === 'playlist' || command === 'p' || command === 'pl' ||
             command === 'search' || command === 'go' || command === 'next') {
             new Player(message, command, words);
+        }
+        else if (command === 'set') {
+            new Settings(message, words);
         }
         else if (command === 'repeat') {
             Player.toggleLoop(message);

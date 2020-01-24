@@ -757,7 +757,7 @@ export default class Player {
         });
         const deletedVideo = playlist.total_items - pushCount;
         if (deletedVideo >= 1) {
-            message.channel.send('❓ ' + deletedVideo + (deletedVideo === 1 ? ' vidéo supprimée' : ' vidéos supprimées'));
+            message.channel.send('🗑 ' + deletedVideo + (deletedVideo === 1 ? ' vidéo supprimée' : ' vidéos supprimées'));
         }
     }
 

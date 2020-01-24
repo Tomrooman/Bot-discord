@@ -24,8 +24,8 @@ export default class RadioPlayer extends React.Component {
                 const radioUrl = e.target.value;
                 const index = e.target.getAttribute('index');
                 const radioName = e.target.innerHTML;
-                this.props.setRadioArgs('?radio=' + index + '&play=true&volume=' + $('audio')[0].volume);
                 this.setRadioSourceAndInfos(imagePath, radioUrl, index, radioName, $('audio')[0].volume);
+                this.props.setRadioArgs('?radio=' + index + '&play=true&volume=' + $('audio')[0].volume);
             });
         }
         this.setPauseHandler();
@@ -38,7 +38,7 @@ export default class RadioPlayer extends React.Component {
             const imagePath = $('#radio_choices')[0].children[index].getAttribute('image');
             const radioUrl = $('#radio_choices')[0].children[index].value;
             const radioName = $('#radio_choices')[0].children[index].innerHTML;
-            const volume = parsedUrl.searchParams.get('volume') || 0;
+            const volume = parsedUrl.searchParams.get('volume') || 0.2;
             this.setRadioSourceAndInfos(imagePath, radioUrl, index, radioName, volume);
             this.props.setRadioArgs('?radio=' + index + '&play=true&volume=' + volume);
             if (playArg === 'false') {
@@ -48,11 +48,14 @@ export default class RadioPlayer extends React.Component {
                 });
             }
         }
+        else {
+            $('audio')[0].volume = 0.2;
+        }
     }
 
     setRadioSourceAndInfos(imagePath, radioUrl, index, radioName, volume) {
         $('.icon_figure')[0].style.display = '';
-        $('audio')[0].volume = volume === 0 ? 0.2 : volume;
+        $('audio')[0].volume = volume;
         const radioImg = document.createElement('img');
         radioImg.src = imagePath;
         $('.icon_figure')[0].innerHTML = '';
@@ -96,7 +99,7 @@ export default class RadioPlayer extends React.Component {
         return (
             <div className='radio_player'>
                 <figure className='icon_figure'>
-                    <img src='/img/nrj.png' alt='radio_img' />
+                    <img src='#' alt='radio_img' />
                 </figure>
                 <figure className='radio_figure'>
                     <audio controls autoPlay />
