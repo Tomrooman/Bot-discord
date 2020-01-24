@@ -9,13 +9,16 @@ export default class Message {
             this.remove(message, parseInt(words[1]));
         }
         else {
-            message.channel.send('❌ Vous devez écrire le nombre de messages que vous voulez supprimé.');
+            message.channel.send('❌ Vous devez écrire le nombre de messages que vous voulez supprimer.');
         }
     }
 
     remove(message, howMany) {
         if (howMany > 99) {
             message.channel.send('❌ Écrivez un chiffre inférieur ou égal à 99');
+        }
+        else if (removeInfos[message.guild.id]) {
+            message.channel.send('❌ Vous devez attendre la confirmation de suppression des messages');
         }
         else {
             removeInfos[message.guild.id] = 0;
@@ -47,7 +50,7 @@ export default class Message {
                                 }
                             })
                             .catch((e) => {
-                                console.log('Erreur de suppression du message : ', e);
+                                console.log('Erreur de suppression du message : ', e.message);
                             });
                     }));
             })
