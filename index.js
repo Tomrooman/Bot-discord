@@ -1,9 +1,9 @@
 import Discord from 'discord.js';
-import Controller from './assets/js/controller.js';
-import Level from './assets/js/level.js';
+import Controller from './lib/js/controller.js';
+import Level from './lib/js/level.js';
+import Helper from './lib/js/helper.js';
+import Player from './lib/js/player.js';
 import config from './config.json';
-import Helper from './assets/js/helper.js';
-import Player from './assets/js/player.js';
 // const mongoose = require('mongoose');
 const bot = new Discord.Client();
 
