@@ -1,25 +1,32 @@
 import Discord from 'discord.js';
+import dateFormat from 'dateformat';
 import Controller from './lib/js/controller.js';
 import Level from './lib/js/level.js';
 import Helper from './lib/js/helper.js';
 import Player from './lib/js/player.js';
+import Settings from './lib/js/settings.js';
 import config from './config.json';
 // const mongoose = require('mongoose');
 const bot = new Discord.Client();
 
 // connectToDatabase();
-console.log('----- Starting -----');
-bot.login(config.token);
+console.log(' ');
+console.log('----- ' + dateFormat(Date.now(), 'HH:MM:ss dd/mm/yyyy') + ' -----');
+
+updateSettings();
+
 
 bot.on('ready', () => {
     disconnectBotFromOldChannel();
-    console.log('----- Connected ' + config.WHAT + ' -----');
-    console.log('Connected guilds : ', bot.guilds.size);
+    bot.user.setActivity('!!help | https://syxbot.com/docs', { type: 'PLAYING' })
+        .catch(e => console.log('Error while set presence : ', e.message));
+    console.log(' - Connected : ' + config.WHAT);
+    console.log(' - Connected guilds : ', bot.guilds.size);
 });
 
 bot.on('message', (message) => {
     if (message.type === 'GUILD_MEMBER_JOIN' && message.author.id === config.clientId) {
-        message.channel.send('> Mon préfix est : `' + config.prefix + '` \n > Pour afficher la liste des commandes faites : `' + config.prefix + 'help`');
+        message.channel.send('🖐 **Salut !** 🖐\n\n🔑 Mon préfix est : `' + config.prefix + '` \n❓ Pour afficher la liste des commandes faites : `' + config.prefix + 'help`');
     }
     else if (message.content.toLowerCase().startsWith(config.prefix) && message.content.indexOf('!!!') === -1) {
         Controller(message, config.prefix, bot);
@@ -85,6 +92,7 @@ function getSelectionByReaction(reaction) {
 }
 
 // function connectToDatabase() {
+//     console.log('----- Starting -----');
 //     console.log('Connecting to database ...');
 //     mongoose.connect('mongodb://localhost/syxbot-database', {
 //         useNewUrlParser: true,
@@ -97,6 +105,25 @@ function getSelectionByReaction(reaction) {
 //         bot.login(config.token);
 //     });
 // }
+
+function updateSettings() {
+    Settings.update()
+        .then(res => {
+            if (res) {
+                console.log('Connecting syxbot ...');
+                bot.login(config.token);
+            }
+            else {
+                setTimeout(() => {
+                    updateSettings();
+                }, 1000);
+            }
+        })
+        .catch((e) => {
+            console.log('Index error while update settings : ', e.message);
+            updateSettings();
+        });
+}
 
 function disconnectBotFromOldChannel() {
     console.log('Disconnecting from all channels ...');
@@ -119,7 +146,7 @@ function disconnectBotFromOldChannel() {
             }
         });
     });
-    console.log('Disconnected from all channels !');
+    console.log(' - Disconnected from all channels !');
 }
 
 process.on('SIGINT', () => {
