@@ -112,12 +112,10 @@ function getSelectionByReaction(reaction) {
 //     const oldUserChannel = oldMember.channelID;
 //     if (!oldUserChannel && newUserChannel) {
 //         // User Joins a voice channel
-//         console.log('Joined channel !');
-//         newMember.channel.members.map(member => {
-//             if (member.bot && member.id === config.clientId) {
-//                 console.log('syxbot in the new channel');
-//             }
-//         });
+//         console.log('Joined channel ! : ', newMember);
+//         if (checkBot(newMember)) {
+//             console.log('Joined channel with bot in there');
+//         }
 //     }
 //     else if (oldUserChannel && !newUserChannel) {
 //         // User disconnect a voice channel
@@ -126,12 +124,32 @@ function getSelectionByReaction(reaction) {
 //     else if (oldUserChannel !== newUserChannel) {
 //         // User change channel
 //         console.log('User change channel');
+//         if (checkBot(newMember)) {
+//         }
 //     }
 // });
 
+// function checkBot(memberParam) {
+//     let pass = false;
+//     memberParam.channel.members.map(member => {
+//         console.log('member : ', member.user.bot);
+//         console.log('member id : ', member.id);
+//         if (member.user.bot && member.id === config.clientId) {
+//             console.log('syxbot in the channel');
+//             pass = true;
+//         }
+//     });
+//     return pass;
+// }
+
 // bot.on('guildMemberSpeaking', (user, speaking) => {
-//     console.log('Speaking : ', speaking);
-//     new Speech(user);
+//     if (speaking) {
+//         console.log('Speaking');
+//         new Speech(user, bot);
+//     }
+//     else {
+//         return console.log('not speaking');
+//     }
 // });
 
 function updateSettings() {
