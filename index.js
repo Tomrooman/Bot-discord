@@ -6,6 +6,7 @@ import Helper from './lib/js/helper.js';
 import Player from './lib/js/player.js';
 import Settings from './lib/js/settings.js';
 import config from './config.json';
+// import Speech from './lib/js/speech.js';
 // const mongoose = require('mongoose');
 const bot = new Discord.Client();
 
@@ -105,6 +106,33 @@ function getSelectionByReaction(reaction) {
 //         bot.login(config.token);
 //     });
 // }
+
+// bot.on('voiceStateUpdate', (oldMember, newMember) => {
+//     const newUserChannel = newMember.channelID;
+//     const oldUserChannel = oldMember.channelID;
+//     if (!oldUserChannel && newUserChannel) {
+//         // User Joins a voice channel
+//         console.log('Joined channel !');
+//         newMember.channel.members.map(member => {
+//             if (member.bot && member.id === config.clientId) {
+//                 console.log('syxbot in the new channel');
+//             }
+//         });
+//     }
+//     else if (oldUserChannel && !newUserChannel) {
+//         // User disconnect a voice channel
+//         console.log('Disconnect channel !');
+//     }
+//     else if (oldUserChannel !== newUserChannel) {
+//         // User change channel
+//         console.log('User change channel');
+//     }
+// });
+
+// bot.on('guildMemberSpeaking', (user, speaking) => {
+//     console.log('Speaking : ', speaking);
+//     new Speech(user);
+// });
 
 function updateSettings() {
     Settings.update()

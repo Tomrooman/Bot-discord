@@ -18,14 +18,13 @@ export default class RadioPlayer extends React.Component {
             radioCookie: cookies.get('syxbot_doc') || {}
         };
         this.createRadiosArray();
+        this.handlePlay = this.handlePlay.bind(this);
+        this.handlePause = this.handlePause.bind(this);
+        this.handleVolumeChange = this.handleVolumeChange.bind(this);
     }
 
     componentDidMount() {
         $('.icon_figure')[0].style.display = 'none';
-        this.setClickHandler();
-        this.setPauseHandler();
-        this.setPlayHandler();
-        this.setVolumeHandler();
         const index = this.state.radioCookie.radio;
         const playArg = this.state.radioCookie.play;
         if (index) {
@@ -37,7 +36,7 @@ export default class RadioPlayer extends React.Component {
             if (!playArg) {
                 $('audio')[0].removeAttribute('autoPlay');
                 this.setState({
-                    dropdown_title: radioName
+                    dropdown_title: radioName.indexOf('&amp;') !== -1 ? radioName.split('&amp;').join(' & ') : radioName
                 });
             }
         }
@@ -78,17 +77,10 @@ export default class RadioPlayer extends React.Component {
         ];
     }
 
-    setClickHandler() {
-        for (let i = 0; i < $('#radio_choices').children().length; i++) {
-            $('#radio_choices')[0].children[i].addEventListener('click', (e) => {
-                const imagePath = e.target.getAttribute('image');
-                const radioUrl = e.target.value;
-                const index = e.target.getAttribute('index');
-                const radioName = e.target.innerHTML;
-                this.setRadioSourceAndInfos(imagePath, radioUrl, index, radioName, $('audio')[0].volume);
-                this.setRadioCookie(true, index, $('audio')[0].volume);
-            });
-        }
+    handleClick(image, url, index, radio) {
+        this.setRadioSourceAndInfos(image, url, index, radio, $('audio')[0].volume);
+        this.setRadioCookie(true, index, $('audio')[0].volume);
+        $('audio')[0].play();
     }
 
     setRadioSourceAndInfos(imagePath, radioUrl, index, radioName, volume) {
@@ -106,38 +98,35 @@ export default class RadioPlayer extends React.Component {
         });
     }
 
-    setVolumeHandler() {
-        $('audio')[0].addEventListener('volumechange', () => {
-            if ($('audio')[0].paused) {
-                this.setRadioCookie(false, this.state.index, $('audio')[0].volume);
-            }
-            else {
-                this.setRadioCookie(true, this.state.index, $('audio')[0].volume);
-            }
-        });
-    }
-
-    setPauseHandler() {
-        $('audio')[0].addEventListener('pause', () => {
+    handleVolumeChange() {
+        if ($('audio')[0].paused) {
             this.setRadioCookie(false, this.state.index, $('audio')[0].volume);
-        });
+        }
+        else {
+            this.setRadioCookie(true, this.state.index, $('audio')[0].volume);
+        }
     }
 
-    setPlayHandler() {
-        $('audio')[0].addEventListener('play', () => {
-            this.setState({
-                dropdown_title: this.state.radioName
-            });
-            this.setRadioCookie(true, this.state.index, $('audio')[0].volume);
+    handlePause() {
+        this.setRadioCookie(false, this.state.index, $('audio')[0].volume);
+    }
+
+    handlePlay() {
+        this.setState({
+            dropdown_title: this.state.radioName.indexOf('&amp;') !== -1 ? this.state.radioName.split('&amp;').join(' & ') : this.state.radioName
         });
+        this.setRadioCookie(true, this.state.index, $('audio')[0].volume);
     }
 
     setRadioCookie(play, radio, volume) {
-        cookies.set('syxbot_doc', {
-            play: play,
-            radio: radio,
-            volume: volume
-        });
+        const radioCookie = cookies.get('syxbot_doc');
+        if (!radioCookie || (radioCookie && (radioCookie.play !== play || radioCookie.radio !== radio || radioCookie.volume !== volume))) {
+            cookies.set('syxbot_doc', {
+                play: play,
+                radio: radio,
+                volume: volume
+            });
+        }
     }
 
     render() {
@@ -147,7 +136,13 @@ export default class RadioPlayer extends React.Component {
                     <img src='#' alt='radio_img' />
                 </figure>
                 <figure className='radio_figure'>
-                    <audio controls autoPlay />
+                    <audio
+                        controls
+                        autoPlay
+                        onPlay={this.handlePlay}
+                        onPause={this.handlePause}
+                        onVolumeChange={this.handleVolumeChange}
+                    />
                     <figcaption>
                         <div className='dropdown'>
                             <button type='button' className='radio_select btn btn-secondary dropdown-toggle' id='dropdownMenu2' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
@@ -162,6 +157,7 @@ export default class RadioPlayer extends React.Component {
                                             image={obj.image}
                                             index={index}
                                             key={index}
+                                            onClick={() => this.handleClick(obj.image, obj.url, index, obj.name)}
                                         >
                                             {obj.name}
                                         </button>

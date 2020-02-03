@@ -47,7 +47,9 @@ export default class Sidebar extends React.Component {
             { name: 'Remove', icon: 'eraser' },
             { name: 'Clear', icon: 'trash-alt' },
             { name: 'Search', icon: 'search' },
-            { name: 'Radio', icon: 'rss' }
+            { name: 'Radio', icon: 'rss' },
+            { name: 'Current', icon: 'music' },
+            { name: 'Settings', icon: 'cogs' }
         ];
     }
 

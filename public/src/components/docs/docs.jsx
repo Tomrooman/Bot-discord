@@ -9,9 +9,11 @@ import Sidebar from './sidebar/sidebar.jsx';
 import RadioPlayer from './radio/radio.jsx';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faMusic, faCogs } from '@fortawesome/free-solid-svg-icons';
 import './docs.css';
 library.add(faCheck);
+library.add(faMusic);
+library.add(faCogs);
 
 export default class Docs extends React.Component {
     constructor(props) {
@@ -50,7 +52,9 @@ export default class Docs extends React.Component {
             { name: 'Remove', icon: 'eraser', description: 'Supprime le nombre de message désiré.' },
             { name: 'Clear', icon: 'trash-alt', description: 'Supprime tout les messages chargés du salon.' },
             { name: 'Search', icon: 'search', description: 'Affiche la liste des résultats d\'une recherche, sélectionne un des résultats.' },
-            { name: 'Radio', icon: 'rss', description: 'Permet d\'écouter la radio en la sélectionnant par son nom.' }
+            { name: 'Radio', icon: 'rss', description: 'Permet d\'écouter la radio en la sélectionnant par son nom.' },
+            { name: 'Current', icon: 'music', description: 'Affiche la musique en cours d\'écoute.' },
+            { name: 'Settings', icon: 'cogs', description: 'Permet de régler les notifications et le volume.' }
         ];
     }
 
