@@ -112,6 +112,10 @@
             "error",
             "single"
         ],
+        "operator-linebreak": [
+            2,
+            "after"
+        ],
         "semi": [
             "error",
             "always"

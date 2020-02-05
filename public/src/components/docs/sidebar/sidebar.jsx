@@ -120,7 +120,11 @@ export default class Sidebar extends React.Component {
                             Me contacter
                         </a>
                     </li>
-
+                    <a href='/'>
+                        <h6 className='website-btn'>
+                            Accéder au site
+                        </h6>
+                    </a>
                     <h5 id='command_list_title'><FontAwesomeIcon icon='list-ul' />Liste des commandes</h5>
                     <li id='command_list'>
                         {this.commands.map((obj, index) => {

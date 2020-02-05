@@ -69,7 +69,7 @@ function nextReaction(reaction, user, type) {
         new Player().youtubeResearch(reaction.message, null, type, false, [true, user]);
     }
     else {
-        reaction.message.channel.send('> Vous devez être connecté dans un salon !');
+        reaction.message.channel.send('❌ Vous devez être connecté dans un salon !');
     }
 }
 

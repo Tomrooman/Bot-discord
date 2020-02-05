@@ -1,13 +1,14 @@
 'use strict';
 
 import React from 'react';
+import Site from './../site/site.jsx';
 import Docs from './../docs/docs.jsx';
 
 export default class Router extends React.Component {
     constructor() {
         super();
         this.state = {
-            page: null
+            page: ''
         };
     }
 
@@ -18,6 +19,11 @@ export default class Router extends React.Component {
         if (page && page.substr(0, 4) === 'docs') {
             this.setState({
                 page: <Docs command={pageArg} />
+            });
+        }
+        else {
+            this.setState({
+                page: <Site />
             });
         }
     }

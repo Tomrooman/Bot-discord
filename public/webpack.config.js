@@ -13,7 +13,7 @@ module.exports = {
         https: true,
         proxy: {
             '/api': {
-                target: config.API.URL,
+                target: 'https://localhost:9000',
                 pathRewrite: { '^/api': '' },
                 changeOrigin: true,
                 secure: false

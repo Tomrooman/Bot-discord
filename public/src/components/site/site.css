@@ -1,0 +1,122 @@
+ul li.active > a, a[aria-expanded="true"] {
+    color: inherit !important;
+    background: inherit !important;
+    box-shadow: none !important;
+    border-left: none !important;
+}
+
+@keyframes spinner-border {
+    100% {
+        webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes loading-text{
+    50% {
+        opacity : 0.1;
+    }
+    100% {
+        opacity : 1;
+    }
+}
+
+.loading-table {
+    text-align: center;
+    height : 97vh;
+    width: 100%;
+}
+
+.loading-td {
+    text-align: center;
+}
+
+.loading-td h1 {
+    margin-bottom : 2rem;
+    font-size : 3rem;
+    -webkit-animation: loading-text 1.3s linear infinite;
+    animation: loading-text 1.3s linear infinite;
+}
+
+.website-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-spinner {
+    display: inline-block;
+    width: 8rem;
+    height: 8rem;
+    vertical-align: text-bottom;
+    border: 0.25em solid rgb(36, 35, 35);
+    border-right-color: transparent;
+    border-radius: 50%;
+    -webkit-animation: spinner-border .75s linear infinite;
+    animation: spinner-border .75s linear infinite;
+}
+
+.nav-item {
+    padding-left: 15px;
+    padding-right : 15px;
+    border-radius: 5px;
+}
+
+.nav-item.active {
+    box-shadow: 0px 0px 7px rgba(121,75,139,1);
+    border: 1px solid rgba(121,75,139,1);
+}
+
+.navbar-brand img {
+    margin-right: 0.5rem;
+}
+
+.navbar {
+    background : rgb(44, 44, 44);
+    color: white;
+}
+
+.connect-btn {
+    background: linear-gradient(45deg, rgba(121,75,139,1) 0%, rgba(134,31,43,1) 100%);
+    border-radius: 5px;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    padding-top : 7px;
+    padding-bottom : 7px;
+    padding-left: 15px;
+    padding-right : 15px;
+    transition: all 0.3s;
+}
+
+.connect-btn:hover {
+    padding-left: 25px;
+    padding-right: 25px;
+    letter-spacing: 3px;
+    transition: all 0.3s;
+}
+
+.microphone {
+    text-align: 'center';
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+#microphone-btn {
+    width: 60px;
+    height: 60px;
+    background: lightblue;
+    border-radius: 50%;
+    margin: 6em 0 2em 0;
+}
+
+#final {
+    color: black;
+    border: #ccc 1px solid;
+    padding: 1em;
+    margin: 1em;
+    width: 300px;
+}

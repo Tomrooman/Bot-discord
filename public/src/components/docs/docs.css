@@ -428,7 +428,8 @@ audio:focus, audio:active {
 
 .docs_content_command h5 {
     color: #fff;
-    background: rgb(95, 59, 109);
+    /* background: rgb(95, 59, 109); */
+    background: linear-gradient(45deg, rgb(75, 85, 139) 0%, rgb(95, 63, 122) 100%);
     text-align: center;
     box-shadow: 0px 0px 3px #757575;
     border-top-left-radius: 5px;
@@ -490,6 +491,33 @@ audio:focus, audio:active {
     box-shadow: none;
     outline: none !important;
     border: none;
+}
+
+.website-btn:hover {
+    letter-spacing: 3px;
+    width : 90%;
+    transition: all 0.3s;
+}
+
+.website-btn a {
+    width : 100%;
+}
+
+.website-btn {
+    transition: all 0.3s;
+    padding-top : 12px;
+    padding-bottom : 12px;
+    color : #fff;
+    opacity: 0.9;
+    text-align: center;
+    width: 80%;
+    border-radius: 5px;;
+    margin-left : auto;
+    margin-right : auto;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(0deg, rgb(75, 85, 139) 0%, rgb(95, 63, 122) 100%);
+    box-shadow: 1px 0px 3px rgb(108, 98, 165);
 }
 
 .toggleSideMenu {

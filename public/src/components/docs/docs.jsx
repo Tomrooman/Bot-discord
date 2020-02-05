@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import Play from './play/play.jsx';
 import Contact from './contact/contact.jsx';
 import Sidebar from './sidebar/sidebar.jsx';
-import RadioPlayer from './radio/radio.jsx';
+import RadioPlayer from './../radio/radio.jsx';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faMusic, faCogs } from '@fortawesome/free-solid-svg-icons';
