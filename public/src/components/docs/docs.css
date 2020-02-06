@@ -147,6 +147,13 @@ a[data-toggle="collapse"] {
 /* ---------------------------------------------------
     CONTENT STYLE
 ----------------------------------------------------- */
+@keyframes spinner-border {
+    100% {
+        webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
 #content {
     width: 100%;
     min-height: 100vh;
@@ -159,7 +166,7 @@ a[data-toggle="collapse"] {
     padding-top : 13px;
     padding-bottom : 10px;
     opacity : 0;
-    transform: translateY(-40px);
+    transform : scale(0.5, 0.5);
     color: rgb(44, 44, 44);
     /* box-shadow : -1px 0px 3px rgb(37, 37, 37); */
     margin-top : 2rem;
@@ -171,6 +178,19 @@ a[data-toggle="collapse"] {
     margin-right: auto;
     border-radius: 5px;
     margin-bottom : 0;
+}
+
+.custom-spinner-radio {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    margin-bottom : 4px;
+    vertical-align: text-bottom;
+    border: 0.25em solid rgb(255, 255, 255);
+    border-right-color: transparent;
+    border-radius: 50%;
+    -webkit-animation: spinner-border .75s linear infinite;
+    animation: spinner-border .75s linear infinite;
 }
 
 .contact-btn {
@@ -196,15 +216,28 @@ audio {
 }
 
 .radio_player {
-    background : rgb(80, 80, 80);
     text-align :center;
-    max-height : 65px;
+    max-height : 49px;
+}
+
+.navbar-nav-radio {
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .radio_select {
     margin-bottom : 30px;
     text-align: center;
     margin-left : 1rem;
+    background: linear-gradient(45deg, rgba(121,75,139,1) 0%, rgba(134,31,43,1) 100%);
+    border-radius: 5px;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    padding-top : 7px;
+    padding-bottom : 7px;
+    padding-left: 10px;
+    padding-right : 10px;
 }
 
 .radio_select svg {
@@ -215,10 +248,19 @@ audio {
     display: none;
 }
 
+.radio-nav {
+    position: static;
+}
+
+.dropdown {
+    z-index: 5;
+}
+
 #radio_choices {
     max-height: 70vh;
     overflow-y: scroll;
     border-radius: 5px;
+    z-index: 50;
 }
 
 #radio_choices button {
@@ -246,7 +288,7 @@ audio:focus, audio:active {
 }
 
 .radio_figure{
-    margin-top : 10px;
+    /* margin-top : 10px; */
     text-align: center;
 }
 
@@ -287,7 +329,7 @@ audio:focus, audio:active {
 
 .docs-contact {
     opacity : 0;
-    transform: translateY(-40px) ;
+    transform: scale(0.5, 0.5);
     background: rgb(235, 235, 235);
     color: rgb(44, 44, 44);
     border-radius: 5px;
@@ -345,7 +387,7 @@ audio:focus, audio:active {
     padding-right: 10px;
     text-align: center;
     opacity: 0;
-    transform: translateY(-40px);
+    transform: scale(0.5, 0.5);
 }
 
 .contact-mail, .contact-object {
@@ -423,7 +465,7 @@ audio:focus, audio:active {
 .div_docs_content_command {
     border-radius: 5px;
     opacity: 0;
-    transform: translateY(-40px);
+    transform: scale(0.5, 0.5);
 }
 
 .docs_content_command h5 {
@@ -478,7 +520,7 @@ audio:focus, audio:active {
 }
 
 .syx_container h1.load, .docs_panel.load, .div_docs_content_command.load, .docs-contact.load {
-    transform: translateY(0);
+    transform: scale(1, 1);
     transition-duration: 1s;
     opacity : 1;
 }
@@ -641,11 +683,5 @@ audio:focus, audio:active {
 
     .radio_figure {
         width : 100%;
-    }
-}
-
-@media screen and (max-width: 522px) {
-    .radio_player {
-        max-height : 110px;
     }
 }

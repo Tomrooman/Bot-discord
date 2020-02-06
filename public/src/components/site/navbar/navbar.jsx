@@ -5,17 +5,19 @@ import PropTypes from 'prop-types';
 import Config from './../../../../../config.json';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSignOutAlt, faUserCircle } from '@fortawesome/free-solid-svg-icons';
+import { faSignOutAlt, faUserCircle, faBook, faGamepad } from '@fortawesome/free-solid-svg-icons';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
 
 library.add(faSignOutAlt);
 library.add(faDiscord);
 library.add(faUserCircle);
+library.add(faBook);
+library.add(faGamepad);
 
 export default class Navbar extends React.Component {
     render() {
         return (
-            <nav className='navbar navbar-expand-sm navbar-dark'>
+            <nav className='navbar navbar-expand-lg navbar-dark navbar-site'>
                 <a className='navbar-brand' href='/'>
                     <img src='/img/Syxbot_logo.png' width='30' height='30' className='d-inline-block align-top' alt='syxbot_logo' />
                     Syxbot
@@ -26,15 +28,20 @@ export default class Navbar extends React.Component {
                 <div className='collapse navbar-collapse' id='navbarSupportedContent'>
                     <ul className='navbar-nav mr-auto'>
                         <li className={this.props.page === '/' ? 'nav-item active' : 'nav-item'}>
-                            <a className='nav-link' href='/'>Accueil</a>
+                            <a className='nav-link' href='/'><FontAwesomeIcon icon='home' /> Accueil</a>
                         </li>
                         {this.props.user ?
                             <li className={this.props.page === 'controls' ? 'nav-item active' : 'nav-item'}>
-                                <a className='nav-link' href='/controls'>Contrôler le bot</a>
+                                <a className='nav-link' href='/controls'><FontAwesomeIcon icon='gamepad' /> Contrôler le bot</a>
                             </li> : ''}
                     </ul>
                 </div>
                 <div className='form-inline my-2 my-lg-0'>
+                    <a href='/docs'>
+                        <button className='docs-btn'>
+                            <FontAwesomeIcon icon='book' /> Documentation
+                        </button>
+                    </a>
                     {
                         this.props.user ?
                             <div className='dropdown'>

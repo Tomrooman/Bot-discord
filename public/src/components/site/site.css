@@ -1,8 +1,8 @@
-ul li.active > a, a[aria-expanded="true"] {
-    color: inherit !important;
-    background: inherit !important;
-    box-shadow: none !important;
-    border-left: none !important;
+.navbar-site ul li.active > a, a[aria-expanded="true"] {
+    color: inherit;
+    background: inherit;
+    box-shadow: none;
+    border-left: none;
 }
 
 @keyframes spinner-border {
@@ -61,8 +61,8 @@ ul li.active > a, a[aria-expanded="true"] {
 /* ---------------------------- NAVBAR ---------------------------- */
 
 .nav-item {
-    padding-left: 10px;
-    padding-right : 10px;
+    padding-left: 7px;
+    padding-right : 7px;
     border-radius: 5px;
     margin-right: 0.5rem;
     transition-duration: 0.3s;
@@ -85,7 +85,7 @@ ul li.active > a, a[aria-expanded="true"] {
 }
 
 .navbar-brand {
-    margin-right : 3rem;
+    margin-right : 1rem;
 }
 
 .navbar-brand img {
@@ -97,11 +97,25 @@ ul li.active > a, a[aria-expanded="true"] {
     color: white;
 }
 
+.docs-btn {
+    background: linear-gradient(0deg, rgb(75, 85, 139) 0%, rgb(95, 63, 122) 100%);
+    border-radius: 5px;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    padding-top : 7px;
+    padding-bottom : 7px;
+    padding-left: 15px;
+    padding-right : 15px;
+    transition: all 0.3s;
+    margin-right: 0.5rem;
+}
+
 .username {
     font-size: 1.1rem;
 }
 
-.username svg {
+.username svg, .docs-btn svg {
     margin-right: 3px;
 }
 
@@ -169,18 +183,21 @@ ul li.active > a, a[aria-expanded="true"] {
     padding-bottom : 7px;
     padding-left: 15px;
     padding-right : 15px;
-    transition: all 0.3s;
+    transition: all 0.2s;
 }
 
 .connect-btn svg {
     margin-right: 3px;
 }
 
+.docs-btn:hover {
+    box-shadow: 0px 0px 10px rgb(45, 76, 160);
+    transition: all 0.2s;
+}
+
 .connect-btn:hover {
-    padding-left: 25px;
-    padding-right: 25px;
-    letter-spacing: 3px;
-    transition: all 0.3s;
+    box-shadow: 0px 0px 10px rgb(160, 45, 45);
+    transition: all 0.2s;
 }
 
 /* ---------------------------- SPEECH RECOGNITION ---------------------------- */

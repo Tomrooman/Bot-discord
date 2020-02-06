@@ -94,7 +94,7 @@ export default class RadioPlayer extends React.Component {
         $('.icon_figure').append(radioImg);
         $('audio')[0].src = radioUrl;
         this.setState({
-            dropdown_title: 'Chargement ...',
+            dropdown_title: 'Chargement',
             index: index,
             radioName: radioName
         });
@@ -133,43 +133,59 @@ export default class RadioPlayer extends React.Component {
 
     render() {
         return (
-            <div className='radio_player'>
-                <figure className='icon_figure'>
-                    <img src='#' alt='radio_img' />
-                </figure>
-                <figure className='radio_figure'>
-                    <audio
-                        controls
-                        autoPlay
-                        onPlay={this.handlePlay}
-                        onPause={this.handlePause}
-                        onVolumeChange={this.handleVolumeChange}
-                    />
-                    <figcaption>
-                        <div className='dropdown'>
-                            <button type='button' className='radio_select btn btn-secondary dropdown-toggle' id='dropdownMenu2' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                                {this.state.dropdown_title} <FontAwesomeIcon icon='caret-square-down' />
-                            </button>
-                            <div id='radio_choices' className='dropdown-menu' aria-labelledby='dropdownMenu2'>
-                                {this.radios.map((obj, index) => {
-                                    return (
-                                        <button
-                                            className='dropdown-item'
-                                            value={obj.url}
-                                            image={obj.image}
-                                            index={index}
-                                            key={index}
-                                            onClick={() => this.handleClick(obj.image, obj.url, index, obj.name)}
-                                        >
-                                            {obj.name}
+            <nav className='navbar navbar-dark navbar-expand-lg radio-nav'>
+                <a className='navbar-brand' href='/'>
+                    <img src='/img/Syxbot_logo.png' width='30' height='30' className='d-inline-block align-top' alt='syxbot_logo' />
+                    Syxbot
+                </a>
+                <button className='navbar-toggler' type='button' data-toggle='collapse' data-target='#navbarSupportedContent' aria-controls='navbarSupportedContent' aria-expanded='false' aria-label='Toggle navigation'>
+                    <span className='navbar-toggler-icon' />
+                </button>
+                <div className='collapse navbar-collapse' id='navbarSupportedContent'>
+                    <ul className='navbar-nav navbar-nav-radio'>
+                        <div className='radio_player'>
+                            <figure className='icon_figure'>
+                                <img src='#' alt='radio_img' />
+                            </figure>
+                            <figure className='radio_figure'>
+                                <audio
+                                    controls
+                                    autoPlay
+                                    onPlay={this.handlePlay}
+                                    onPause={this.handlePause}
+                                    onVolumeChange={this.handleVolumeChange}
+                                />
+                                <figcaption>
+                                    <div className='dropdown'>
+                                        <button type='button' className='radio_select btn btn-secondary dropdown-toggle' id='dropdownMenu2' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                                            {this.state.dropdown_title === 'Chargement' ?
+                                                <span>{this.state.dropdown_title} <div className='custom-spinner-radio' /></span> :
+                                                this.state.dropdown_title}
+                                            <FontAwesomeIcon icon='caret-square-down' />
                                         </button>
-                                    );
-                                })}
-                            </div>
+                                        <div id='radio_choices' className='dropdown-menu' aria-labelledby='dropdownMenu2'>
+                                            {this.radios.map((obj, index) => {
+                                                return (
+                                                    <button
+                                                        className='dropdown-item'
+                                                        value={obj.url}
+                                                        image={obj.image}
+                                                        index={index}
+                                                        key={index}
+                                                        onClick={() => this.handleClick(obj.image, obj.url, index, obj.name)}
+                                                    >
+                                                        {obj.name}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                </figcaption>
+                            </figure>
                         </div>
-                    </figcaption>
-                </figure>
-            </div>
+                    </ul>
+                </div>
+            </nav>
         );
     }
 }

@@ -160,7 +160,7 @@ export default class Site extends React.Component {
                     <tbody>
                         <tr>
                             <td className='align-middle loading-td'>
-                                <h1>Chargement</h1>
+                                <h1>Syxbot</h1>
                                 <div className='custom-spinner' />
                             </td>
                         </tr>

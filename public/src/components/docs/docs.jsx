@@ -59,7 +59,6 @@ export default class Docs extends React.Component {
         // Appear effect
         setTimeout(() => {
             $('.syx_container h1').addClass('load');
-            $('.top_logo').addClass('load');
             if ($('.docs_panel')) {
                 setTimeout(() => {
                     $('.docs_panel').addClass('load');
