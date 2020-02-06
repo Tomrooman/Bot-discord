@@ -19,10 +19,7 @@ export default class Docs extends React.Component {
     constructor(props) {
         super();
         let page = null;
-        let goodCommand = props.command;
-        if (props.command.indexOf('?') !== -1) {
-            goodCommand = props.command.substr(0, props.command.indexOf('?'));
-        }
+        const goodCommand = props.command;
         if (goodCommand === 'play') {
             page = <Play />;
         }

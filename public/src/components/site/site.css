@@ -16,10 +16,12 @@ ul li.active > a, a[aria-expanded="true"] {
     50% {
         opacity : 0.1;
     }
-    100% {
+    100% {
         opacity : 1;
     }
 }
+
+/* ---------------------------- LOADING ---------------------------- */
 
 .loading-table {
     text-align: center;
@@ -56,15 +58,34 @@ ul li.active > a, a[aria-expanded="true"] {
     animation: spinner-border .75s linear infinite;
 }
 
+/* ---------------------------- NAVBAR ---------------------------- */
+
 .nav-item {
-    padding-left: 15px;
-    padding-right : 15px;
+    padding-left: 10px;
+    padding-right : 10px;
     border-radius: 5px;
+    margin-right: 0.5rem;
+    transition-duration: 0.3s;
+}
+
+.navbar-nav {
+    flex-direction: initial;
+}
+
+.nav-item:hover {
+    transition-duration: 0.3s;
+    background : rgb(66, 66, 66)
 }
 
 .nav-item.active {
+    transition-duration: 0.3s;
     box-shadow: 0px 0px 7px rgba(121,75,139,1);
     border: 1px solid rgba(121,75,139,1);
+    color : white;
+}
+
+.navbar-brand {
+    margin-right : 3rem;
 }
 
 .navbar-brand img {
@@ -74,6 +95,68 @@ ul li.active > a, a[aria-expanded="true"] {
 .navbar {
     background : rgb(44, 44, 44);
     color: white;
+}
+
+.username {
+    font-size: 1.1rem;
+}
+
+.username svg {
+    margin-right: 3px;
+}
+
+.discriminator {
+    font-size: 0.9rem;
+    color: rgb(226, 226, 226);
+}
+
+.user-dropdown::after {
+    margin-right : -11px;
+}
+
+.user-dropdown:active {
+    opacity: 0.8;
+}
+
+.user-dropdown:focus {
+    outline : 0 !important;
+}
+
+.user-dropdown {
+    background: linear-gradient(45deg, rgba(121,75,139,1) 0%, rgba(134,31,43,1) 100%);
+    border-radius: 5px;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    padding-top : 7px;
+    padding-bottom : 7px;
+    padding-left: 10px;
+    padding-right : 25px;
+}
+
+.user-dropdown-list p {
+    font-size : 1rem;
+    margin-bottom : 0;
+}
+
+.dropdown-menu {
+    padding: 0 !important;
+    border-radius: 7px !important;
+}
+
+.dropdown-disconnect {
+    border-radius: 5px;
+    padding-top : 9px;
+    padding-bottom : 9px;
+    color: rgb(219, 48, 48);
+    transition-duration: 0.3s;
+}
+
+.dropdown-disconnect:hover {
+    cursor: pointer;
+    color: rgb(243, 243, 243);
+    background : rgb(219, 48, 48);
+    transition-duration: 0.3s;
 }
 
 .connect-btn {
@@ -89,12 +172,18 @@ ul li.active > a, a[aria-expanded="true"] {
     transition: all 0.3s;
 }
 
+.connect-btn svg {
+    margin-right: 3px;
+}
+
 .connect-btn:hover {
     padding-left: 25px;
     padding-right: 25px;
     letter-spacing: 3px;
     transition: all 0.3s;
 }
+
+/* ---------------------------- SPEECH RECOGNITION ---------------------------- */
 
 .microphone {
     text-align: 'center';

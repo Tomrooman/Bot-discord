@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Cookies from 'universal-cookie';
+import PropTypes from 'prop-types';
 // import VoiceRecognition from './voiceRecognition.jsx';
 import FormData from 'form-data';
 import Config from './../../../../config.json';
@@ -15,6 +16,7 @@ export default class Site extends React.Component {
     constructor() {
         super();
         this.generateRandomString = this.generateRandomString.bind(this);
+        this.disconnect = this.disconnect.bind(this);
         this.state = {
             randStr: false,
             user: cookies.get('syxbot') || false
@@ -28,6 +30,9 @@ export default class Site extends React.Component {
         }
         else if (this.state.user) {
             this.verifyTokenExpiration();
+        }
+        else if (this.props.page !== '/') {
+            window.location.href = Config.OAuth.redirect_url;
         }
         else {
             this.generateRandomString();
@@ -144,6 +149,7 @@ export default class Site extends React.Component {
                         randStr={this.state.randStr}
                         user={this.state.user}
                         disconnect={this.disconnect}
+                        page={this.props.page}
                     />
                 </div>
             );
@@ -164,3 +170,7 @@ export default class Site extends React.Component {
         }
     }
 }
+
+Site.propTypes = {
+    page: PropTypes.string.isRequired
+};
