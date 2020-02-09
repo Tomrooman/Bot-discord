@@ -161,16 +161,16 @@ export default class Site extends React.Component {
                     {this.state.page ?
                         this.state.page :
                         <div className='home-container'>
-                            <div className='home-infos-container col-lg-8 col-md-10'>
-                                <div className='home-infos col-10 offset-1'>
+                            <div className='home-infos-container col-12 row'>
+                                <div className='home-infos col-10 offset-1 col-md-5 offset-md-0'>
                                     <div className='infos-top-color infos-recognition-title col-12'>
-                                        <h3>Reconnaissance vocale</h3>
+                                        <h4>Reconnaissance vocale</h4>
                                     </div>
                                     <div className='col-12'>
-                                        <div className='home-infos-svg-div col-lg-4 col-md-4 col-sm-12 text-center'>
+                                        <div className='home-infos-svg-div col-12 text-center'>
                                             <FontAwesomeIcon icon='assistive-listening-systems' />
                                         </div>
-                                        <div className='home-infos-text col-lg-8 col-md-8 col-sm-12 offset-md-0 text-center text-md-left'>
+                                        <div className='home-infos-text col-12 text-center text-md-left'>
                                             {this.state.user ?
                                                 <p>Maintenant que vous êtes connectés, vous pouvez utilisé la reconnaissance vocale pour demander à Syxbot d'éffectuer certaines commandes.</p> :
                                                 <p>Une fois que vous serez connectés gràce à vos identifiants discord, vous pourrez utilisé la reconnaissance vocale pour demander à Syxbot d'éffectuer certaines commandes.</p>}
@@ -188,15 +188,15 @@ export default class Site extends React.Component {
                                             </a>}
                                     </div>
                                 </div>
-                                <div className='home-infos col-10 offset-1'>
+                                <div className='home-infos col-10 offset-1 col-md-5'>
                                     <div className='infos-top-color infos-infos-title col-12'>
-                                        <h3>Informations</h3>
+                                        <h4>Informations</h4>
                                     </div>
                                     <div className='col-12'>
-                                        <div className='home-infos-svg-div col-lg-4 col-md-4 col-sm-12 text-center'>
+                                        <div className='home-infos-svg-div col-12 text-center'>
                                             <FontAwesomeIcon icon='book-open' />
                                         </div>
-                                        <div className='home-infos-text col-lg-8 col-md-8 col-sm-12 offset-md-0 text-center text-md-left'>
+                                        <div className='home-infos-text col-12 text-center text-md-left'>
                                             <p>Une documentation est disponible, n'hésitez pas à la consulter si vous souhaitez avoir plus d'informations sur certaines commandes.</p>
                                         </div>
                                         <a href='/docs'>

@@ -217,8 +217,52 @@
 
 .home-infos {
     margin-bottom : 2rem;
+    padding-bottom : 1rem;
+    margin-left: auto;
+    margin-right: auto;
     border-radius : 20px;
     min-width: 315px;
+    background: rgb(207, 205, 205);
+    box-shadow : 0px 0px 3px rgb(70, 70, 70);
+    transition: all 0.2s;
+}
+
+.home-infos:hover {
+    transition: all 0.2s;
+    background: rgb(184, 184, 184);
+}
+
+.home-infos:hover .infos-top-color {
+    transition: all 0.2s;
+    letter-spacing: 3px;
+}
+
+.infos-recognition-title {
+    /* background: linear-gradient(45deg, rgba(121,75,139,0.85) 0%, rgba(134,31,43,0.85) 100%); */
+    color: rgb(26, 26, 26);
+    padding-bottom : 0.2rem;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+
+.home-infos:nth-child(1) {
+    /* background: rgba(131, 25, 34, 0.3);
+    box-shadow : 0px 0px 5px rgba(121,75,139); */
+}
+
+.home-infos:nth-child(2) {
+    /* background: rgb(75, 85, 139, 0.3);
+    box-shadow : 0px 0px 5px rgb(75, 85, 139); */
+}
+
+.home-infos:nth-child(1):hover {
+    /* background: rgba(131,25,34, 0.5); */
+    /* background: linear-gradient(45deg, rgba(121,75,139,0.3) 0%, rgba(134,31,43,0.3) 100%); */
+}
+
+.home-infos:nth-child(2):hover {
+    /* background: linear-gradient(0deg, rgb(75, 85, 139, 0.5) 0%, rgb(95, 63, 122, 0.5) 100%); */
+    /* background: rgb(75, 85, 139, 0.5); */
 }
 
 .infos-top-color {
@@ -226,14 +270,13 @@
     text-align: center;
     padding-top : 0.5rem;
     font-size: 1.3rem;
-    letter-spacing: 5px;
-    color: black;
+    transition: all 0.2s;
 }
 
-.home-infos-svg-div, .home-infos-text {
+/* .home-infos-svg-div, .home-infos-text {
     display: inline-block;
     vertical-align: middle;
-}
+} */
 
 .home-infos-svg-div svg {
     margin: 1rem;
