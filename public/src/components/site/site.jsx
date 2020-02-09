@@ -162,31 +162,43 @@ export default class Site extends React.Component {
                         this.state.page :
                         <div className='home-container'>
                             <div className='home-infos-container col-lg-8 col-md-10'>
-                                <div className='infos-top-color infos-recognition-title col-10 offset-1'>
-                                    Reconnaissance vocale
-                                </div>
-                                <div className='col-10 offset-1 home-infos'>
-                                    <div className='home-infos-svg-div col-lg-4 col-md-3 col-sm-12 text-center'>
-                                        <FontAwesomeIcon icon='assistive-listening-systems' />
+                                <div className='home-infos col-10 offset-1'>
+                                    <div className='infos-top-color infos-recognition-title col-12'>
+                                        <h3>Reconnaissance vocale</h3>
                                     </div>
-                                    <div className='home-infos-text col-lg-8 col-md-9 col-sm-12 offset-md-0 text-center text-md-left'>
-                                        Une fois que vous serez connecté gràce à vos identifiants discord, vous pourrez utilisé la reconnaissance vocale pour demander à Syxbot d'éffectuer certaines commandes.
-                                        <a href={`${Config.OAuth.connection_url}&state=${this.state.randStr}`}>
-                                            <div className='col-12 col-sm-8 offset-sm-2 col-md-8 offset-md-2 text-center infos-connect-btn'>
-                                                <FontAwesomeIcon icon={['fab', 'discord']} /> Se connecter
-                                            </div>
-                                        </a>
+                                    <div className='col-12'>
+                                        <div className='home-infos-svg-div col-lg-4 col-md-4 col-sm-12 text-center'>
+                                            <FontAwesomeIcon icon='assistive-listening-systems' />
+                                        </div>
+                                        <div className='home-infos-text col-lg-8 col-md-8 col-sm-12 offset-md-0 text-center text-md-left'>
+                                            {this.state.user ?
+                                                <p>Maintenant que vous êtes connectés, vous pouvez utilisé la reconnaissance vocale pour demander à Syxbot d'éffectuer certaines commandes.</p> :
+                                                <p>Une fois que vous serez connectés gràce à vos identifiants discord, vous pourrez utilisé la reconnaissance vocale pour demander à Syxbot d'éffectuer certaines commandes.</p>}
+                                        </div>
+                                        {this.state.user ?
+                                            <a href='/controls'>
+                                                <div className='col-12 col-sm-8 offset-sm-2 col-md-8 offset-md-2 text-center infos-connect-btn'>
+                                                    <FontAwesomeIcon icon='gamepad' /> Contrôler le bot
+                                                </div>
+                                            </a> :
+                                            <a href={`${Config.OAuth.connection_url}&state=${this.state.randStr}`}>
+                                                <div className='col-12 col-sm-8 offset-sm-2 col-md-8 offset-md-2 text-center infos-connect-btn'>
+                                                    <FontAwesomeIcon icon={['fab', 'discord']} /> Se connecter
+                                                </div>
+                                            </a>}
                                     </div>
                                 </div>
-                                <div className='infos-top-color infos-infos-title col-10 offset-1'>
-                                    Informations
-                                </div>
-                                <div className='col-10 offset-1 home-infos'>
-                                    <div className='home-infos-svg-div col-lg-4 col-md-3 col-sm-12 text-center'>
-                                        <FontAwesomeIcon icon='book-open' />
+                                <div className='home-infos col-10 offset-1'>
+                                    <div className='infos-top-color infos-infos-title col-12'>
+                                        <h3>Informations</h3>
                                     </div>
-                                    <div className='home-infos-text col-lg-8 col-md-9 col-sm-12 offset-md-0 text-center text-md-left'>
-                                        Une documentation est disponible, n'hésitez pas à la consulter si vous souhaitez avoir plus d'informations sur certaines commandes.
+                                    <div className='col-12'>
+                                        <div className='home-infos-svg-div col-lg-4 col-md-4 col-sm-12 text-center'>
+                                            <FontAwesomeIcon icon='book-open' />
+                                        </div>
+                                        <div className='home-infos-text col-lg-8 col-md-8 col-sm-12 offset-md-0 text-center text-md-left'>
+                                            <p>Une documentation est disponible, n'hésitez pas à la consulter si vous souhaitez avoir plus d'informations sur certaines commandes.</p>
+                                        </div>
                                         <a href='/docs'>
                                             <div className='col-12 col-sm-8 offset-sm-2 col-md-8 offset-md-2 text-center infos-docs-btn'>
                                                 <FontAwesomeIcon icon='book' /> Documentation
