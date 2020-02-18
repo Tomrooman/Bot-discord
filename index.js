@@ -24,7 +24,7 @@ bot.on('ready', () => {
     bot.user.setActivity('!!help | https://syxbot.com/docs', { type: 'PLAYING' })
         .catch(e => console.log('Error while set presence : ', e.message));
     console.log(' - Connected : ' + config.WHAT);
-    console.log(' - Connected guilds : ', bot.guilds.size);
+    console.log(' - Connected guilds : ', bot.guilds.length);
 });
 
 bot.on('message', (message) => {
