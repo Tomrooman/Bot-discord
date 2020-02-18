@@ -175,25 +175,30 @@ function updateSettings() {
 
 function disconnectBotFromOldChannel() {
     console.log('Disconnecting from all channels ...');
-    Object.values(bot.guilds).map(g => {
-        g.channels.map(channel => {
-            if (channel.type === 'voice') {
-                if (channel.members) {
-                    channel.members.map(member => {
-                        if (member.user.bot && member.user.id === config.clientId) {
-                            channel.join()
-                                .then(connection => {
-                                    connection.channel.leave();
-                                })
-                                .catch(e => {
-                                    console.log('error while disconnecting at start : ', e.message);
-                                });
+    const interval = setInterval(() => {
+        console.log('interval');
+        if (bot.guilds) {
+            console.log('GOT GUILDS');
+            clearInterval(interval);
+            bot.guilds.map(g => {
+                g.channels.map(channel => {
+                    if (channel.type === 'voice') {
+                        if (channel.members) {
+                            if (channel.members.find(member => member.user.bot && member.user.id === config.clientId)) {
+                                channel.join()
+                                    .then(connection => {
+                                        connection.channel.leave();
+                                    })
+                                    .catch(e => {
+                                        console.log('error while disconnecting at start : ', e.message);
+                                    });
+                            }
                         }
-                    });
-                }
-            }
-        });
-    });
+                    }
+                });
+            });
+        }
+    }, 500);
     console.log(' - Disconnected from all channels !');
 }
 
