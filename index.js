@@ -5,6 +5,7 @@ import Level from './lib/js/level.js';
 import Helper from './lib/js/helper.js';
 import Player from './lib/js/player.js';
 import Settings from './lib/js/settings.js';
+import Streams from './lib/js/streams.js';
 import config from './config.json';
 // import Speech from './lib/js/speech.js';
 // const mongoose = require('mongoose');
@@ -19,6 +20,7 @@ updateSettings();
 
 bot.on('ready', () => {
     disconnectBotFromOldChannel();
+    new Streams(bot);
     bot.user.setActivity('!!help | https://syxbot.com/docs', { type: 'PLAYING' })
         .catch(e => console.log('Error while set presence : ', e.message));
     console.log(' - Connected : ' + config.WHAT);
