@@ -175,7 +175,7 @@ function updateSettings() {
 
 function disconnectBotFromOldChannel() {
     console.log('Disconnecting from all channels ...');
-    console.log('BOT GUILDS : ', bot.guilds);
+    console.log('BOT GUILDS : ', bot.guilds.cache);
     bot.guilds.map(g => {
         g.channels.map(channel => {
             if (channel.type === 'voice') {
