@@ -24,7 +24,7 @@ bot.on('ready', () => {
     bot.user.setActivity('!!help | https://syxbot.com/docs', { type: 'PLAYING' })
         .catch(e => console.log('Error while set presence : ', e.message));
     console.log(' - Connected : ' + config.WHAT);
-    console.log(' - Connected guilds : ', bot.guilds.size);
+    console.log(' - Connected guilds : ', bot.guilds.cache.size);
 });
 
 bot.on('message', (message) => {
@@ -175,9 +175,10 @@ function updateSettings() {
 
 function disconnectBotFromOldChannel() {
     console.log('Disconnecting from all channels ...');
-    console.log('BOT GUILDS : ', bot.guilds.cache);
-    bot.guilds.map(g => {
-        g.channels.map(channel => {
+    // console.log('BOT GUILDS : ', bot.guilds.cache);
+    // const allGuilds = bot.guilds.cache ? bot.guilds.cache : bot.guilds
+    bot.guilds.cache.map(g => {
+        g.channels.cache.map(channel => {
             if (channel.type === 'voice') {
                 if (channel.members) {
                     channel.members.map(member => {
