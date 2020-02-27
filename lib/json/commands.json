@@ -1,0 +1,167 @@
+[
+    {
+        "name": "play | p",
+        "command": "**play | p** + URL/TITRE",
+        "exemple": "```!!p https://www.youtube.com/watch?v=F6E3GkaYdHs``````!!play Eminem rap god``` \n",
+        "infos": [
+            "Rajoute la musique youtube à partir de l'URL ```!!play https://www.youtube.com/watch?v=XbGs_qK2PQA```\n",
+            "Affiche la liste des musiques en file d'attente ```!!p list```\n",
+            "Sélectionne une musique de la file d'attente et la joue directement ```!!play 4``` \n",
+            "Recherche une musique par titre ```!!play Eminem rap god``` \n",
+            "Affiche la liste des résultats de toutes les recherches ```!!search``` \n",
+            "Affiche la liste des résultats de la recherche de musique ```!!search play``` \n",
+            "Sélectionne une musique dans les résultats de la recherche ```!!search p 4```\n",
+            "Supprime une/des musique(s) en file d'attente ```!!p remove 15|15-20```"
+        ]
+    },
+    {
+        "name": "playlist | pl",
+        "command": "**playlist | pl** + URL/TITRE",
+        "exemple": "```!!pl https://www.youtube.com/playlist?list=PL4o29bINVT4EG_y-k5jGoOu3-Am8Nvi10``````!!playlist anime op``` \n",
+        "infos": [
+            "Rajoute les musiques de la playlist youtube à partir de l'URL ```!!playlist https://www.youtube.com/playlist?list=PL4o29bINVT4EG_y-k5jGoOu3-Am8Nvi10``` \n",
+            "Affiche la liste des musiques en file d'attente ```!!pl list```\n",
+            "Sélectionne une musique de la file d'attente et la joue directement ```!!playlist 4``` \n",
+            "Recherche une playlist par titre ```!!playlist Hip hop``` \n",
+            "Affiche la liste des résultats de toutes les recherches ```!!search``` \n",
+            "Affiche la liste des résultats de la recherche de playlist ```!!search playlist``` \n",
+            "Sélectionne une playlist dans les résultats de la recherche ```!!search pl 4```\n",
+            "Supprime une/des musique(s) en file d'attente ```!!pl remove 15|15-20```"
+        ]
+    },
+    {
+        "name": "cancel",
+        "command": "**cancel**",
+        "exemple": "```!!cancel``` \n",
+        "infos": [
+            "Annule la recherche par titre```!!cancel```"
+        ]
+    },
+    {
+        "name": "go",
+        "command": "**go** + CHOIX",
+        "exemple": "```!!go 15``` \n",
+        "infos": [
+            "Supprime toutes les musiques avant celle sélectionnée et la joue directement```!!go 15```"
+        ]
+    },
+    {
+        "name": "repeat",
+        "command": "**repeat**",
+        "exemple": "```!!repeat``` \n",
+        "infos": [
+            "Active ou désactive le mode répétition pour la musique en écoute ```!!repeat```"
+        ]
+    },
+    {
+        "name": "help",
+        "command": "**help** + COMMANDE",
+        "exemple": "```!!help``````!!help pl``` \n",
+        "infos": [
+            "Affiche la liste de toutes les commandes ```!!help```\n",
+            "Affiche les fonctionnalités d'une commande ```!!help pl```"
+        ]
+    },
+    {
+        "name": "current | now",
+        "command": "**current | now**",
+        "exemple": "```!!current``````!!now```\n",
+        "infos": [
+            "Affiche la musique en cours d'écoute```!!current```\n"
+        ]
+    },
+    {
+        "name": "next",
+        "command": "**next**",
+        "exemple": "```!!next``` \n",
+        "infos": [
+            "Passe à la musique suivante ```!!next```"
+        ]
+    },
+    {
+        "name": "pause",
+        "command": "**pause**",
+        "exemple": "```!!pause``` \n",
+        "infos": [
+            "Met la musique en pause```!!pause```"
+        ]
+    },
+    {
+        "name": "stop",
+        "command": "**stop**",
+        "exemple": "```!!stop``` \n",
+        "infos": [
+            "Arrête la musique et supprime la file d'attente```!!stop```"
+        ]
+    },
+    {
+        "name": "join",
+        "command": "**join**",
+        "exemple": "```!!join``` \n",
+        "infos": [
+            "Permet de se connecter à votre salon vocal```!!join```"
+        ]
+    },
+    {
+        "name": "resume",
+        "command": "**resume**",
+        "exemple": "```!!resume``` \n",
+        "infos": [
+            "Reprend la lecture de la musique ```!!resume```"
+        ]
+    },
+    {
+        "name": "quit",
+        "command": "**quit**",
+        "exemple": "```!!quit``` \n",
+        "infos": [
+            "Déconnecte le bot du salon vocal et supprime la file d'attente ```!!quit```"
+        ]
+    },
+    {
+        "name": "remove",
+        "command": "**remove** + CHOIX",
+        "exemple": "```!!remove 5``` \n",
+        "infos": [
+            "Supprime le nombre de messages choisit ```!!remove 8```"
+        ]
+    },
+    {
+        "name": "clear",
+        "command": "**clear**",
+        "exemple": "```!!clear``` \n",
+        "infos": [
+            "Supprime tous les messages ```!!clear```"
+        ]
+    },
+    {
+        "name": "search",
+        "command": "**search**",
+        "exemple": "```!!search``` \n",
+        "infos": [
+            "Affiche la liste des résultats d'une recherche ```!!search```\n",
+            "Affiche les musiques dans la liste des résultats d'une recherche ```!!search p```\n",
+            "Sélectionne une musique dans la liste des résultats d'une recherche ```!!search p 3```\n",
+            "Affiche les playlists dans la liste des résultats d'une recherche ```!!search pl```\n",
+            "Sélectionne une playlist dans la liste des résultats d'une recherche ```!!search pl 1```"
+        ]
+    },
+    {
+        "name": "radio",
+        "command": "**radio** + CHOIX",
+        "exemple": "```!!radio nrj``` \n",
+        "infos": [
+            "Affiche la liste des radios disponibles```!!radio list```\n",
+            "Sélectionne une musique de la liste par son nom ```!!radio nrj```"
+        ]
+    },
+    {
+        "name": "settings | set",
+        "command": "**settings | set** + CATEGORIE + PARAM + VALEUR",
+        "exemple": "```!!set notif added off``` \n",
+        "infos": [
+            "Affiche la liste des paramètres disponibles```!!settings list```\n",
+            "Exemple de modification d'un paramètre ```!!set notif added off```"
+        ]
+    }
+]

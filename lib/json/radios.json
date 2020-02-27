@@ -1,0 +1,110 @@
+[
+    {
+        "name": "NRJ",
+        "url": "https://scdn.nrjaudio.fm/fr/30001/aac_64.mp3?origine=playerweb;playerid:nrj&origine=playernrj&aw_0_req.userConsent=BOvEk5hOvEk5hAKAABENC9-AAAAuFr_7__7-_9_-_f__9uj3Or_v_f__32ccL59v_h_7v-_7fi_20nV4u_1vft9yfk1-5ctDztp507iakiPHmqNeb9n9mz1e5pRP78k89r7337Ew_v8_v-b7BCON_YxE&cdn_path=audio_lbs7"
+    },
+    {
+        "name": "Subarashii",
+        "url": "https://listen.radionomy.com/subarashii.mp3"
+    },
+    {
+        "name": "Bel RTL",
+        "url": "https://belrtl.ice.infomaniak.ch/belrtl-mp3-128.mp3"
+    },
+    {
+        "name": "Contact",
+        "url": "https://radiocontact.ice.infomaniak.ch/radiocontact-mp3-128.mp3"
+    },
+    {
+        "name": "Nostalgie BE",
+        "url": "https://streamingp.shoutcast.com/NostalgiePremium-mp3"
+    },
+    {
+        "name": "Nostalgie FR",
+        "url": "https://scdn.nrjaudio.fm/fr/30601/aac_64.mp3?origine=playerweb;playerid:nostalgie&origine=playernostalgie&aw_0_req.userConsent=BOvHTQ8OvHTQ8AKAABENC--AAAAuhr_7__7-_9_-_f__9uj3Or_v_f__32ccL59v_h_7v-_7fi_20nV4u_1vft9yfk1-5ctDztp507iakiPHmqNeb9n9mz1e5pRP78k89r7337Ew_v8_v-b7BCON_YxEiA&cdn_path=audio_lbs8"
+    },
+    {
+        "name": "Classic21",
+        "url": "https://radios.rtbf.be/classic21-128.mp3"
+    },
+    {
+        "name": "Pure FM",
+        "url": "https://radios.rtbf.be/pure-128.mp3"
+    },
+    {
+        "name": "Musiq3",
+        "url": "https://radios.rtbf.be/musiq3-128.mp3"
+    },
+    {
+        "name": "VivaCite",
+        "url": "https://radios.rtbf.be/vivabxl-128.mp3"
+    },
+    {
+        "name": "Fun radio",
+        "url": "https://icecast.rtl.fr/fun-1-44-128"
+    },
+    {
+        "name": "Rire&chansons",
+        "url": "https://scdn.nrjaudio.fm/audio1/fr/30401/mp3_128.mp3?origine=fluxradios"
+    },
+    {
+        "name": "Virgin",
+        "url": "https://ais-live.cloud-services.paris:8443/virgin.aac?aw_0_1st.playerid=lagardereWebVirgin"
+    },
+    {
+        "name": "RFM",
+        "url": "https://ais-live.cloud-services.paris:8443/rfm.aac?aw_0_1st.playerid=lgrdrnwsRadiofrRFM"
+    },
+    {
+        "name": "RMC",
+        "url": "https://rmc.bfmtv.com/rmcinfo-mp3"
+    },
+    {
+        "name": "BFM Business",
+        "url": "https://chai5she.cdn.dvmr.fr/bfmbusiness"
+    },
+    {
+        "name": "Jazz",
+        "url": "https://jazzradio.ice.infomaniak.ch/jazzradio-high.mp3"
+    },
+    {
+        "name": "Cherie FM",
+        "url": "https://scdn.nrjaudio.fm/audio1/fr/30201/mp3_128.mp3?origine=fluxradios"
+    },
+    {
+        "name": "Europe1",
+        "url": "https://ais-live.cloud-services.paris:8443/europe1.mp3?aw_0_1st.playerid=lgrdrnwsRadiofrE1"
+    },
+    {
+        "name": "RTL",
+        "url": "https://icecast.rtl.fr/rtl-1-44-128?id=webRTL&aw_0_req.userConsent=BOvHiJgOvHiMPAHABBFRCv-AAAAstrv7__7-_9_-_f__9ujzOr_v_f__30ccL59v_B_zv-_7fi_20jV4u_1vft9yfk1-5ctDztp507iakivXmqdeZ9v_nz3_5phPr8k89r6337EwwAAAAAAAAAAA"
+    },
+    {
+        "name": "RTL 2",
+        "url": "https://icecast.rtl.fr/rtl2-1-44-128?listen=webDAQODAkPCwwMAg8EBAIFCQ"
+    },
+    {
+        "name": "Classique",
+        "url": "https://radioclassique.ice.infomaniak.ch/radioclassique-high.mp3"
+    },
+    {
+        "name": "Skyrock",
+        "url": "https://www.skyrock.fm/stream.php/tunein16_128mp3.mp3"
+    },
+    {
+        "name": "France Inter",
+        "url": "https://direct.franceinter.fr/live/franceinter-midfi.mp3"
+    },
+    {
+        "name": "France Culture",
+        "url": "https://direct.franceculture.fr/live/franceculture-midfi.mp3"
+    },
+    {
+        "name": "France Musique",
+        "url": "https://direct.francemusique.fr/live/francemusique-midfi.mp3"
+    },
+    {
+        "name": "France Bleu",
+        "url": "https://direct.francebleu.fr/live/fbpicardie-midfi.mp3"
+    }
+]
