@@ -39,6 +39,14 @@ bot.on('message', (message) => {
     }
 });
 
+bot.on('shardReconnecting', id => {
+    console.log(`Shard reconnected with ID ${id} reconnected.`);
+});
+
+bot.on('shardResumed', (replayed, shardID) => {
+    console.log(`Shard ID ${shardID} resumed connection and replayed ${replayed} events.`);
+});
+
 bot.on('messageReactionAdd', (reaction, user) => {
     if (!user.bot) {
         const playlistExist = reaction.message.content.indexOf('Ex: ' + config.prefix + 'search pl 1') !== -1;
