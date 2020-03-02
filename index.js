@@ -21,7 +21,7 @@ updateSettings();
 bot.on('ready', () => {
     disconnectBotFromOldChannel();
     new Streams(bot);
-    bot.user.setActivity('!!help | https://syxbot.com/docs', { type: 'PLAYING' })
+    bot.user.setActivity(`${config.prefix}help | https://syxbot.com/docs`, { type: 'PLAYING' })
         .catch(e => console.log('Error while set presence : ', e.message));
     console.log(' - Connected : ' + config.WHAT);
     console.log(' - Connected guilds : ', bot.guilds.cache.size);
@@ -40,6 +40,8 @@ bot.on('message', (message) => {
 });
 
 bot.on('shardReconnecting', id => {
+    bot.user.setActivity(`${config.prefix}help | https://syxbot.com/docs`, { type: 'PLAYING' })
+        .catch(e => console.log('Error while set presence : ', e.message));
     console.log(`Shard reconnected with ID ${id} reconnected.`);
 });
 
