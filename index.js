@@ -40,9 +40,10 @@ bot.on('message', (message) => {
 });
 
 bot.on('shardReconnecting', id => {
-    bot.user.setActivity(`${config.prefix}help | https://syxbot.com/docs`, { type: 'PLAYING' })
-        .catch(e => console.log('Error while set presence : ', e.message));
-    console.log(`Shard reconnected with ID ${id} reconnected.`);
+    // bot.user.setActivity(`${config.prefix}help | https://syxbot.com/docs`, { type: 'PLAYING' })
+    //     .catch(e => console.log('Error while set presence : ', e.message));
+    bot.login(config.token);
+    console.log(`Shard reconnected, ID => ${id}`);
 });
 
 bot.on('shardResumed', (replayed, shardID) => {
