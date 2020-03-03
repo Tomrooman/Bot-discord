@@ -7,6 +7,7 @@ import Player from './lib/js/player.js';
 import Settings from './lib/js/settings.js';
 import Streams from './lib/js/streams.js';
 import config from './config.json';
+import https from 'https';
 // import Speech from './lib/js/speech.js';
 // const mongoose = require('mongoose');
 const bot = new Discord.Client();
@@ -25,6 +26,11 @@ bot.on('ready', () => {
         .catch(e => console.log('Error while set presence : ', e.message));
     console.log(' - Connected : ' + config.WHAT);
     console.log(' - Connected guilds : ', bot.guilds.cache.size);
+    // Keep bot connection alive
+    setInterval(() => {
+        console.log(`interval keep alive => ${dateFormat(Date.now(), 'HH:MM:ss dd/mm/yyyy')} -----`);
+        https.get('https://syxbot.com/api/');
+    }, (1000 * 60 * 30));
 });
 
 bot.on('message', (message) => {
@@ -42,7 +48,7 @@ bot.on('message', (message) => {
 bot.on('shardReconnecting', id => {
     // bot.user.setActivity(`${config.prefix}help | https://syxbot.com/docs`, { type: 'PLAYING' })
     //     .catch(e => console.log('Error while set presence : ', e.message));
-    bot.login(config.token);
+    // bot.login(config.token);
     console.log(`Shard reconnected, ID => ${id}`);
 });
 
