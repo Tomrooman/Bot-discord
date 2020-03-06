@@ -7,7 +7,7 @@ import Player from './lib/js/player.js';
 import Settings from './lib/js/settings.js';
 import Streams from './lib/js/streams.js';
 import config from './config.json';
-import https from 'https';
+import Axios from 'axios';
 // import Speech from './lib/js/speech.js';
 // const mongoose = require('mongoose');
 const bot = new Discord.Client();
@@ -28,8 +28,7 @@ bot.on('ready', () => {
     console.log(' - Connected guilds : ', bot.guilds.cache.size);
     // Keep bot connection alive
     setInterval(() => {
-        console.log(`interval keep alive => ${dateFormat(Date.now(), 'HH:MM:ss dd/mm/yyyy')} -----`);
-        https.get('https://syxbot.com/api/');
+        Axios.post('https://syxbot.com/api/');
     }, (1000 * 60 * 30));
 });
 
