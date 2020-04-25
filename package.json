@@ -8,7 +8,7 @@
         "test": "mocha --require @babel/register ./tests/index.test.js --exit",
         "start": "pm2 start index.js --interpreter babel-node --name syxbot",
         "dev": "pm2 start index.js --ignore-watch='node_modules audio' --watch --interpreter babel-node --name syxbot && npm run log",
-        "log": "pm2 log --lines 100 syxbot ",
+        "log": "pm2 log --lines 500 syxbot ",
         "status": "pm2 status",
         "stop": "pm2 stop syxbot",
         "stopall": "pm2 stop all",
