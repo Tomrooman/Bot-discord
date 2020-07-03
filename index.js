@@ -5,7 +5,7 @@ import Level from './lib/js/level.js';
 import Helper from './lib/js/helper.js';
 import Player from './lib/js/player.js';
 import Settings from './lib/js/settings.js';
-import Streams from './lib/js/streams.js';
+// import Streams from './lib/js/streams.js';
 import config from './config.json';
 import Axios from 'axios';
 // import Speech from './lib/js/speech.js';
@@ -21,14 +21,14 @@ updateSettings();
 
 bot.on('ready', () => {
     disconnectBotFromOldChannel();
-    new Streams(bot);
-    bot.user.setActivity(`${config.prefix}help | https://syxbot.com/docs`, { type: 'PLAYING' })
+    // new Streams(bot);
+    bot.user.setActivity(`${config.prefix}help`, { type: 'PLAYING' })
         .catch(e => console.log('Error while set presence : ', e.message));
     console.log(' - Connected : ' + config.WHAT);
     console.log(' - Connected guilds : ', bot.guilds.cache.size);
     // Keep bot connection alive
     setInterval(() => {
-        Axios.post('https://syxbot.com/api/');
+        Axios.post('/api/');
     }, (1000 * 60 * 30));
 });
 
@@ -39,15 +39,12 @@ bot.on('message', (message) => {
     else if (message.content.toLowerCase().startsWith(config.prefix) && message.content.indexOf('!!!') === -1) {
         Controller(message, config.prefix, bot);
     }
-    else if (message.author.id !== config.clientId) {
-        Level.addXp(message);
-    }
+    // else if (message.author.id !== config.clientId) {
+    //     Level.addXp(message);
+    // }
 });
 
 bot.on('shardReconnecting', id => {
-    // bot.user.setActivity(`${config.prefix}help | https://syxbot.com/docs`, { type: 'PLAYING' })
-    //     .catch(e => console.log('Error while set presence : ', e.message));
-    // bot.login(config.token);
     console.log(`Shard reconnected, ID => ${id}`);
 });
 
@@ -191,8 +188,6 @@ function updateSettings() {
 
 function disconnectBotFromOldChannel() {
     console.log('Disconnecting from all channels ...');
-    // console.log('BOT GUILDS : ', bot.guilds.cache);
-    // const allGuilds = bot.guilds.cache ? bot.guilds.cache : bot.guilds
     bot.guilds.cache.map(g => {
         g.channels.cache.map(channel => {
             if (channel.type === 'voice') {
