@@ -8,7 +8,7 @@
         "test": "mocha --require @babel/register ./tests/index.test.js --exit",
         "start": "pm2 start index.js --interpreter babel-node --name syxbot",
         "dev": "pm2 start index.js --ignore-watch='node_modules audio' --watch --interpreter babel-node --name syxbot && npm run log",
-        "log": "pm2 log --lines 500 syxbot ",
+        "log": "pm2 log --lines 100 syxbot ",
         "status": "pm2 status",
         "stop": "pm2 stop syxbot",
         "stopall": "pm2 stop all",
@@ -26,13 +26,14 @@
         "discord.js": "^12.2.0",
         "ffmpeg-static": "^4.2.0",
         "lodash": "^4.17.15",
-        "mongoose": "^5.9.10",
-        "pm2": "^4.4.0",
+        "mongoose": "^5.8.5",
+        "node-opus": "^0.3.3",
+        "pm2": "^4.2.1",
         "twit": "^2.2.11",
         "wav": "^1.0.2",
-        "ytdl-core": "^2.1.1",
-        "ytpl": "^0.1.20",
-        "ytsr": "^0.1.12"
+        "ytdl-core": "^1.0.7",
+        "ytpl": "^0.1.18",
+        "ytsr": "^0.1.10"
     },
     "devDependencies": {
         "@babel/cli": "^7.8.4",
