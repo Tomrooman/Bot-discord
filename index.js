@@ -28,7 +28,7 @@ bot.on('ready', () => {
     console.log(' - Connected guilds : ', bot.guilds.cache.size);
     // Keep bot connection alive
     setInterval(() => {
-        Axios.post('/api/');
+        Axios.post('https://syxbot.com/api/');
     }, (1000 * 60 * 30));
 });
 
