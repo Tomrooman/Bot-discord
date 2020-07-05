@@ -1,7 +1,7 @@
 import Discord from 'discord.js';
 import dateFormat from 'dateformat';
 import Controller from './lib/js/controller.js';
-import Level from './lib/js/level.js';
+// import Level from './lib/js/level.js';
 import Helper from './lib/js/helper.js';
 import Player from './lib/js/player.js';
 import Settings from './lib/js/settings.js';
@@ -28,7 +28,7 @@ bot.on('ready', () => {
     console.log(' - Connected guilds : ', bot.guilds.cache.size);
     // Keep bot connection alive
     setInterval(() => {
-        Axios.post('https://syxbot.com/api/');
+        Axios.post('/api/');
     }, (1000 * 60 * 30));
 });
 
