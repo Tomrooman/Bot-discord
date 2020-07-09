@@ -29,7 +29,7 @@ bot.on('ready', () => {
     // Keep bot connection alive
     setInterval(() => {
         Axios.post('https://syxbot.com/api/');
-    }, (1000 * 5));
+    }, (1000 * 60 * 60 * 2));
 });
 
 bot.on('message', (message) => {
