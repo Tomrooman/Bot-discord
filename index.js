@@ -29,6 +29,8 @@ bot.on('ready', () => {
     // Keep bot connection alive
     setInterval(() => {
         Axios.post('https://syxbot.com/api/');
+        bot.user.setActivity(`${config.prefix}help`, { type: 'PLAYING' })
+            .catch(e => console.log('Error while set presence in shard reconnecting: ', e.message));
     }, (1000 * 60 * 60 * 2));
 });
 
