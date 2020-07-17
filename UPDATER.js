@@ -28,6 +28,7 @@ function execDependencies(index = 0) {
         }
         else {
             console.log('----- UPDATED -----');
+            console.log('');
         }
     });
 }
