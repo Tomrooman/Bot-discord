@@ -10,7 +10,9 @@
     },
     "ignorePatterns": [
         "tests/",
-        "public/"
+        "public/",
+        ".yarn/",
+        "dist/"
     ],
     "rules": {
         "brace-style": [
