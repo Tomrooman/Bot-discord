@@ -18,7 +18,7 @@
         "stop-dev": "pm2 stop syxbot_dev",
         "stop-all": "pm2 stop all",
         "clean": "rimraf dist",
-        "remove-modules": "rimraf .yarn/build-state.yml .yarn/cache .yarn/install-state.gz .yarn/unplugged .pnp.js yarn.lock package-lock.json",
+        "remove-modules": "yarn rimraf .yarn/build-state.yml .yarn/cache .yarn/install-state.gz .yarn/unplugged .pnp.js yarn.lock package-lock.json",
         "clean-unusable": "rimraf dist/node_modules dist/UPDATER.js dist/babel.config.json dist/package.json dist/yarn.lock dist/package-lock.json dist/.circleci dist/private dist/.yarn dist/.pnp.js dist/.yarnrc.yml",
         "mongodb": "sudo service mongod start"
     },

@@ -169,23 +169,17 @@ function getSelectionByReaction(reaction) {
 //     }
 // });
 
-function updateSettings() {
-    Settings.update()
-        .then(res => {
-            if (res) {
-                console.log('Connecting syxbot ...');
-                bot.login(config.token);
-            }
-            else {
-                setTimeout(() => {
-                    updateSettings();
-                }, 1000);
-            }
-        })
-        .catch((e) => {
-            console.log('Index error while update settings : ', e.message);
+async function updateSettings() {
+    const res = await Settings.update();
+    if (res) {
+        console.log('Connecting syxbot ...');
+        bot.login(config.token);
+    }
+    else {
+        setTimeout(() => {
             updateSettings();
-        });
+        }, 1000);
+    }
 }
 
 function disconnectBotFromOldChannel() {
