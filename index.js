@@ -8,7 +8,6 @@ import Settings from './lib/js/settings.js';
 // import Streams from './lib/js/streams.js';
 import config from './config.json';
 import Axios from 'axios';
-// import Speech from './lib/js/speech.js';
 // const mongoose = require('mongoose');
 const bot = new Discord.Client();
 
@@ -120,54 +119,9 @@ function getSelectionByReaction(reaction) {
 //     });
 //     mongoose.connection.once('open', () => {
 //         console.log('Connected to database !');
-//         bot.login(config.token);
+//         updateSettings();
 //     });
 // }
-
-// bot.on('voiceStateUpdate', (oldMember, newMember) => {
-//     const newUserChannel = newMember.channelID;
-//     const oldUserChannel = oldMember.channelID;
-//     if (!oldUserChannel && newUserChannel) {
-//         // User Joins a voice channel
-//         console.log('Joined channel ! : ', newMember);
-//         if (checkBot(newMember)) {
-//             console.log('Joined channel with bot in there');
-//         }
-//     }
-//     else if (oldUserChannel && !newUserChannel) {
-//         // User disconnect a voice channel
-//         console.log('Disconnect channel !');
-//     }
-//     else if (oldUserChannel !== newUserChannel) {
-//         // User change channel
-//         console.log('User change channel');
-//         if (checkBot(newMember)) {
-//         }
-//     }
-// });
-
-// function checkBot(memberParam) {
-//     let pass = false;
-//     memberParam.channel.members.map(member => {
-//         console.log('member : ', member.user.bot);
-//         console.log('member id : ', member.id);
-//         if (member.user.bot && member.id === config.clientId) {
-//             console.log('syxbot in the channel');
-//             pass = true;
-//         }
-//     });
-//     return pass;
-// }
-
-// bot.on('guildMemberSpeaking', (user, speaking) => {
-//     if (speaking) {
-//         console.log('Speaking');
-//         new Speech(user, bot);
-//     }
-//     else {
-//         return console.log('not speaking');
-//     }
-// });
 
 async function updateSettings() {
     const res = await Settings.update();
