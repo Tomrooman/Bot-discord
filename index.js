@@ -1,10 +1,11 @@
 import Discord from 'discord.js';
 import dateFormat from 'dateformat';
-import Controller from './lib/js/controller.js';
+import Controller from './lib/js/controller';
 // import Level from './lib/js/level.js';
-import Helper from './lib/js/helper.js';
-import Player from './lib/js/player.js';
-import Settings from './lib/js/settings.js';
+import Helper from './lib/js/helper';
+import Player from './lib/js/player';
+import Settings from './lib/js/settings';
+import { update as dragodindeUpdate } from './lib/js/dragodinde';
 // import Streams from './lib/js/streams.js';
 import config from './config.json';
 import Axios from 'axios';
@@ -59,21 +60,11 @@ bot.on('messageReactionAdd', (reaction, user) => {
         const videoExist = reaction.message.content.indexOf('Ex: ' + config.prefix + 'search p 2') !== -1;
         if (playlistExist || videoExist) {
             const selection = getSelectionByReaction(reaction);
-            if (playlistExist && !videoExist) {
-                if (reaction.emoji.name === '⏩') {
-                    nextReaction(reaction, user, 'playlist');
-                }
-                else {
-                    new Player().selectSongInSearchList(reaction.message, selection, 'playlist', [true, user]);
-                }
+            if (reaction.emoji.name === '⏩') {
+                nextReaction(reaction, user, playlistExist ? 'playlist' : 'video');
             }
-            else if (videoExist && !playlistExist) {
-                if (reaction.emoji.name === '⏩') {
-                    nextReaction(reaction, user, 'video');
-                }
-                else {
-                    new Player().selectSongInSearchList(reaction.message, selection, 'musique', [true, user]);
-                }
+            else {
+                new Player().selectSongInSearchList(reaction.message, selection, playlistExist ? 'playlist' : 'musique', [true, user]);
             }
         }
     }
@@ -106,7 +97,7 @@ function getSelectionByReaction(reaction) {
         return 5;
     }
     return false;
-}
+};
 
 // function connectToDatabase() {
 //     console.log('----- Starting -----');
@@ -124,17 +115,11 @@ function getSelectionByReaction(reaction) {
 // }
 
 async function updateSettings() {
-    const res = await Settings.update();
-    if (res) {
-        console.log('Connecting syxbot ...');
-        bot.login(config.token);
-    }
-    else {
-        setTimeout(() => {
-            updateSettings();
-        }, 1000);
-    }
-}
+    await Settings.update();
+    await dragodindeUpdate();
+    console.log('Connecting syxbot ...');
+    bot.login(config.token);
+};
 
 function disconnectBotFromOldChannel() {
     console.log('Disconnecting from all channels ...');
