@@ -8,9 +8,9 @@
         "start-log": "yarn npm-run-all build server log-prod",
         "start": "yarn npm-run-all build server",
         "server": "pm2 start dist/index.js --name syxbot_prod",
-        "build": "npm-run-all clean transpile clean-unusable",
-        "transpile": "babel ./ --out-dir dist --copy-files --ignore node_modules,runner.js,UPDATER.js,babel.config.json,package.json,yarn.lock,package-lock.json,.yarn,.pnp.js,.yarnrc.yml",
-        "dev": "yarn pm2 start runner.js --watch --name syxbot_dev && npm run log-dev",
+        "build": "npm-run-all clean transpile",
+        "transpile": "yarn tsc",
+        "dev": "yarn rimraf dist && yarn tsc && yarn concurrently \"yarn tsc --watch\" \"yarn pm2 start dist/index.js --watch --name syxbot_dev\" \"npm run log-dev\"",
         "log-prod": "yarn pm2 log --lines 100 syxbot_prod",
         "log-dev": "yarn pm2 log --lines 100 syxbot_dev",
         "status": "yarn pm2 status",
@@ -18,8 +18,7 @@
         "stop-dev": "yarn pm2 stop syxbot_dev",
         "stop-all": "yarn pm2 stop all",
         "clean": "rimraf dist",
-        "remove-modules": "yarn rimraf .yarn/build-state.yml .yarn/cache .yarn/install-state.gz .yarn/unplugged .pnp.js yarn.lock package-lock.json",
-        "clean-unusable": "rimraf dist/node_modules dist/runner.js dist/UPDATER.js dist/babel.config.json dist/package.json dist/yarn.lock dist/package-lock.json dist/.circleci dist/private dist/.yarn dist/.pnp.js dist/.yarnrc.yml"
+        "remove-modules": "yarn rimraf node_modules .yarn/build-state.yml .yarn/cache .yarn/install-state.gz .yarn/unplugged .pnp.js yarn.lock package-lock.json"
     },
     "private": true,
     "author": "Tom Rooman",
@@ -35,7 +34,6 @@
         "convert-svg-to-png": "^0.5.0",
         "dateformat": "^3.0.3",
         "discord.js": "^12.2.0",
-        "esm": "^3.2.25",
         "ffmpeg-static": "^4.2.5",
         "lodash": "^4.17.19",
         "mongoose": "^5.9.24",
@@ -48,7 +46,10 @@
         "ytsr": "^0.1.15"
     },
     "devDependencies": {
+        "@types/node": "^14.0.25",
+        "concurrently": "^5.2.0",
         "eslint": "^7.4.0",
-        "mocha": "^8.0.1"
+        "mocha": "^8.0.1",
+        "typescript": "^3.9.7"
     }
 }
