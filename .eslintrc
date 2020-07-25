@@ -1,18 +1,26 @@
 {
-    "extends": "eslint:recommended",
+    "plugins": [
+        "@typescript-eslint"
+    ],
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
     "env": {
         "node": true,
         "es2020": true
     },
     "root": true,
     "parserOptions": {
+        "ecmaVersion": 2020,
         "sourceType": "module"
     },
     "ignorePatterns": [
-        "tests/",
-        "public/",
+        "test/",
         ".yarn/",
-        "dist/"
+        "dist/",
+        "node_modules/"
     ],
     "rules": {
         "brace-style": [
@@ -60,6 +68,7 @@
                 "max": 2
             }
         ],
+        "@typescript-eslint/no-explicit-any": "off",
         "no-console": "off",
         "no-empty-function": "error",
         "no-floating-decimal": "error",

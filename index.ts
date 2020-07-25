@@ -1,4 +1,4 @@
-import Discord from 'discord.js';
+import Discord, { VoiceChannel } from 'discord.js';
 import dateFormat from 'dateformat';
 import Controller from './lib/js/controller';
 // import Level from './lib/js/level.js';
@@ -22,16 +22,16 @@ updateSettings();
 bot.on('ready', () => {
     disconnectBotFromOldChannel();
     // new Streams(bot);
-    bot.user.setActivity(`${config.prefix}help`, { type: 'PLAYING' })
+    bot.user!.setActivity(`${config.prefix}help`, { type: 'PLAYING' })
         .catch(e => console.log('Error while set presence : ', e.message));
     console.log(' - Connected : ' + config.WHAT);
     console.log(' - Connected guilds : ', bot.guilds.cache.size);
     // Keep bot connection alive
     setInterval(() => {
         Axios.post('https://syxbot.com/api/');
-        bot.user.setActivity(`${config.prefix}help`, { type: 'PLAYING' })
+        bot.user!.setActivity(`${config.prefix}help`, { type: 'PLAYING' })
             .catch(e => console.log('Error while set presence in shard reconnecting: ', e.message));
-    }, (1000 * 60 * 60 * 2));
+    }, (1000 * 60 * 60 * 6));
 });
 
 bot.on('message', (message) => {
@@ -50,7 +50,7 @@ bot.on('shardReconnecting', id => {
     console.log(`Shard reconnected, ID => ${id}`);
 });
 
-bot.on('shardResumed', (replayed, shardID) => {
+bot.on('shardResume', (replayed, shardID) => {
     console.log(`Shard ID ${shardID} resumed connection and replayed ${replayed} events.`);
 });
 
@@ -129,7 +129,7 @@ function disconnectBotFromOldChannel() {
                 if (channel.members) {
                     channel.members.map(member => {
                         if (member.user.bot && member.user.id === config.clientId) {
-                            channel.join()
+                            (channel as VoiceChannel).join()
                                 .then(connection => {
                                     connection.channel.leave();
                                 })
