@@ -3,7 +3,11 @@
 import axios from 'axios';
 import dateFormat from 'dateformat';
 
-const dofusInfos = { notif: [] };
+type dofusInfosType = {
+    notif: string
+}
+
+const dofusInfos: dofusInfosType[] = [];
 
 const controller = (message, words) => {
     if (words[1]) {
@@ -16,17 +20,19 @@ const controller = (message, words) => {
 
 const notif = async (message, words) => {
     if (!words[2] || words[2] === 'status') {
-        const status = dofusInfos.notif[message.author.id] ? dofusInfos.notif[message.author.id].toUpperCase() : 'OFF';
+        const status = dofusInfos[message.author.id] ? dofusInfos[message.author.id].notif.toUpperCase() : 'OFF';
         return message.channel.send('> ** Dragodindes ** \n > `Notifications` : `' + status + '`');
     }
     if (words[2].toLowerCase() === 'on' || words[2].toLowerCase() === 'off') {
         const status = words[2].toLowerCase() === 'on' ? 'on' : 'off';
-        if ((!dofusInfos.notif[message.author.id] && status === 'on') || (dofusInfos.notif[message.author.id] && dofusInfos.notif[message.author.id] !== status)) {
+        if ((!dofusInfos[message.author.id] && status === 'on') || (dofusInfos[message.author.id] && dofusInfos[message.author.id].notif !== status)) {
             const { data } = await axios.post('/api/dofus/dragodindes/notif', {
                 userId: message.author.id,
                 status: status
             });
-            dofusInfos.notif[message.author.id] = data.notif ? 'on' : 'off';
+            dofusInfos[message.author.id] = {
+                notif: data.notif ? 'on' : 'off'
+            };
             return message.channel.send('> ** Dragodindes ** \n > `Notifications` : `' + status.toUpperCase() + '`');
         }
         return message.channel.send('❌ Vous devez écrire une valeur différente de celle actuelle');
@@ -42,7 +48,9 @@ const update = async () => {
     const { data } = await axios.post('/api/dofus/dragodindes/notif/all');
     if (data) {
         data.map(setting => {
-            dofusInfos.notif[setting.userId] = setting.notif ? 'on' : 'off';
+            dofusInfos[setting.userId] = {
+                notif: setting.notif ? 'on' : 'off'
+            }
         });
         console.log(' - Dragodindes settings updated !');
         return true;

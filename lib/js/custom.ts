@@ -1,3 +1,5 @@
+'use strict';
+
 export default class Custom {
     static pioupiou(message) {
         message.member.guild.members.cache.map(member => {

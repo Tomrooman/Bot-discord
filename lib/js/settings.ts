@@ -1,9 +1,24 @@
+'use strict';
+
 import dateFormat from 'dateformat';
 import _ from 'lodash';
 import axios from 'axios';
 import config from './../../config.json';
 
-const settings = [];
+type settingsType = {
+    guildId: string,
+    notif: {
+        current: string,
+        added: string,
+        removed: string,
+        radio: string
+    },
+    audio: {
+        volume: number
+    }
+}
+
+const settings: settingsType[] = [];
 
 export default class Settings {
     constructor(message, words) {
@@ -49,7 +64,7 @@ export default class Settings {
         const volume = '>     volume : `' + settingsObj.audio.volume + '`\n';
         const radio = '>     radio : `' + settingsObj.notif.radio.toUpperCase() + '`\n';
         const listAsString = '> **⚙️ Paramètres du serveur** \n > \n > **Notif [on/off]** 🔔 \n' + current + added + removed + radio + '> \n' + '> **Audio [0...1]** 🔊 \n' + volume;
-        message.channel.send(listAsString);
+        return message.channel.send(listAsString);
     }
 
     paramsControl(message, words) {

@@ -1,8 +1,10 @@
-import Helper from './helper.js';
-import Player from './player.js';
-import Settings from './settings.js';
+'use strict';
+
+import Helper from './helper';
+import Player from './player';
+import Settings from './settings';
 import config from './../../config.json';
-import Discord from 'discord.js';
+import Discord, { VoiceConnection } from 'discord.js';
 import Radios from './../json/radios.json';
 
 export default class Radio {
@@ -59,7 +61,7 @@ export default class Radio {
                 Player.removeArray(message, 'playlistArray');
                 Player.removeArray(message, 'playlistInfos');
                 Player.streamDestroy(message);
-                const radioStream = Player.getArray(message, 'connections').play(radio.url);
+                const radioStream = (Player.getArray(message, 'connections') as VoiceConnection).play(radio.url);
                 radioStream.setVolume(0.4);
                 Player.setArray(message, 'streams', radioStream);
             }
@@ -78,7 +80,7 @@ export default class Radio {
                 }
                 Player.setArray(message, 'connections', connection);
                 Player.setArray(message, 'connected', voiceChannel.id);
-                const radioStream = Player.getArray(message, 'connections').play(radio.url);
+                const radioStream = (Player.getArray(message, 'connections') as VoiceConnection).play(radio.url);
                 radioStream.setVolume(setting ? setting.audio.volume : 0.4);
                 Player.setArray(message, 'streams', radioStream);
             })

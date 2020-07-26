@@ -1,4 +1,6 @@
-import Helper from './helper.js';
+'use strict';
+
+import Helper from './helper';
 
 export default class Admin {
     constructor(message, words, bot) {

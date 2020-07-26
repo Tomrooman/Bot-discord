@@ -1,6 +1,7 @@
 'use strict';
 
 import commands from './../json/commands.json';
+import { VoiceChannel } from 'discord.js';
 
 export default class Helper {
     constructor(message, words) {
@@ -12,8 +13,8 @@ export default class Helper {
         }
     }
 
-    static take_user_voiceChannel(message) {
-        let voiceChannel = false;
+    static take_user_voiceChannel(message): VoiceChannel {
+        let voiceChannel = {};
         if (message.guild) {
             message.guild.channels.cache.map(channel => {
                 if (channel.type === 'voice') {
@@ -27,11 +28,11 @@ export default class Helper {
                 }
             });
         }
-        return voiceChannel;
+        return voiceChannel as VoiceChannel;
     }
 
-    static take_user_voiceChannel_by_reaction(message, author) {
-        let voiceChannel = false;
+    static take_user_voiceChannel_by_reaction(message, author): VoiceChannel {
+        let voiceChannel = {};
         message.guild.channels.cache.map(channel => {
             if (channel.type === 'voice') {
                 if (channel.members) {
@@ -43,7 +44,7 @@ export default class Helper {
                 }
             }
         });
-        return voiceChannel;
+        return voiceChannel as VoiceChannel;
     }
 
     // static getBot(message, choice) {

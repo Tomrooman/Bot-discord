@@ -1,21 +1,23 @@
 import Discord, { VoiceChannel } from 'discord.js';
 import dateFormat from 'dateformat';
 import Controller from './lib/js/controller';
-// import Level from './lib/js/level.js';
 import Helper from './lib/js/helper';
 import Player from './lib/js/player';
 import Settings from './lib/js/settings';
 import { update as dragodindeUpdate } from './lib/js/dragodinde';
-// import Streams from './lib/js/streams.js';
 import config from './config.json';
 import Axios from 'axios';
+import chalk from 'chalk';
+// import Streams from './lib/js/streams';
+// import Level from './lib/js/level';
 // const mongoose = require('mongoose');
+
 const bot = new Discord.Client();
 
-// connectToDatabase();
 console.log(' ');
 console.log('----- ' + dateFormat(Date.now(), 'HH:MM:ss dd/mm/yyyy') + ' -----');
 
+// connectToDatabase();
 updateSettings();
 
 
@@ -24,9 +26,16 @@ bot.on('ready', () => {
     // new Streams(bot);
     bot.user!.setActivity(`${config.prefix}help`, { type: 'PLAYING' })
         .catch(e => console.log('Error while set presence : ', e.message));
-    console.log(' - Connected : ' + config.WHAT);
-    console.log(' - Connected guilds : ', bot.guilds.cache.size);
-    // Keep bot connection alive
+    if (config.WHAT === 'DEV') console.log(chalk.bgRgb(60, 121, 0)(`\n         CONNECTED          `));
+    if (config.WHAT === 'DEV') {
+        console.log('      Connected => ' + config.WHAT);
+        console.log('      Guilds =>', bot.guilds.cache.size);
+    }
+    else {
+        console.log('Connected => ' + config.WHAT);
+        console.log('Guilds =>', bot.guilds.cache.size);
+    }
+    // Keep bot connection alive & activity (send signal every 6H)
     setInterval(() => {
         Axios.post('https://syxbot.com/api/');
         bot.user!.setActivity(`${config.prefix}help`, { type: 'PLAYING' })
@@ -115,9 +124,10 @@ function getSelectionByReaction(reaction) {
 // }
 
 async function updateSettings() {
+    if (config.WHAT === 'DEV') console.log(chalk.bgRgb(215, 102, 8)('          SETTINGS          '));
     await Settings.update();
     await dragodindeUpdate();
-    console.log('Connecting syxbot ...');
+    if (config.WHAT === 'DEV') console.log(chalk.bgRgb(25, 108, 207)('\n         CONNECTION         '));
     bot.login(config.token);
 };
 

@@ -1,8 +1,10 @@
-const removeInfos = [];
+'use strict';
+
+const removeInfos: number[] = [];
 
 export default class Message {
-    constructor(message, words, all = false) {
-        if (all) {
+    constructor(message, words, all = '') {
+        if (all !== '') {
             this.remove(message, 'all');
         }
         else if (words[1] && Number.isFinite(parseInt(words[1])) && parseInt(words[1]) > 0) {

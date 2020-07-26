@@ -1,24 +1,27 @@
+'use strict';
+
 import ytdl from 'ytdl-core';
 import ytpl from 'ytpl';
 import ytsr from 'ytsr';
-import Helper from './helper.js';
-import Settings from './settings.js';
+import Helper from './helper';
+import Settings from './settings';
 import _ from 'lodash';
 import config from './../../config.json';
-import Discord from 'discord.js';
+import Discord, { VoiceChannel, VoiceConnection, StreamDispatcher } from 'discord.js';
+import * as T from './../types/player';
 
-const connectionsArray = [];
-const streamsArray = [];
-const playlistArray = [];
-const playlistInfos = [];
-const connectedGuild = [];
-const radioPlayed = [];
-const musicParams = { 'cancel': [], 'loop': [], 'wait': [], 'nextSetLoop': [], 'tryToNext': [] };
-const searchVideo = [];
-const searchPlaylist = [];
+const connectionsArray: VoiceConnection[] = [];
+const streamsArray: StreamDispatcher[] = [];
+const playlistArray: T.playlistArray[] = [];
+const playlistInfos: T.playlistInfos[][] = [];
+const connectedGuild: string[] = [];
+const radioPlayed: boolean[] = [];
+const musicParams: T.musicParams = { 'cancel': [], 'loop': [], 'wait': [], 'nextSetLoop': [], 'tryToNext': [] };
+const searchVideo: T.searchVideo[] = [];
+const searchPlaylist: T.searchPlaylist[] = [];
 
 export default class Player {
-    constructor(message, command, words) {
+    constructor(message = undefined, command = undefined, words = []) {
         // Check command and call function if args in new instance
         if (message) {
             if (command === 'next') {
@@ -105,7 +108,7 @@ export default class Player {
         streamsArray[message.guild.id].destroy();
     }
 
-    playSongs(message, command, words, byReaction = [false, undefined]) {
+    playSongs(message, command, words, byReaction = [false, {}]) {
         let voiceChannel = Helper.take_user_voiceChannel(message);
         if (byReaction[0]) {
             // If call by reaction get voice channel with good function
@@ -329,7 +332,7 @@ export default class Player {
 
     setArrayWithChoice(message, title, type, nextPage, byReaction) {
         let nextPageVar = nextPage;
-        const options = {
+        const options: { limit: number, nextpageRef?: string } = {
             limit: 20
         };
         if (!nextPage) {
@@ -371,7 +374,7 @@ export default class Player {
         }
         filteredResult.map(result => {
             // If selected array length < 5 push element in it ELSE push in last array for the next page
-            const resultObj = {
+            const resultObj: { url: string, title: string, plLength?: number } = {
                 url: result.link,
                 title: result.title
             };
@@ -397,7 +400,7 @@ export default class Player {
         // Call without instance and activate or desactivate repeat mode
         const userChannel = Helper.take_user_voiceChannel(message);
         if (Helper.verifyBotLocation(message, connectedGuild[message.guild.id], userChannel)) {
-            if (playlistArray[message.guild.id] && playlistArray[message.guild.id].length) {
+            if (playlistArray[message.guild.id] && playlistArray[message.guild.id]['url'].length) {
                 if (!musicParams.loop[message.guild.id]) {
                     musicParams.loop[message.guild.id] = true;
                     message.channel.send('🔄 Mode répétition activé !');
@@ -447,7 +450,7 @@ export default class Player {
         if (words[1] === 'p' || words[1] === 'play') {
             // If there is something after p|play search for the music
             if (words[2]) {
-                Player.selectSongInSearchList(message, parseInt(words[2]));
+                this.selectSongInSearchList(message, parseInt(words[2]));
             }
             // If nothing after p|play send the list
             else {
@@ -457,7 +460,7 @@ export default class Player {
         else if (words[1] === 'pl' || words[1] === 'playlist') {
             // If there is something after pl|playlist search for the playlist
             if (words[2]) {
-                Player.selectSongInSearchList(message, parseInt(words[2]), 'playlist');
+                this.selectSongInSearchList(message, parseInt(words[2]), 'playlist');
             }
             else {
                 this.sendSearchResultsAsString(message, 'playlist');
@@ -566,7 +569,7 @@ export default class Player {
         const setting = Settings.get(message.guild.id);
         const embedObj = this.setEmbedObj(playlistInfos[message.guild.id][0].title, playlistInfos[message.guild.id][0].id, playlistInfos[message.guild.id][0].thumbnail, playlistInfos[message.guild.id][0].duration);
         this.sendMusicEmbed(message, embedObj);
-        const stream = ytdl(playlistArray[message.guild.id][0], { filter: 'audio', liveBuffer: 10000, highWaterMark: 512 });
+        const stream = ytdl(playlistArray[message.guild.id]['url'][0], { filter: 'audio', liveBuffer: 10000, highWaterMark: 512 });
         delete musicParams.tryToNext[message.guild.id];
         streamsArray[message.guild.id] = connectionsArray[message.guild.id].play(stream, { highWaterMark: 512 });
         // CHECK IF SPEAKING --> !streamsArray[message.guild.id].player.voiceConnection.speaking.bitfield
@@ -621,13 +624,13 @@ export default class Player {
         if (playlistArray[message.guild.id]) {
             // If loop is desactivate
             if (!musicParams.loop[message.guild.id]) {
-                delete playlistArray[message.guild.id][0];
+                delete playlistArray[message.guild.id]['url'][0];
                 delete playlistInfos[message.guild.id][0];
-                playlistArray[message.guild.id] = _.compact(playlistArray[message.guild.id]);
+                playlistArray[message.guild.id]['url'] = _.compact(playlistArray[message.guild.id]['url']);
                 playlistInfos[message.guild.id] = _.compact(playlistInfos[message.guild.id]);
             }
             // If playlist is empty
-            if (!playlistArray[message.guild.id][0]) {
+            if (!playlistArray[message.guild.id]['url'][0]) {
                 musicParams.wait[message.guild.id] = true;
                 // Use this condition if loop is activate and user try to go to the next song without queued songs
                 if (musicParams.loop[message.guild.id] || musicParams.nextSetLoop[message.guild.id]) {
@@ -653,14 +656,14 @@ export default class Player {
         const add = added[0] && setting && setting.notif.added === 'on';
         const current = !added[0] && setting && setting.notif.current === 'on';
         if (!setting || force || add || current) {
-            const queuedLength = playlistArray[message.guild.id].length - 1;
-            let formattedDuration = 0;
+            const queuedLength = playlistArray[message.guild.id]['url'].length - 1;
+            let formattedDuration = '';
             const musicLink = type === 'video' ? `[${embedObj.title}](https://www.youtube.com/watch?v=${embedObj.id})` : `[${embedObj.title}](https://www.youtube.com/playlist?list=${embedObj.id})`;
             const color = added[0] ? 3768896 : 5520025;
             const title = added[0] && added[1] > 1 ? 'Playlist ajoutée' : added[0] ? 'Musique ajoutée' : 'Musique';
             const authorUrl = title.indexOf('ajoutée') !== -1 ? 'https://syxbot.com/assets/img/music_add.png' : 'https://syxbot.com/assets/img/embed_music.png';
             // Calculate the queued duration and save as formatted string
-            if (playlistArray[message.guild.id].length >= 2) {
+            if (playlistArray[message.guild.id]['url'].length >= 2) {
                 playlistInfos[message.guild.id].map((video, index) => {
                     if (index >= 1) {
                         this.addDuration(message, index, video.duration, 'current');
@@ -675,11 +678,11 @@ export default class Player {
                 .setFooter('🎶 "' + config.prefix + 'p list" pour afficher la file d\'attente')
                 .setThumbnail(embedObj.thumbnail)
                 .addField('Titre', musicLink, true)
-                .addBlankField(true)
+                .addField('\u200b', '\u200b', true)
                 .addField('File d\'attente', queuedLength, true)
                 .addField('Durée', embedObj.duration, true)
-                .addBlankField(true)
-                .addField('Durée en attente', formattedDuration, true);
+                .addField('\u200b', '\u200b', true)
+                .addField('Durée en attente', formattedDuration || '0', true);
             message.channel.send({ embed });
         }
     }
@@ -698,13 +701,13 @@ export default class Player {
     }
 
     addPlaylistItems(message, playlist, play, byReaction) {
-        let voiceChannel = Helper.take_user_voiceChannel(message);
+        let voiceChannel: VoiceChannel = Helper.take_user_voiceChannel(message);
         if (byReaction[0]) {
             voiceChannel = Helper.take_user_voiceChannel_by_reaction(message, byReaction[1]);
         }
         if (radioPlayed[message.guild.id] || play) {
             // If radio is active or if we tell us to play the song now
-            playlistArray[message.guild.id] = [];
+            playlistArray[message.guild.id]['url'] = [];
             playlistInfos[message.guild.id] = [];
             delete radioPlayed[message.guild.id];
         }
@@ -715,9 +718,9 @@ export default class Player {
         const embedObj = this.setEmbedObj(playlist.title, playlist.id, playlist.items[0].thumbnail, formattedDuration);
         if (play) {
             voiceChannel.join()
-                .then(conection => {
+                .then(connection => {
                     connectedGuild[message.guild.id] = voiceChannel.id;
-                    connectionsArray[message.guild.id] = conection;
+                    connectionsArray[message.guild.id] = connection;
                     this.sendMusicEmbed(message, embedObj, [true, playlist.items.length], 'playlist');
                     this.playSong(message);
                 });
@@ -730,7 +733,7 @@ export default class Player {
                 delete radioPlayed[message.guild.id];
                 this.playSong(message);
             }
-            else if (musicParams.wait[message.guild.id] || playlistArray[message.guild.id].length === playlistLength) {
+            else if (musicParams.wait[message.guild.id] || playlistArray[message.guild.id]['url'].length === playlistLength) {
                 delete musicParams.wait[message.guild.id];
                 this.playSong(message);
             }
@@ -741,20 +744,20 @@ export default class Player {
         const videoURL = 'https://www.youtube.com/watch?v=';
         let pushCount = 0;
         playlist.items.map(video => {
-            if (video.title !== '[Deleted video]' && video.title !== '[Private video]') {
+            if (video.videoDetails.title !== '[Deleted video]' && video.videoDetails.title !== '[Private video]') {
                 // Push elements and calculate how many elements was pushed
                 pushCount++;
-                this.addDuration(message, pushCount, video.duration, 'new');
-                playlistArray[message.guild.id].push(videoURL + video.id);
+                this.addDuration(message, pushCount, video.videoDetails.duration, 'new');
+                playlistArray[message.guild.id]['url'].push(videoURL + video.videoDetails.videoId);
                 let thumbnailURL = '';
-                if (video.thumbnail) {
-                    thumbnailURL = video.thumbnail;
+                if (video.videoDetails.thumbnail) {
+                    thumbnailURL = video.videoDetails.thumbnail;
                 }
                 playlistInfos[message.guild.id].push({
-                    title: video.title,
-                    id: video.id,
+                    title: video.videoDetails.title,
+                    id: video.videoDetails.id,
                     thumbnail: thumbnailURL,
-                    duration: video.duration
+                    duration: video.videoDetails.duration
                 });
             }
         });
@@ -789,10 +792,10 @@ export default class Player {
             }
         }
         else if (type === 'new') {
-            playlistArray[message.guild.id]['newPlaylistDuration'] += this.getSeconds(duration);
+            playlistArray[message.guild.id]['newPlaylistDuration']! += this.getSeconds(duration);
         }
         else {
-            playlistArray[message.guild.id]['currentDuration'] += this.getSeconds(duration);
+            playlistArray[message.guild.id]['currentDuration']! += this.getSeconds(duration);
         }
     }
 
@@ -812,21 +815,20 @@ export default class Player {
         return resultSeconds;
     }
 
-    getVideo(message, words, playSongParams = true, byReaction) {
+    async getVideo(message, words, playSongParams = true, byReaction) {
         // Call video API
-        ytdl.getBasicInfo(words[1], (err, infos) => {
-            if (infos) {
-                if (infos.title !== '[Deleted video]' && infos.title !== '[Private video]') {
-                    this.setMusicArrayAndPlayMusic(infos, message, playSongParams, byReaction);
-                }
-                else {
-                    message.channel.send('❌ Cette vidéo est privée ou a été supprimée !');
-                }
+        const infos = await ytdl.getBasicInfo(words[1]);
+        if (infos) {
+            if (infos.videoDetails.title !== '[Deleted video]' && infos.videoDetails.title !== '[Private video]') {
+                this.setMusicArrayAndPlayMusic(infos, message, playSongParams, byReaction);
             }
             else {
-                message.channel.send('❌ Impossible de charger la vidéo, probablement indisponible dans ce pays !');
+                message.channel.send('❌ Cette vidéo est privée ou a été supprimée !');
             }
-        });
+        }
+        else {
+            message.channel.send('❌ Impossible de charger la vidéo !');
+        }
     }
 
     setMusicArrayAndPlayMusic(infos, message, playSongParams, byReaction) {
@@ -854,8 +856,8 @@ export default class Player {
         else {
             // If radio is inactive and song is playing so send the added embed
             const formattedDuration = this.clearAndAddArrayInfos(message, infos);
-            const embedObj = this.setEmbedObj(infos.title, infos.video_id, infos.player_response.videoDetails.thumbnail.thumbnails[0].url, formattedDuration);
-            if (playlistArray[message.guild.id].length === 1) {
+            const embedObj = this.setEmbedObj(infos.videoDetails.title, infos.videoDetails.videoId, infos.videoDetails.thumbnail.thumbnails[0].url, formattedDuration);
+            if (playlistArray[message.guild.id]['url'].length === 1) {
                 this.playSong(message);
             }
             else {
@@ -875,16 +877,16 @@ export default class Player {
 
     clearAndAddArrayInfos(message, infos) {
         // Create queued array if needed and push item in it
-        if (!playlistArray[message.guild.id]) {
-            playlistArray[message.guild.id] = [];
+        if (!playlistArray[message.guild.id] || !playlistArray[message.guild.id]['url']) {
+            playlistArray[message.guild.id] = { url: [] };
             playlistInfos[message.guild.id] = [];
         }
-        playlistArray[message.guild.id].push(infos.video_url);
-        const formattedDuration = this.convertSecondsToFormattedDuration(infos.player_response.videoDetails.lengthSeconds);
+        playlistArray[message.guild.id]['url'].push(infos.videoDetails.video_url);
+        const formattedDuration = this.convertSecondsToFormattedDuration(infos.videoDetails.lengthSeconds);
         playlistInfos[message.guild.id].push({
-            title: infos.title,
-            id: infos.video_id,
-            thumbnail: infos.player_response.videoDetails.thumbnail.thumbnails[0].url,
+            title: infos.videoDetails.title,
+            id: infos.videoDetails.videoId,
+            thumbnail: infos.videoDetails.thumbnail.thumbnails[0].url,
             duration: formattedDuration
         });
         return formattedDuration;
@@ -897,18 +899,18 @@ export default class Player {
                 if (number > 0 && number <= playlistInfos[message.guild.id].length) {
                     // Add the current music at the top of the list
                     playlistInfos[message.guild.id].splice(1, 0, playlistInfos[message.guild.id][0]);
-                    playlistArray[message.guild.id].splice(1, 0, playlistArray[message.guild.id][0]);
+                    playlistArray[message.guild.id]['url'].splice(1, 0, playlistArray[message.guild.id]['url'][0]);
                     // Add selected music at the top of the list
                     playlistInfos[message.guild.id].splice(1, 0, playlistInfos[message.guild.id][number + 1]);
-                    playlistArray[message.guild.id].splice(1, 0, playlistArray[message.guild.id][number + 1]);
+                    playlistArray[message.guild.id]['url'].splice(1, 0, playlistArray[message.guild.id]['url'][number + 1]);
                     // Remove selected music from where we copy it (+2 because we add 2 item before)
                     delete playlistInfos[message.guild.id][number + 2];
-                    delete playlistArray[message.guild.id][number + 2];
+                    delete playlistArray[message.guild.id]['url'][number + 2];
                     // Remove current music
                     delete playlistInfos[message.guild.id][0];
-                    delete playlistArray[message.guild.id][0];
+                    delete playlistArray[message.guild.id]['url'][0];
                     // Compact who remove all falsey values
-                    playlistArray[message.guild.id] = _.compact(playlistArray[message.guild.id]);
+                    playlistArray[message.guild.id]['url'] = _.compact(playlistArray[message.guild.id]['url']);
                     playlistInfos[message.guild.id] = _.compact(playlistInfos[message.guild.id]);
                     // Destroy stream and start playing
                     streamsArray[message.guild.id].destroy();
@@ -954,7 +956,7 @@ export default class Player {
     }
 
     createSongsString(message) {
-        const songsArray = [];
+        const songsArray: string[] = [];
         let songs = '';
         // Create string with queued songs
         playlistInfos[message.guild.id].map((music, index) => {
@@ -979,7 +981,7 @@ export default class Player {
         const userChannel = Helper.take_user_voiceChannel(message);
         if (userChannel) {
             if (Helper.verifyBotLocation(message, connectedGuild[message.guild.id], userChannel)) {
-                if (playlistArray[message.guild.id] && playlistArray[message.guild.id].length) {
+                if (playlistArray[message.guild.id] && playlistArray[message.guild.id]['url'].length) {
                     if (words[2]) {
                         const selection = words[2].split('-');
                         if (selection.length <= 2) {
@@ -1010,34 +1012,34 @@ export default class Player {
         if (selection[1]) {
             const selectOne = Number(selection[1]);
             if (selectOne && selectZero && selectZero < selectOne) {
-                if (selectZero > 0 && selectOne < playlistArray[message.guild.id].length) {
+                if (selectZero > 0 && selectOne < playlistArray[message.guild.id]['url'].length) {
                     // If 2 index is number and beetwen 1 and the queued length
                     for (let i = selectZero; i <= selectOne; i++) {
                         delete playlistInfos[message.guild.id][i];
                         delete playlistArray[message.guild.id][i];
                     }
-                    playlistArray[message.guild.id] = _.compact(playlistArray[message.guild.id]);
+                    playlistArray[message.guild.id]['url'] = _.compact(playlistArray[message.guild.id]['url']);
                     playlistInfos[message.guild.id] = _.compact(playlistInfos[message.guild.id]);
                     this.sendRemoveEmbed(message, (selectOne - selectZero) + 1);
                 }
                 else {
-                    message.channel.send('❌ Sélectionnez des musiques compris entre 1 et ' + playlistArray[message.guild.id].length - 1);
+                    message.channel.send('❌ Sélectionnez des musiques compris entre 1 et ' + (playlistArray[message.guild.id]['url'].length - 1));
                 }
             }
             else {
                 message.channel.send('❌ Le 2ème index doit être plus grand que le premier !');
             }
         }
-        else if (selectZero && selectZero > 0 && selectZero < playlistArray[message.guild.id].length) {
+        else if (selectZero && selectZero > 0 && selectZero < playlistArray[message.guild.id]['url'].length) {
             // If 1 index is number and beetwen 1 and the queued length
             delete playlistInfos[message.guild.id][selectZero];
-            delete playlistArray[message.guild.id][selectZero];
-            playlistArray[message.guild.id] = _.compact(playlistArray[message.guild.id]);
+            delete playlistArray[message.guild.id]['url'][selectZero];
+            playlistArray[message.guild.id]['url'] = _.compact(playlistArray[message.guild.id]['url']);
             playlistInfos[message.guild.id] = _.compact(playlistInfos[message.guild.id]);
             this.sendRemoveEmbed(message, 1);
         }
         else {
-            message.channel.send('❌ Sélectionnez une musique compris entre 1 et ' + playlistArray[message.guild.id].length - 1);
+            message.channel.send('❌ Sélectionnez une musique compris entre 1 et ' + (playlistArray[message.guild.id]['url'].length - 1));
         }
     }
 
@@ -1092,21 +1094,21 @@ export default class Player {
             if (Helper.verifyBotLocation(message, connectedGuild[message.guild.id], userChannel)) {
                 if (words[1] && Number(words[1])) {
                     const number = Number(words[1]);
-                    if (playlistArray[message.guild.id] && playlistArray[message.guild.id].length > 1) {
-                        if (number > 0 && number < playlistArray[message.guild.id].length) {
+                    if (playlistArray[message.guild.id] && playlistArray[message.guild.id]['url'].length > 1) {
+                        if (number > 0 && number < playlistArray[message.guild.id]['url'].length) {
                             // If playlist exist and number is between 1 and queued length && verif user channel and bot location
                             streamsArray[message.guild.id].destroy();
                             for (let i = 0; i < number; i++) {
                                 delete playlistInfos[message.guild.id][i];
-                                delete playlistArray[message.guild.id][i];
+                                delete playlistArray[message.guild.id]['url'][i];
                             }
-                            playlistArray[message.guild.id] = _.compact(playlistArray[message.guild.id]);
+                            playlistArray[message.guild.id]['url'] = _.compact(playlistArray[message.guild.id]['url']);
                             playlistInfos[message.guild.id] = _.compact(playlistInfos[message.guild.id]);
                             this.sendRemoveEmbed(message, number);
                             this.playSong(message);
                         }
                         else {
-                            message.channel.send('❌ Sélectionnez une musique compris entre 1 et ' + (playlistArray[message.guild.id].length - 1));
+                            message.channel.send('❌ Sélectionnez une musique compris entre 1 et ' + (playlistArray[message.guild.id]['url'].length - 1));
                         }
                     }
                     else {
@@ -1127,7 +1129,7 @@ export default class Player {
         const userChannel = Helper.take_user_voiceChannel(message);
         if (userChannel) {
             if (Helper.verifyBotLocation(message, connectedGuild[message.guild.id], userChannel)) {
-                if (playlistArray[message.guild.id]) {
+                if (playlistArray[message.guild.id] && playlistArray[message.guild.id]['url'].length) {
                     const embedObj = this.setEmbedObj(playlistInfos[message.guild.id][0].title, playlistInfos[message.guild.id][0].id, playlistInfos[message.guild.id][0].thumbnail, playlistInfos[message.guild.id][0].duration);
                     this.sendMusicEmbed(message, embedObj, [false, 1], 'video', true);
                 }
@@ -1145,7 +1147,7 @@ export default class Player {
         const setting = Settings.get(message.guild.id);
         if (!setting || (setting && setting.notif.removed === 'on')) {
             const title = number > 1 ? 'Musiques supprimées' : 'Musique supprimée';
-            const queuedLength = playlistArray[message.guild.id].length - 1;
+            const queuedLength = playlistArray[message.guild.id]['url'].length - 1;
             // #952716 | Rouge | Decimal value
             const color = 9774870;
             const embed = new Discord.MessageEmbed()
@@ -1153,7 +1155,7 @@ export default class Player {
                 .setColor(color)
                 .setFooter('🎶 "' + config.prefix + 'p list" pour afficher la file d\'attente')
                 .addField('Nombre', number, true)
-                .addBlankField(true)
+                .addField('\u200b', '\u200b', true)
                 .addField('File d\'attente', queuedLength, true);
             message.channel.send({ embed });
         }
@@ -1162,7 +1164,7 @@ export default class Player {
     static joinChannel(message) {
         const voiceChannel = Helper.take_user_voiceChannel(message);
         if (voiceChannel) {
-            if (!playlistArray[message.guild.id] && !radioPlayed[message.guild.id]) {
+            if (!playlistArray[message.guild.id] && !playlistArray[message.guild.id]['url'] && !radioPlayed[message.guild.id]) {
                 voiceChannel.join()
                     .then(connection => {
                         connectedGuild[message.guild.id] = voiceChannel.id;
@@ -1193,7 +1195,7 @@ export default class Player {
             else {
                 musicParams.wait[message.guild.id] = true;
             }
-            if (leave || playlistArray[message.guild.id] && playlistArray[message.guild.id].length) {
+            if (leave || playlistArray[message.guild.id] && playlistArray[message.guild.id]['url'].length) {
                 delete streamsArray[message.guild.id];
                 delete playlistArray[message.guild.id];
                 delete playlistInfos[message.guild.id];
@@ -1201,7 +1203,9 @@ export default class Player {
                 delete musicParams.loop[message.guild.id];
                 delete musicParams.tryToNext[message.guild.id];
             }
-            else if (!playlistArray[message.guild.id] && !radioPlayed[message.guild.id]) {
+            else if ((!playlistArray[message.guild.id] && !radioPlayed[message.guild.id]) ||
+                (playlistArray[message.guild.id] && !playlistArray[message.guild.id]['url'].length)
+            ) {
                 message.channel.send('❌ Aucune musique en file d\'attente');
             }
         }
@@ -1210,7 +1214,9 @@ export default class Player {
     static pause(message) {
         const userChannel = Helper.take_user_voiceChannel(message);
         if (Helper.verifyBotLocation(message, connectedGuild[message.guild.id], userChannel)) {
-            if (!playlistArray[message.guild.id] && !radioPlayed[message.guild.id]) {
+            if ((!playlistArray[message.guild.id] && !radioPlayed[message.guild.id]) ||
+                (playlistArray[message.guild.id] && !playlistArray[message.guild.id]['url'].length)
+            ) {
                 message.channel.send('❌ Aucune musique en cours d\'écoute');
             }
             else if (streamsArray[message.guild.id]) {
@@ -1222,7 +1228,9 @@ export default class Player {
     static resume(message) {
         const userChannel = Helper.take_user_voiceChannel(message);
         if (Helper.verifyBotLocation(message, connectedGuild[message.guild.id], userChannel)) {
-            if (!playlistArray[message.guild.id] && !radioPlayed[message.guild.id]) {
+            if ((!playlistArray[message.guild.id] && !radioPlayed[message.guild.id]) ||
+                (playlistArray[message.guild.id] && !playlistArray[message.guild.id]['url'].length)
+            ) {
                 message.channel.send('❌ Aucune musique en cours d\'écoute');
             }
             else if (streamsArray[message.guild.id]) {
@@ -1234,14 +1242,14 @@ export default class Player {
     next(message) {
         const userChannel = Helper.take_user_voiceChannel(message);
         if (Helper.verifyBotLocation(message, connectedGuild[message.guild.id], userChannel)) {
-            if (playlistArray[message.guild.id]) {
+            if (playlistArray[message.guild.id] && playlistArray[message.guild.id]['url'].length) {
                 musicParams.tryToNext[message.guild.id] = true;
                 if (musicParams.loop[message.guild.id]) {
                     delete musicParams.loop[message.guild.id];
                     musicParams.nextSetLoop[message.guild.id] = true;
                 }
                 streamsArray[message.guild.id].destroy();
-                this.setArrays(message, connectionsArray[message.guild.id]);
+                this.setArrays(message);
             }
             else {
                 message.channel.send('❌ Aucune musique en file d\'attente');

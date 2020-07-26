@@ -3,12 +3,12 @@
 import Player from './player';
 import Radio from './radio';
 import Message from './message';
-import Level from './level';
 import Helper from './helper';
 import Custom from './custom';
 import Admin from './admin';
 import Settings from './settings';
 import * as Dragodinde from './dragodinde';
+// import Level from './level';
 
 export default function controller(message, prefix, bot) {
     // Prevent bad prefix
@@ -59,9 +59,9 @@ export default function controller(message, prefix, bot) {
             else if (command === 'clear') {
                 new Message(message, words, 'all');
             }
-            else if (command === 'grade') {
-                Level.grade(message);
-            }
+            // else if (command === 'grade') {
+            //     Level.grade(message);
+            // }
             else if (command === 'help') {
                 new Helper(message, words);
             }
