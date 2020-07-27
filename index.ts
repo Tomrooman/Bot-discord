@@ -124,6 +124,7 @@ function getSelectionByReaction(reaction) {
 // }
 
 async function updateSettings() {
+
     if (config.WHAT === 'DEV') console.log(chalk.bgRgb(215, 102, 8)('          SETTINGS          '));
     await Settings.update();
     await dragodindeUpdate();
