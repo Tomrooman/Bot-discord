@@ -2,6 +2,8 @@
     "name": "syxbot",
     "version": "0.5.0",
     "description": "",
+    "private": true,
+    "author": "Tom Rooman",
     "scripts": {
         "eslint": "yarn eslint ./",
         "test": "yarn mocha ./test/runner.js --exit",
@@ -20,9 +22,6 @@
         "clean": "rimraf dist",
         "remove-modules": "yarn rimraf node_modules .yarn/build-state.yml .yarn/cache .yarn/install-state.gz .yarn/unplugged .pnp.js yarn.lock package-lock.json"
     },
-    "private": true,
-    "author": "Tom Rooman",
-    "license": "GPL-3.0-only",
     "dependencies": {
         "@discordjs/opus": "^0.3.2",
         "axios": "^0.19.2",

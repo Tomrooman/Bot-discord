@@ -32,7 +32,7 @@ bot.on('ready', () => {
         console.log('      Guilds =>', bot.guilds.cache.size);
     }
     else {
-        console.log('Connected => ' + config.WHAT);
+        console.log('\nConnected => ' + config.WHAT);
         console.log('Guilds =>', bot.guilds.cache.size);
     }
     // Keep bot connection alive & activity (send signal every 6H)
