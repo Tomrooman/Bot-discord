@@ -3,9 +3,9 @@
 import Helper from './helper';
 import Player from './player';
 import Settings from './settings';
-import config from './../../config.json';
+import config from '../../config.json';
 import Discord, { VoiceConnection } from 'discord.js';
-import Radios from './../json/radios.json';
+import Radios from '../json/radios.json';
 
 export default class Radio {
     constructor(message, words) {

@@ -3,7 +3,7 @@
 import dateFormat from 'dateformat';
 import _ from 'lodash';
 import axios from 'axios';
-import config from './../../config.json';
+import config from '../../config.json';
 
 type settingsType = {
     guildId: string,

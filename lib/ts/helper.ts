@@ -1,6 +1,6 @@
 'use strict';
 
-import commands from './../json/commands.json';
+import commands from '../json/commands.json';
 import { VoiceChannel } from 'discord.js';
 
 export default class Helper {
@@ -116,7 +116,7 @@ export default class Helper {
                     'name': 'Liste des commandes'
                 },
                 'footer': {
-                    'text': 'Veuillez remplacer "+ MAJUSCULE" par votre choix.'
+                    'text': 'Détails d\'une commande: `!!help +COMMANDE`'
                 }
             }
         });

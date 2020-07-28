@@ -156,6 +156,15 @@
         ]
     },
     {
+        "name": "d | drago | dragodinde",
+        "command": "**d | drago** notif + CHOIX",
+        "exemple": "```!!d notif on|off|status``` \n",
+        "infos": [
+            "Afficher le statut des notifications des dragodindes```!!d notif status```\n",
+            "Modifier le statut des notifications ```!!d notif on|off```"
+        ]
+    },
+    {
         "name": "settings | set",
         "command": "**settings | set** + CATEGORIE + PARAM + VALEUR",
         "exemple": "```!!set notif added off``` \n",

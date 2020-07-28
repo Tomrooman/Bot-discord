@@ -6,19 +6,19 @@ import ytsr from 'ytsr';
 import Helper from './helper';
 import Settings from './settings';
 import _ from 'lodash';
-import config from './../../config.json';
+import config from '../../config.json';
 import Discord, { VoiceChannel, VoiceConnection, StreamDispatcher } from 'discord.js';
-import * as T from './../types/player';
+import { playlistArrayType, playlistInfosType, musicParamsType, searchVideoType, searchPlaylistType } from '../@types/player';
 
 const connectionsArray: VoiceConnection[] = [];
 const streamsArray: StreamDispatcher[] = [];
-const playlistArray: T.playlistArray[] = [];
-const playlistInfos: T.playlistInfos[][] = [];
+const playlistArray: playlistArrayType[] = [];
+const playlistInfos: playlistInfosType[][] = [];
 const connectedGuild: string[] = [];
 const radioPlayed: boolean[] = [];
-const musicParams: T.musicParams = { 'cancel': [], 'loop': [], 'wait': [], 'nextSetLoop': [], 'tryToNext': [] };
-const searchVideo: T.searchVideo[] = [];
-const searchPlaylist: T.searchPlaylist[] = [];
+const musicParams: musicParamsType = { 'cancel': [], 'loop': [], 'wait': [], 'nextSetLoop': [], 'tryToNext': [] };
+const searchVideo: searchVideoType[] = [];
+const searchPlaylist: searchPlaylistType[] = [];
 
 export default class Player {
     constructor(message = undefined, command = undefined, words = []) {

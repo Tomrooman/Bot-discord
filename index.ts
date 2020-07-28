@@ -1,10 +1,10 @@
 import Discord, { VoiceChannel } from 'discord.js';
 import dateFormat from 'dateformat';
-import Controller from './lib/js/controller';
-import Helper from './lib/js/helper';
-import Player from './lib/js/player';
-import Settings from './lib/js/settings';
-import { update as dragodindeUpdate } from './lib/js/dragodinde';
+import Controller from './lib/ts/controller';
+import Helper from './lib/ts/helper';
+import Player from './lib/ts/player';
+import Settings from './lib/ts/settings';
+import { update as dragodindeUpdate } from './lib/ts/dragodinde';
 import config from './config.json';
 import Axios from 'axios';
 import chalk from 'chalk';
@@ -32,7 +32,8 @@ bot.on('ready', () => {
         console.log('      Guilds =>', bot.guilds.cache.size);
     }
     else {
-        console.log('\nConnected => ' + config.WHAT);
+        console.log(' ');
+        console.log('Connected => ' + config.WHAT);
         console.log('Guilds =>', bot.guilds.cache.size);
     }
     // Keep bot connection alive & activity (send signal every 6H)
@@ -124,7 +125,6 @@ function getSelectionByReaction(reaction) {
 // }
 
 async function updateSettings() {
-
     if (config.WHAT === 'DEV') console.log(chalk.bgRgb(215, 102, 8)('          SETTINGS          '));
     await Settings.update();
     await dragodindeUpdate();
