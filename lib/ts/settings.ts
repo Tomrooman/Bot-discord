@@ -1,7 +1,7 @@
 'use strict';
 
 import dateFormat from 'dateformat';
-import _ from 'lodash';
+import _, { clone } from 'lodash';
 import axios from 'axios';
 import config from '../../config.json';
 
@@ -109,6 +109,8 @@ export default class Settings {
     //         cloneSettings[category][param].status = value;
     //         cloneSettings[category][param].channelID = message.channel.id;
     //         cloneSettings[category][param].channelName = message.channel.name;
+    //         cloneSettings['token'] = config.security.token
+    //         cloneSettings['type'] = 'bot';
     //         axios.post('https://syxbot.com/api/settings/update', cloneSettings)
     //             .then(res => {
     //                 if (res.data) {
@@ -146,6 +148,8 @@ export default class Settings {
         if (settings[message.guild.id][category][convertedParam] !== value) {
             const cloneSettings = settings[message.guild.id];
             cloneSettings[category][convertedParam] = isFinite(value) ? value : value.toLowerCase();
+            cloneSettings['token'] = config.security.token;
+            cloneSettings['type'] = 'bot';
             const { data } = await axios.post('/api/settings/update', cloneSettings);
             if (data) {
                 settings[message.guild.id][category][convertedParam] = isFinite(value) ? value : value.toLowerCase();
@@ -166,7 +170,7 @@ export default class Settings {
 
     static async update() {
         console.log('Updating server settings ... | ' + dateFormat(Date.now(), 'HH:MM:ss'));
-        const { data } = await axios.post('/api/settings/');
+        const { data } = await axios.post('/api/settings/', { token: config.security.token, type: 'bot' });
         if (data) {
             data.map(setting => {
                 settings[setting.guildId] = {

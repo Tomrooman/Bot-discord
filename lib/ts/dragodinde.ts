@@ -2,6 +2,7 @@
 
 import axios from 'axios';
 import dateFormat from 'dateformat';
+import Config from '../../config.json';
 
 type dofusInfosType = {
     notif: string
@@ -28,7 +29,9 @@ const notif = async (message, words) => {
         if ((!dofusInfos[message.author.id] && status === 'on') || (dofusInfos[message.author.id] && dofusInfos[message.author.id].notif !== status)) {
             const { data } = await axios.post('/api/dofus/dragodindes/notif', {
                 userId: message.author.id,
-                status: status
+                status: status,
+                token: Config.security.token,
+                type: 'bot'
             });
             dofusInfos[message.author.id] = {
                 notif: data.notif ? 'on' : 'off'
@@ -45,7 +48,7 @@ const getInfos = userId => {
 
 const update = async () => {
     console.log('Updating dragodindes settings ... | ' + dateFormat(Date.now(), 'HH:MM:ss'));
-    const { data } = await axios.post('/api/dofus/dragodindes/notif/all');
+    const { data } = await axios.post('/api/dofus/dragodindes/notif/all', { token: Config.security.token, type: 'bot' });
     if (data) {
         data.map(setting => {
             dofusInfos[setting.userId] = {
