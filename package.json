@@ -31,27 +31,27 @@
         "discord.js": "^12.2.0",
         "ffmpeg-static": "^4.2.6",
         "lodash": "^4.17.19",
-        "mongoose": "^5.9.25",
+        "mongoose": "^5.9.27",
         "npm-run-all": "^4.1.5",
         "pm2": "^4.4.0",
         "rimraf": "^3.0.2",
         "ts-node-dev": "^1.0.0-pre.56",
         "twit": "^2.2.11",
-        "ytdl-core": "^3.1.3",
-        "ytpl": "0.2.1",
-        "ytsr": "0.1.18"
+        "ytdl-core": "^3.2.0",
+        "ytpl": "^0.2.3",
+        "ytsr": "^0.1.20"
     },
     "devDependencies": {
         "@types/dateformat": "^3.0.1",
         "@types/lodash": "^4.14.158",
         "@types/mocha": "^8.0.0",
-        "@types/mongoose": "^5.7.32",
-        "@types/node": "^14.0.26",
-        "@typescript-eslint/eslint-plugin": "^3.7.0",
-        "@typescript-eslint/parser": "^3.7.0",
+        "@types/mongoose": "^5.7.34",
+        "@types/node": "^14.0.27",
+        "@typescript-eslint/eslint-plugin": "^3.7.1",
+        "@typescript-eslint/parser": "^3.7.1",
         "concurrently": "^5.2.0",
         "eslint": "^7.5.0",
-        "mocha": "^8.0.1",
+        "mocha": "^8.1.0",
         "typescript": "^3.9.7"
     }
 }
