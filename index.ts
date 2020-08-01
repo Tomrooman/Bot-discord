@@ -1,4 +1,4 @@
-import Discord, { VoiceChannel } from 'discord.js';
+import Discord, { VoiceChannel, Message, MessageReaction, User, PartialUser } from 'discord.js';
 import dateFormat from 'dateformat';
 import Controller from './lib/ts/controller';
 import Helper from './lib/ts/helper';
@@ -44,7 +44,7 @@ bot.on('ready', () => {
     }, (1000 * 60 * 60 * 6));
 });
 
-bot.on('message', (message) => {
+bot.on('message', (message: Message) => {
     if (message.type === 'GUILD_MEMBER_JOIN' && message.author.id === config.clientId) {
         message.channel.send('🖐 **Salut !** 🖐\n\n🔑 Mon préfix est : `' + config.prefix + '` \n❓ Pour afficher la liste des commandes faites : `' + config.prefix + 'help`');
     }
@@ -64,14 +64,14 @@ bot.on('shardResume', (replayed, shardID) => {
     console.log(`Shard ID ${shardID} resumed connection and replayed ${replayed} events.`);
 });
 
-bot.on('messageReactionAdd', (reaction, user) => {
+bot.on('messageReactionAdd', (reaction: MessageReaction, user: User | PartialUser) => {
     if (!user.bot) {
         const playlistExist = reaction.message.content.indexOf('Ex: ' + config.prefix + 'search pl 1') !== -1;
         const videoExist = reaction.message.content.indexOf('Ex: ' + config.prefix + 'search p 2') !== -1;
         if (playlistExist || videoExist) {
             const selection = getSelectionByReaction(reaction);
             if (reaction.emoji.name === '⏩') {
-                nextReaction(reaction, user, playlistExist ? 'playlist' : 'video');
+                nextReaction(reaction, user as User, playlistExist ? 'playlist' : 'video');
             }
             else {
                 new Player().selectSongInSearchList(reaction.message, selection, playlistExist ? 'playlist' : 'musique', [true, user]);
@@ -80,7 +80,7 @@ bot.on('messageReactionAdd', (reaction, user) => {
     }
 });
 
-function nextReaction(reaction, user, type) {
+function nextReaction(reaction: MessageReaction, user: User, type: string) {
     const userChannel = Helper.take_user_voiceChannel_by_reaction(reaction.message, user);
     if (userChannel) {
         new Player().youtubeResearch(reaction.message, null, type, false, [true, user]);
@@ -90,7 +90,7 @@ function nextReaction(reaction, user, type) {
     }
 }
 
-function getSelectionByReaction(reaction) {
+function getSelectionByReaction(reaction: MessageReaction) {
     if (reaction.emoji.name === '1️⃣') {
         return 1;
     }

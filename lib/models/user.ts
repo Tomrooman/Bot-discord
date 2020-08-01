@@ -12,7 +12,7 @@ const userSchema = new Schema({
     versionKey: false
 });
 
-userSchema.statics.get = async (userId, serverId) => {
+userSchema.statics.get = async (userId: string, serverId: string) => {
     if (userId && serverId) {
         const User = mongoose.model<userType>('User');
         const user = await User.findOne({
@@ -26,7 +26,7 @@ userSchema.statics.get = async (userId, serverId) => {
     return false;
 };
 
-userSchema.statics.create = async (userId, serverId) => {
+userSchema.statics.create = async (userId: string, serverId: string) => {
     if (userId && serverId) {
         const User = mongoose.model<userType>('User');
         const user = await new User({
@@ -40,7 +40,7 @@ userSchema.statics.create = async (userId, serverId) => {
     return false;
 };
 
-userSchema.methods.updateExp = async (user) => {
+userSchema.methods.updateExp = async (user: userType) => {
     if (user) {
         let xp = user.xp + 5;
         let grade = user.grade;

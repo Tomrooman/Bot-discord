@@ -4,11 +4,11 @@ import Helper from './helper';
 import Player from './player';
 import Settings from './settings';
 import config from '../../config.json';
-import Discord, { VoiceConnection } from 'discord.js';
+import Discord, { VoiceConnection, Message, VoiceChannel } from 'discord.js';
 import Radios from '../json/radios.json';
 
 export default class Radio {
-    constructor(message, words) {
+    constructor(message: Message, words: string[]) {
         if (words[1]) {
             const radioChoice = words[2] ? words[1].toLowerCase() + ' ' + words[2].toLowerCase() : words[1].toLowerCase();
             if (words[1].toLowerCase() === 'list') {
@@ -26,7 +26,7 @@ export default class Radio {
         }
     }
 
-    radioExist(radio) {
+    radioExist(radio: string) {
         const check = Radios.filter(r => r.name.toLowerCase() === radio);
         if (check && check.length) {
             return true;
@@ -34,7 +34,7 @@ export default class Radio {
         return false;
     }
 
-    showRadioList(message) {
+    showRadioList(message: Message) {
         let stringRadioList = '';
         // Create radio list as string and send it
         Radios.map(r => {
@@ -43,7 +43,7 @@ export default class Radio {
         message.channel.send('> Écrivez le nom de la radio que vous voulez écouter.\n > Ex: ' + config.prefix + 'radio nrj\n > \n ' + stringRadioList);
     }
 
-    connectRadio(message, words, radioChoice, retry = false) {
+    connectRadio(message: Message, words: string[], radioChoice: string = '', retry: boolean = false) {
         const radio = Radios.filter(r => r.name.toLowerCase() === radioChoice)[0];
         const voiceChannel = Helper.take_user_voiceChannel(message);
         if (voiceChannel) {
@@ -71,10 +71,10 @@ export default class Radio {
         }
     }
 
-    joinChannelAndPlayRadio(message, words, voiceChannel, radio, retry) {
+    joinChannelAndPlayRadio(message: Message, words: string[], voiceChannel: VoiceChannel, radio: { name: string, url: string }, retry: boolean) {
         voiceChannel.join()
             .then(connection => {
-                const setting = Settings.get(message.guild.id);
+                const setting = Settings.get(String(message.guild?.id));
                 if (!retry) {
                     this.sendRadioEmbed(message, radio);
                 }
@@ -86,13 +86,13 @@ export default class Radio {
             })
             .catch(() => {
                 setTimeout(() => {
-                    this.connectRadio(message, words, true);
+                    this.connectRadio(message, words);
                 }, 1500);
             });
     }
 
-    sendRadioEmbed(message, radio) {
-        const setting = Settings.get(message.guild.id);
+    sendRadioEmbed(message: Message, radio: { name: string, url: string }) {
+        const setting = Settings.get(String(message.guild?.id));
         if (!setting || (setting && setting.notif.radio === 'on')) {
             // #543A99 | Mauve
             const color = 5520025;

@@ -1,11 +1,13 @@
 'use strict';
 
 import dateFormat from 'dateformat';
-import _, { clone } from 'lodash';
+import _ from 'lodash';
 import axios from 'axios';
 import config from '../../config.json';
+import { Message } from 'discord.js';
 
 type settingsType = {
+    [index: string]: any,
     guildId: string,
     notif: {
         current: string,
@@ -21,29 +23,33 @@ type settingsType = {
 const settings: settingsType[] = [];
 
 export default class Settings {
-    constructor(message, words) {
+    constructor(message: Message, words: string[]) {
         if (message) {
             delete words[0];
             words = _.compact(words);
-            if (!settings[message.guild.id]) {
-                settings[message.guild.id] = this.setParamObject(message);
+            if (!settings[Number(message.guild?.id)]) {
+                settings[Number(message.guild?.id)] = this.setParamObject(message);
             }
             if (words[0]) {
                 if (words[0].toLowerCase() === 'list') {
-                    return this.showParamsList(message);
+                    this.showParamsList(message);
+                    return;
                 }
                 else if (words[0].toLowerCase() === 'notif' || words[0].toLowerCase() === 'audio') {
-                    return this.paramsControl(message, words);
+                    this.paramsControl(message, words);
+                    return;
                 }
-                return message.channel.send('❌ Le paramètre `' + words[0] + '` n\'existe pas \n⚙️ Afficher les paramètres : `' + config.prefix + 'set list`');
+                message.channel.send('❌ Le paramètre `' + words[0] + '` n\'existe pas \n⚙️ Afficher les paramètres : `' + config.prefix + 'set list`');
+                return;
             }
-            return message.channel.send('❌ Veuillez écrire les paramètres à modifier \n⌨️ Ex: `' + config.prefix + 'set notif current off`\n⚙️ Afficher les paramètres : `' + config.prefix + 'set list`');
+            message.channel.send('❌ Veuillez écrire les paramètres à modifier \n⌨️ Ex: `' + config.prefix + 'set notif current off`\n⚙️ Afficher les paramètres : `' + config.prefix + 'set list`');
+            return;
         }
     }
 
-    setParamObject(message) {
+    setParamObject(message: Message): settingsType {
         return {
-            guildId: message.guild.id,
+            guildId: String(message.guild?.id),
             notif: {
                 current: 'on',
                 added: 'on',
@@ -56,8 +62,8 @@ export default class Settings {
         };
     }
 
-    showParamsList(message) {
-        const settingsObj = settings[message.guild.id];
+    showParamsList(message: Message) {
+        const settingsObj = settings[Number(message.guild?.id)];
         const current = '>     actuel : `' + settingsObj.notif.current.toUpperCase() + '`\n';
         const added = '>     rajout : `' + settingsObj.notif.added.toUpperCase() + '`\n';
         const removed = '>     suppression : `' + settingsObj.notif.removed.toUpperCase() + '`\n';
@@ -67,16 +73,16 @@ export default class Settings {
         return message.channel.send(listAsString);
     }
 
-    paramsControl(message, words) {
+    paramsControl(message: Message, words: string[]) {
         if (words[1]) {
             const convertedParam = this.paramConvertor(words[1]);
-            if (settings[message.guild.id][words[0]][convertedParam]) {
+            if (settings[Number(message.guild?.id)][words[0]][convertedParam]) {
                 if (words[2]) {
-                    if (words[2].toLowerCase() === 'on' || words[2].toLowerCase() === 'off' || (isFinite(words[2]) && words[2] >= 0 && words[2] <= 1)) {
-                        if (words[1] === 'volume' && isFinite(words[2])) {
+                    if (words[2].toLowerCase() === 'on' || words[2].toLowerCase() === 'off' || (isFinite(Number(words[2])) && Number(words[2]) >= 0 && Number(words[2]) <= 1)) {
+                        if (words[1] === 'volume' && isFinite(Number(words[2]))) {
                             return this.setParams(message, words[0], words[1], words[2], convertedParam);
                         }
-                        else if (words[0] === 'notif' && !isFinite(words[2])) {
+                        else if (words[0] === 'notif' && !isFinite(Number(words[2]))) {
                             return this.setParams(message, words[0], words[1], words[2], convertedParam);
                         }
                         return message.channel.send('❌ `' + words[2] + '` n\'est pas une valeur acceptable');
@@ -90,7 +96,7 @@ export default class Settings {
         return message.channel.send('❌ Veuillez écrire le paramètre à modifier \n⌨️ Ex: `' + config.prefix + 'set notif current off`\n⚙️ Afficher les paramètres : `' + config.prefix + 'set list`');
     }
 
-    paramConvertor(word) {
+    paramConvertor(word: string) {
         if (word === 'actuel') {
             return 'current';
         }
@@ -144,24 +150,24 @@ export default class Settings {
     //     }
     // }
 
-    async setParams(message, category, param, value, convertedParam) {
-        if (settings[message.guild.id][category][convertedParam] !== value) {
-            const cloneSettings = settings[message.guild.id];
-            cloneSettings[category][convertedParam] = isFinite(value) ? value : value.toLowerCase();
+    async setParams(message: Message, category: string, param: string, value: string | number, convertedParam: string) {
+        if (settings[Number(message.guild?.id)][category][convertedParam] !== value) {
+            const cloneSettings = settings[Number(message.guild?.id)];
+            cloneSettings[category][convertedParam] = isFinite(value as number) ? value : (value as string).toLowerCase();
             cloneSettings['token'] = config.security.token;
             cloneSettings['type'] = 'bot';
             const { data } = await axios.post('/api/settings/update', cloneSettings);
             if (data) {
-                settings[message.guild.id][category][convertedParam] = isFinite(value) ? value : value.toLowerCase();
-                return message.channel.send('✅ Paramètre modifié => `' + param + '` : `' + (isFinite(value) ? value : value.toUpperCase()) + '`');
+                settings[Number(message.guild?.id)][category][convertedParam] = isFinite(value as number) ? value : (value as string).toLowerCase();
+                return message.channel.send('✅ Paramètre modifié => `' + param + '` : `' + (isFinite(value as number) ? value : (value as string).toUpperCase()) + '`');
             }
             return message.channel.send('❌ Erreur lors de la mise à jour des paramètres, veuillez réessayer');
         }
         return message.channel.send('❌ Vous devez écrire une valeur différente de celle actuelle');
     }
 
-    static get(guildId) {
-        return settings[guildId];
+    static get(guildId: string) {
+        return settings[Number(guildId)];
     }
 
     static getAll() {
@@ -172,8 +178,8 @@ export default class Settings {
         console.log('Updating server settings ... | ' + dateFormat(Date.now(), 'HH:MM:ss'));
         const { data } = await axios.post('/api/settings/', { token: config.security.token, type: 'bot' });
         if (data) {
-            data.map(setting => {
-                settings[setting.guildId] = {
+            data.map((setting: settingsType) => {
+                settings[Number(setting.guildId)] = {
                     guildId: setting.guildId,
                     notif: {
                         current: setting.notif.current,

@@ -1,13 +1,14 @@
 'use strict';
 
 import Helper from './helper';
+import { Message, Client } from 'discord.js';
 
 export default class Admin {
-    constructor(message, words, bot) {
+    constructor(message: Message, words: string[], bot: Client) {
         this.controller(message, words, bot);
     }
 
-    controller(message, words, bot) {
+    controller(message: Message, words: string[], bot: Client) {
         if (message.author.username + message.author.discriminator === 'Stalyr9246') {
             if (words[1]) {
                 if (words[1] === 'message') {
@@ -36,7 +37,7 @@ export default class Admin {
         }
     }
 
-    sendMessageToAllServer(message, words, bot) {
+    sendMessageToAllServer(message: Message, words: string[], bot: Client) {
         if (words[2]) {
             delete words[0];
             delete words[1];
@@ -44,7 +45,9 @@ export default class Admin {
             bot.guilds.cache.map(guild => {
                 if (guild.available) {
                     const channel = Helper.getFirstAuthorizedChannel(guild);
-                    channel.send('> ' + words.join(' ').trim());
+                    if (channel) {
+                        channel.send('> ' + words.join(' ').trim());
+                    }
                 }
             });
         }

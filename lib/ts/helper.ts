@@ -1,10 +1,10 @@
 'use strict';
 
 import commands from '../json/commands.json';
-import { VoiceChannel } from 'discord.js';
+import { VoiceChannel, Message, Guild, Client, User, ClientUser, Channel, GuildChannel, TextChannel, VoiceConnection, PartialUser } from 'discord.js';
 
 export default class Helper {
-    constructor(message, words) {
+    constructor(message: Message, words: string[]) {
         if (words[1]) {
             this.getCommandInfos(message, words[1].toLowerCase());
         }
@@ -13,7 +13,7 @@ export default class Helper {
         }
     }
 
-    static take_user_voiceChannel(message): VoiceChannel {
+    static take_user_voiceChannel(message: Message): VoiceChannel {
         let voiceChannel = {};
         if (message.guild) {
             message.guild.channels.cache.map(channel => {
@@ -31,13 +31,13 @@ export default class Helper {
         return voiceChannel as VoiceChannel;
     }
 
-    static take_user_voiceChannel_by_reaction(message, author): VoiceChannel {
+    static take_user_voiceChannel_by_reaction(message: Message, author: User | boolean | PartialUser): VoiceChannel {
         let voiceChannel = {};
-        message.guild.channels.cache.map(channel => {
+        (message.guild as Guild).channels.cache.map(channel => {
             if (channel.type === 'voice') {
                 if (channel.members) {
                     channel.members.map(member => {
-                        if (member.user.id === author.id) {
+                        if (member.user.id === (author as User).id) {
                             voiceChannel = channel;
                         }
                     });
@@ -68,22 +68,21 @@ export default class Helper {
     //     return botMember;
     // }
 
-    static getFirstAuthorizedChannel(guild) {
-        if (guild.channels.cache.has(guild.id)) return guild.channels.cache.get(guild.id);
+    static getFirstAuthorizedChannel(guild: Guild): TextChannel | undefined {
+        if (guild.channels.cache.has(guild.id)) return guild.channels.cache.get(guild.id) as TextChannel;
 
         // Check for a "general" channel
         const generalChannel = guild.channels.cache.find(channel => channel.name === 'general');
-        if (generalChannel) return generalChannel;
+        if (generalChannel) return generalChannel as TextChannel;
 
         // If there is no "general" channel, get the first authorized text channel
         // "guild.client.user" is the bot object
         return guild.channels.cache
-            .filter(c => c.type === 'text' &&
-                c.permissionsFor(guild.client.user).has('SEND_MESSAGES'))
-            .first();
+            .filter(c => c.type === 'text')
+            .first() as TextChannel;
     }
 
-    static verifyBotLocation(message, connectedGuild, userChannel, sendMessage = true) {
+    static verifyBotLocation(message: Message, connectedGuild: VoiceConnection | string | undefined, userChannel: VoiceChannel, sendMessage = true) {
         if (connectedGuild) {
             if (connectedGuild === userChannel.id) {
                 return true;
@@ -103,7 +102,7 @@ export default class Helper {
         }
     }
 
-    showCommandlist(message) {
+    showCommandlist(message: Message) {
         let embedDescription = '';
         commands.map(item => {
             embedDescription += item.command + item.exemple;
@@ -122,8 +121,8 @@ export default class Helper {
         });
     }
 
-    getCommandInfos(message, command) {
-        const commandObj = commands.filter(c => c.name.split(' | ')[0] === command || c.name.split(' | ')[1] === command);
+    getCommandInfos(message: Message, command: string) {
+        const commandObj = commands.filter(c => c.name.split(' | ')[0] === command || c.name.split(' | ')[1] === command || c.name.split(' | ')[2] === command);
         if (commandObj && commandObj[0]) {
             let joinedInfos = '';
             commandObj[0].infos.map(info => {

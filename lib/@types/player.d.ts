@@ -1,35 +1,22 @@
 import { Item } from 'ytsr';
 
 export type searchVideoType = {
-    infos: searchVideosInfos[],
-    array: searchVideoArray[],
-    last: Item[],
-    old: searchVideoArray[]
-} | []
-
-export type searchPlaylistType = {
-    infos: searchVideosInfos[],
-    array: searchPlaylistArray[],
-    last: Item[],
-    old: searchVideoArray[]
-} | []
+    infos?: searchVideosInfosType,
+    array?: searchVideoArrayType[],
+    last?: Item[],
+    old?: searchVideoArrayType[]
+}
 
 export type searchVideoArrayType = {
-    nextpage?: string,
+    nextpage?: string | boolean,
     url: string,
-    title: string
+    title: string,
+    plLength?: number
 }
 
 export type searchVideosInfosType = {
     title: string,
     count: number
-}
-
-export type searchPlaylistArrayType = {
-    nextpage?: string,
-    url: string,
-    title: string,
-    plLength: number
 }
 
 export type musicParamsType = {
@@ -51,4 +38,11 @@ export type playlistInfosType = {
     id: string,
     thumbnail: string,
     duration: string
+}
+
+export type embedObjType = {
+    title: string;
+    id: string;
+    duration: string;
+    thumbnail: string;
 }

@@ -2,15 +2,16 @@
 
 import Player from './player';
 import Radio from './radio';
-import Message from './message';
 import Helper from './helper';
 import Custom from './custom';
 import Admin from './admin';
 import Settings from './settings';
 import * as Dragodinde from './dragodinde';
+import MessageFunc from './message';
+import { Message, Client } from 'discord.js';
 // import Level from './level';
 
-export default function controller(message, prefix, bot) {
+export default function controller(message: Message, prefix: string, bot: Client) {
     // Prevent bad prefix
     if (message.content.substr(0, prefix.length) === prefix && message.content.substr(0, 3) !== '!!!') {
         const words = message.content.substr(prefix.length, message.content.length - prefix.length).split(' ');
@@ -54,10 +55,10 @@ export default function controller(message, prefix, bot) {
                 new Radio(message, words);
             }
             else if (command === 'remove') {
-                new Message(message, words);
+                new MessageFunc(message, words);
             }
             else if (command === 'clear') {
-                new Message(message, words, 'all');
+                new MessageFunc(message, words, 'all');
             }
             // else if (command === 'grade') {
             //     Level.grade(message);
