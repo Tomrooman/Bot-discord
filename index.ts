@@ -20,7 +20,7 @@ console.log('----- ' + dateFormat(Date.now(), 'HH:MM:ss dd/mm/yyyy') + ' -----')
 updateSettings();
 
 
-bot.on('ready', () => {
+bot.on('ready', (): void => {
     disconnectBotFromOldChannel();
     // new Streams(bot);
     bot.user!.setActivity(`${config.prefix}help`, { type: 'PLAYING' })
@@ -43,7 +43,7 @@ bot.on('ready', () => {
     }, (1000 * 60 * 60 * 6));
 });
 
-bot.on('message', (message: Message) => {
+bot.on('message', (message: Message): void => {
     if (message.type === 'GUILD_MEMBER_JOIN' && message.author.id === config.clientId) {
         message.channel.send('🖐 **Salut !** 🖐\n\n🔑 Mon préfix est : `' + config.prefix + '` \n❓ Pour afficher la liste des commandes faites : `' + config.prefix + 'help`');
     }
@@ -55,15 +55,15 @@ bot.on('message', (message: Message) => {
     // }
 });
 
-bot.on('shardReconnecting', id => {
+bot.on('shardReconnecting', (id): void => {
     console.log(`Shard reconnected, ID => ${id}`);
 });
 
-bot.on('shardResume', (replayed, shardID) => {
+bot.on('shardResume', (replayed, shardID): void => {
     console.log(`Shard ID ${shardID} resumed connection and replayed ${replayed} events.`);
 });
 
-bot.on('messageReactionAdd', (reaction: MessageReaction, user: User | PartialUser) => {
+bot.on('messageReactionAdd', (reaction: MessageReaction, user: User | PartialUser): void => {
     if (!user.bot) {
         const playlistExist = reaction.message.content.indexOf('Ex: ' + config.prefix + 'search pl 1') !== -1;
         const videoExist = reaction.message.content.indexOf('Ex: ' + config.prefix + 'search p 2') !== -1;
@@ -79,7 +79,7 @@ bot.on('messageReactionAdd', (reaction: MessageReaction, user: User | PartialUse
     }
 });
 
-function nextReaction(reaction: MessageReaction, user: User, type: string) {
+function nextReaction(reaction: MessageReaction, user: User, type: string): void {
     const userChannel = Helper.take_user_voiceChannel_by_reaction(reaction.message, user);
     if (userChannel) {
         new Player().youtubeResearch(reaction.message, null, type, false, [true, user]);
@@ -89,7 +89,7 @@ function nextReaction(reaction: MessageReaction, user: User, type: string) {
     }
 }
 
-function getSelectionByReaction(reaction: MessageReaction) {
+function getSelectionByReaction(reaction: MessageReaction): number | false {
     if (reaction.emoji.name === '1️⃣') {
         return 1;
     }
@@ -123,15 +123,19 @@ function getSelectionByReaction(reaction: MessageReaction) {
 //     });
 // }
 
-async function updateSettings() {
+async function updateSettings(): Promise<void> {
     if (config.WHAT === 'DEV') console.log(chalk.bgRgb(215, 102, 8)('          SETTINGS          '));
-    await Settings.update();
-    await dragodindeUpdate();
-    if (config.WHAT === 'DEV') console.log(chalk.bgRgb(25, 108, 207)('\n         CONNECTION         '));
-    bot.login(config.token);
+    if (await Settings.update()) {
+        if (await dragodindeUpdate()) {
+            if (config.WHAT === 'DEV') console.log(chalk.bgRgb(25, 108, 207)('\n         CONNECTION         '));
+            bot.login(config.token);
+            return;
+        }
+    }
+    updateSettings();
 };
 
-function disconnectBotFromOldChannel() {
+function disconnectBotFromOldChannel(): void {
     console.log('Disconnecting from all channels ...');
     bot.guilds.cache.map(g => {
         g.channels.cache.map(channel => {
@@ -155,7 +159,7 @@ function disconnectBotFromOldChannel() {
     console.log(' - Disconnected from all channels !');
 }
 
-process.on('SIGINT', () => {
+process.on('SIGINT', (): void => {
     // close connections, clear cache, etc
     process.exit(0);
 });
