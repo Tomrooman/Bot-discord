@@ -62,7 +62,7 @@ export default class Settings {
         };
     }
 
-    showParamsList(message: Message) {
+    showParamsList(message: Message): Promise<Message> {
         const settingsObj = settings[Number(message.guild?.id)];
         const current = '>     actuel : `' + settingsObj.notif.current.toUpperCase() + '`\n';
         const added = '>     rajout : `' + settingsObj.notif.added.toUpperCase() + '`\n';
@@ -73,7 +73,7 @@ export default class Settings {
         return message.channel.send(listAsString);
     }
 
-    paramsControl(message: Message, words: string[]) {
+    paramsControl(message: Message, words: string[]): Promise<Message> {
         if (words[1]) {
             const convertedParam = this.paramConvertor(words[1]);
             if (settings[Number(message.guild?.id)][words[0]][convertedParam]) {
@@ -96,7 +96,7 @@ export default class Settings {
         return message.channel.send('❌ Veuillez écrire le paramètre à modifier \n⌨️ Ex: `' + config.prefix + 'set notif current off`\n⚙️ Afficher les paramètres : `' + config.prefix + 'set list`');
     }
 
-    paramConvertor(word: string) {
+    paramConvertor(word: string): string {
         if (word === 'actuel') {
             return 'current';
         }
@@ -150,7 +150,7 @@ export default class Settings {
     //     }
     // }
 
-    async setParams(message: Message, category: string, param: string, value: string | number, convertedParam: string) {
+    async setParams(message: Message, category: string, param: string, value: string | number, convertedParam: string): Promise<Message> {
         if (settings[Number(message.guild?.id)][category][convertedParam] !== value) {
             const cloneSettings = settings[Number(message.guild?.id)];
             cloneSettings[category][convertedParam] = isFinite(value as number) ? value : (value as string).toLowerCase();
@@ -166,15 +166,15 @@ export default class Settings {
         return message.channel.send('❌ Vous devez écrire une valeur différente de celle actuelle');
     }
 
-    static get(guildId: string) {
+    static get(guildId: string): settingsType {
         return settings[Number(guildId)];
     }
 
-    static getAll() {
+    static getAll(): settingsType[] {
         return settings;
     }
 
-    static async update() {
+    static async update(): Promise<boolean> {
         console.log('Updating server settings ... | ' + dateFormat(Date.now(), 'HH:MM:ss'));
         const { data } = await axios.post('/api/settings/', { token: config.security.token, type: 'bot' });
         if (data) {
@@ -195,8 +195,6 @@ export default class Settings {
             console.log(' - Server settings updated !');
             return true;
         }
-        setTimeout(() => {
-            Settings.update()
-        }, 1000);
+        return false;
     }
 }

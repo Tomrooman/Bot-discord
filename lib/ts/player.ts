@@ -61,7 +61,7 @@ export default class Player {
         }
     }
 
-    static removeArray(message: Message, choice: string) {
+    static removeArray(message: Message, choice: string): void {
         // Call without instance and remove selected array
         if (choice === 'loop') {
             delete musicParams.loop[Number(message.guild?.id)];
@@ -89,7 +89,7 @@ export default class Player {
         return object;
     }
 
-    static setArray(message: Message, choice: string, value: any) {
+    static setArray(message: Message, choice: string, value: any): void {
         // Call without instance and set selected array with 'value'
         if (choice === 'radio') {
             radioPlayed[Number(message.guild?.id)] = value;
@@ -105,12 +105,12 @@ export default class Player {
         }
     }
 
-    static streamDestroy(message: Message) {
+    static streamDestroy(message: Message): void {
         // Call without instance and destroy the stream
         streamsArray[Number(message.guild?.id)].destroy();
     }
 
-    playSongs(message: Message, command: string, words: string[], byReaction: [boolean, User | PartialUser] = [false, {} as User]) {
+    playSongs(message: Message, command: string, words: string[], byReaction: [boolean, User | PartialUser] = [false, {} as User]): void {
         let voiceChannel = Helper.take_user_voiceChannel(message);
         if (byReaction[0]) {
             // If call by reaction get voice channel with good function
@@ -135,7 +135,7 @@ export default class Player {
         }
     }
 
-    playSongsAndConnectOrNotBot(message: Message, command: string, words: string[], playSongParams = true, byReaction: [boolean, User | PartialUser]) {
+    playSongsAndConnectOrNotBot(message: Message, command: string, words: string[], playSongParams = true, byReaction: [boolean, User | PartialUser]): void {
         if (words[1] && words[1].includes('youtu') && (words[1].includes('http://') || words[1].includes('https://'))) {
             // If words[1] (element after the command) exist and contain 'youtu' + 'http://' or 'https://'
             if (command === 'playlist' || command === 'pl') {
@@ -176,7 +176,7 @@ export default class Player {
         }
     }
 
-    youtubeResearch(message: Message, title: string | null, type: string, nextPage: string | boolean = false, byReaction: [boolean, User] = [false, {} as User]) {
+    youtubeResearch(message: Message, title: string | null, type: string, nextPage: string | boolean = false, byReaction: [boolean, User] = [false, {} as User]): void {
         // Create array if it doesn't exist
         if (!searchVideo[Number(message.guild?.id)]) {
             searchVideo[Number(message.guild?.id)] = [] as searchVideoType;
@@ -202,12 +202,12 @@ export default class Player {
         }
     }
 
-    static cancel(message: Message) {
+    static cancel(message: Message): void {
         // Set cancel array to tell the API to stop the research
         musicParams.cancel[Number(message.guild?.id)] = true;
     }
 
-    sendCurrentResultAndRecall(message: Message, title: string, type: string, buildedArray: searchVideoArrayType[], searchresults: ytsr.Result, byReaction: [boolean, User]) {
+    sendCurrentResultAndRecall(message: Message, title: string, type: string, buildedArray: searchVideoArrayType[], searchresults: ytsr.Result, byReaction: [boolean, User]): void {
         message.channel.send('✅ ' + buildedArray.length + '/5 trouvé');
         setTimeout(() => {
             // If cancel is activate stop the research
@@ -221,7 +221,7 @@ export default class Player {
         }, 1500);
     }
 
-    getYoutubeResearch(message: Message, title: string, type: string, options: ytsr.Options, byReaction: [boolean, User]) {
+    getYoutubeResearch(message: Message, title: string, type: string, options: ytsr.Options, byReaction: [boolean, User]): void {
         ytsr(title, options, (err, searchresults) => {
             if (searchresults) {
                 const buildedArray = this.makeSearchArray(message, searchresults.items, type);
@@ -255,7 +255,7 @@ export default class Player {
         });
     }
 
-    verifyOldResearch(message: Message, type: string, byReaction: [boolean, User]) {
+    verifyOldResearch(message: Message, type: string, byReaction: [boolean, User]): boolean {
         if (byReaction[0]) {
             // If activate by reaction (button next)
             if (type === 'video' && (searchVideo[Number(message.guild?.id)]['last'] as Item[]).length) {
@@ -286,7 +286,7 @@ export default class Player {
         return false;
     }
 
-    setArrayInfos(message: Message, type: string, title: string | boolean, searchresults: ytsr.Result | { nextpageRef: boolean }) {
+    setArrayInfos(message: Message, type: string, title: string | boolean, searchresults: ytsr.Result | { nextpageRef: boolean }): void {
         // Set research number with title and nextPage token
         if (type === 'video') {
             if (searchresults.nextpageRef) {
@@ -314,7 +314,7 @@ export default class Player {
         }
     }
 
-    clearSearchArrays(message: Message, type: string, byReaction: [boolean, User]) {
+    clearSearchArrays(message: Message, type: string, byReaction: [boolean, User]): void {
         if (!byReaction[0]) {
             // If by reaction clear 'infos' and 'last' array
             if (type === 'video') {
@@ -332,7 +332,7 @@ export default class Player {
         }
     }
 
-    setArrayWithChoice(message: Message, title: string, type: string, nextPage: string | boolean, byReaction: [boolean, User]) {
+    setArrayWithChoice(message: Message, title: string, type: string, nextPage: string | boolean, byReaction: [boolean, User]): { limit: number, nextpageRef?: string } {
         let nextPageVar = nextPage;
         const options: { limit: number, nextpageRef?: string } = {
             limit: 20
@@ -398,7 +398,7 @@ export default class Player {
         return array as searchVideoArrayType[];
     }
 
-    static toggleLoop(message: Message) {
+    static toggleLoop(message: Message): void {
         // Call without instance and activate or desactivate repeat mode
         const userChannel = Helper.take_user_voiceChannel(message);
         if (Helper.verifyBotLocation(message, connectedGuild[Number(message.guild?.id)], userChannel)) {
@@ -418,7 +418,7 @@ export default class Player {
         }
     }
 
-    sendSearchResultsAsString(message: Message, type: string) {
+    sendSearchResultsAsString(message: Message, type: string): void {
         // Create string with search results array and send it
         const selectedArray = type === 'video' ? searchVideo[Number(message.guild?.id)]['array'] : searchPlaylist[Number(message.guild?.id)]['array'];
         if (selectedArray && selectedArray.length) {
@@ -439,7 +439,7 @@ export default class Player {
 
     }
 
-    addSearchReactions(message: Message) {
+    addSearchReactions(message: Message): void {
         message.react('1️⃣')
             .then(() => message.react('2️⃣'))
             .then(() => message.react('3️⃣'))
@@ -448,7 +448,7 @@ export default class Player {
             .then(() => message.react('⏩'));
     }
 
-    selectSongOrPlaylistInSearchList(message: Message, words: string[]) {
+    selectSongOrPlaylistInSearchList(message: Message, words: string[]): void {
         if (words[1] === 'p' || words[1] === 'play') {
             // If there is something after p|play search for the music
             if (words[2]) {
@@ -473,7 +473,7 @@ export default class Player {
         }
     }
 
-    selectSongInSearchList(message: Message, number: number | false, type = 'musique', byReaction: [boolean, User | PartialUser] = [false, {} as User]) {
+    selectSongInSearchList(message: Message, number: number | false, type = 'musique', byReaction: [boolean, User | PartialUser] = [false, {} as User]): void {
         let userChannel = Helper.take_user_voiceChannel(message);
         if (byReaction[0]) {
             userChannel = Helper.take_user_voiceChannel_by_reaction(message, byReaction[1]);
@@ -509,7 +509,7 @@ export default class Player {
         }
     }
 
-    getSongInSearchList(message: Message) {
+    getSongInSearchList(message: Message): void {
         const userChannel = Helper.take_user_voiceChannel(message);
         if (userChannel) {
             const musicExist = searchVideo[Number(message.guild?.id)]['array'] && (searchVideo[Number(message.guild?.id)]['array'] as searchVideoArrayType[]).length;
@@ -526,7 +526,7 @@ export default class Player {
         }
     }
 
-    makeAndSendSearchListArray(message: Message, musicExist: boolean, playlistExist: boolean) {
+    makeAndSendSearchListArray(message: Message, musicExist: boolean, playlistExist: boolean): void {
         let resultChoices = '';
         if (musicExist && playlistExist) {
             // Send music and playlist array as string
@@ -550,7 +550,7 @@ export default class Player {
         }
     }
 
-    makeSearchVideoOrPlaylistString(message: Message, type: string) {
+    makeSearchVideoOrPlaylistString(message: Message, type: string): string {
         let resultChoices = '';
         if (type === 'video') {
             resultChoices += '> **Musiques** \n';
@@ -567,7 +567,7 @@ export default class Player {
         return resultChoices;
     }
 
-    playSong(message: Message) {
+    playSong(message: Message): void {
         const setting = Settings.get(String(message.guild?.id));
         const embedObj = this.setEmbedObj(playlistInfos[Number(message.guild?.id)][0].title, playlistInfos[Number(message.guild?.id)][0].id, playlistInfos[Number(message.guild?.id)][0].thumbnail, playlistInfos[Number(message.guild?.id)][0].duration);
         this.sendMusicEmbed(message, embedObj);
@@ -586,7 +586,7 @@ export default class Player {
         });
     }
 
-    handleFinish(message: Message) {
+    handleFinish(message: Message): void {
         // const diffSec = Math.floor((Date.now() - musicTimes[Number(message.guild?.id)]) / 1000)
         // if (diffSec < this.getSeconds(playlistInfos[Number(message.guild?.id)][0].duration)) {
         //     // If stream is stop too early recall stream at the end of the current
@@ -607,7 +607,7 @@ export default class Player {
         }, 1000);
     }
 
-    handleError(message: Message, e: Error) {
+    handleError(message: Message, e: Error): void {
         console.log('--------------------------------------');
         console.log('Titre : ', playlistInfos[Number(message.guild?.id)][0].title);
         console.log('e message : ', e.message);
@@ -621,7 +621,7 @@ export default class Player {
         console.log('--------------------------------------');
     }
 
-    setArrays(message: Message) {
+    setArrays(message: Message): void {
         // If still connected but the end callback is call to early (after few seconds of playing)
         if (playlistArray[Number(message.guild?.id)]) {
             // If loop is desactivate
@@ -653,7 +653,7 @@ export default class Player {
         }
     }
 
-    sendMusicEmbed(message: Message, embedObj: embedObjType, added: [boolean, number] = [false, 1], type: string = 'video', force: boolean = false) {
+    sendMusicEmbed(message: Message, embedObj: embedObjType, added: [boolean, number] = [false, 1], type: string = 'video', force: boolean = false): void {
         const setting = Settings.get(String(message.guild?.id));
         const add = added[0] && setting && setting.notif.added === 'on';
         const current = !added[0] && setting && setting.notif.current === 'on';
@@ -689,7 +689,7 @@ export default class Player {
         }
     }
 
-    getPlaylist(message: Message, words: string[], playSongParams: boolean, byReaction: [boolean, User | PartialUser]) {
+    getPlaylist(message: Message, words: string[], playSongParams: boolean, byReaction: [boolean, User | PartialUser]): void {
         message.channel.send('🛠 Ajout de la playlist en cours ...');
         // Call playlist API
         ytpl(words[1], { limit: 0 }, (err, playlist: ytpl.result) => {
@@ -702,7 +702,7 @@ export default class Player {
         });
     }
 
-    addPlaylistItems(message: Message, playlist: ytpl.result, play: boolean, byReaction: [boolean, User | PartialUser]) {
+    addPlaylistItems(message: Message, playlist: ytpl.result, play: boolean, byReaction: [boolean, User | PartialUser]): void {
         let voiceChannel: VoiceChannel = Helper.take_user_voiceChannel(message);
         if (byReaction[0]) {
             voiceChannel = Helper.take_user_voiceChannel_by_reaction(message, byReaction[1]);
@@ -742,7 +742,7 @@ export default class Player {
         }
     }
 
-    pushPlaylistItems(message: Message, playlist: ytpl.result) {
+    pushPlaylistItems(message: Message, playlist: ytpl.result): number {
         const videoURL = 'https://www.youtube.com/watch?v=';
         let pushCount = 0;
         (playlist.items as any).map((video: any) => {
@@ -770,7 +770,7 @@ export default class Player {
         return pushCount;
     }
 
-    convertSecondsToFormattedDuration(duration: number) {
+    convertSecondsToFormattedDuration(duration: number): string {
         // Format duration as '5:08' | '1:05:08'
         const videoDate = new Date(duration * 1000);
         const hours = videoDate.getUTCHours();
@@ -783,7 +783,7 @@ export default class Player {
         return formatedDuration;
     }
 
-    addDuration(message: Message, count: number, duration: string, type = 'new') {
+    addDuration(message: Message, count: number, duration: string, type = 'new'): void {
         // Increment seconds value
         if (count === 1) {
             if (type === 'new') {
@@ -801,7 +801,7 @@ export default class Player {
         }
     }
 
-    getSeconds(duration: string) {
+    getSeconds(duration: string): number {
         // Convert and return a formatted time in seconds
         const splittedDuration = duration.split(':');
         let resultSeconds = 0;
@@ -817,7 +817,7 @@ export default class Player {
         return resultSeconds;
     }
 
-    async getVideo(message: Message, words: string[], playSongParams: boolean = true, byReaction: [boolean, User | PartialUser]) {
+    async getVideo(message: Message, words: string[], playSongParams: boolean = true, byReaction: [boolean, User | PartialUser]): Promise<void> {
         // Call video API
         const infos = await ytdl.getBasicInfo(words[1]);
         if (infos) {
@@ -833,7 +833,7 @@ export default class Player {
         }
     }
 
-    setMusicArrayAndPlayMusic(infos: ytdl.videoInfo, message: Message, playSongParams: boolean, byReaction: [boolean, User | PartialUser]) {
+    setMusicArrayAndPlayMusic(infos: ytdl.videoInfo, message: Message, playSongParams: boolean, byReaction: [boolean, User | PartialUser]): void {
         if (playSongParams || musicParams.wait[Number(message.guild?.id)]) {
             // If must play or bot waiting so join channel
             delete musicParams.wait[Number(message.guild?.id)];
@@ -868,7 +868,7 @@ export default class Player {
         }
     }
 
-    setEmbedObj(title: string, id: string, thumbnail: string, duration: string) {
+    setEmbedObj(title: string, id: string, thumbnail: string, duration: string): embedObjType {
         return {
             title: title,
             id: id,
@@ -877,7 +877,7 @@ export default class Player {
         };
     }
 
-    clearAndAddArrayInfos(message: Message, infos: ytdl.videoInfo) {
+    clearAndAddArrayInfos(message: Message, infos: ytdl.videoInfo): string {
         // Create queued array if needed and push item in it
         if (!playlistArray[Number(message.guild?.id)] || !playlistArray[Number(message.guild?.id)]['url']) {
             playlistArray[Number(message.guild?.id)] = { url: [] };
@@ -894,7 +894,7 @@ export default class Player {
         return formattedDuration;
     }
 
-    getSongInPlaylist(message: Message, number: number) {
+    getSongInPlaylist(message: Message, number: number): void {
         const userChannel = Helper.take_user_voiceChannel(message);
         if (Helper.verifyBotLocation(message, connectedGuild[Number(message.guild?.id)], userChannel)) {
             if (playlistInfos[Number(message.guild?.id)] && playlistInfos[Number(message.guild?.id)].length) {
@@ -932,7 +932,7 @@ export default class Player {
         }
     }
 
-    showQueuedSongs(message: Message) {
+    showQueuedSongs(message: Message): void {
         const userChannel = Helper.take_user_voiceChannel(message);
         if (Helper.verifyBotLocation(message, connectedGuild[Number(message.guild?.id)], userChannel)) {
             if (playlistInfos[Number(message.guild?.id)] && playlistInfos[Number(message.guild?.id)].length >= 2) {
@@ -957,7 +957,7 @@ export default class Player {
         }
     }
 
-    createSongsString(message: Message) {
+    createSongsString(message: Message): string[] {
         const songsArray: string[] = [];
         let songs = '';
         // Create string with queued songs
@@ -979,7 +979,7 @@ export default class Player {
         return songsArray;
     }
 
-    removeSelectedSongsMaster(message: Message, words: string[]) {
+    removeSelectedSongsMaster(message: Message, words: string[]): void {
         const userChannel = Helper.take_user_voiceChannel(message);
         if (userChannel) {
             if (Helper.verifyBotLocation(message, connectedGuild[Number(message.guild?.id)], userChannel)) {
@@ -1009,7 +1009,7 @@ export default class Player {
 
     }
 
-    removeSelectedSongs(message: Message, selection: string[]) {
+    removeSelectedSongs(message: Message, selection: string[]): void {
         const selectZero = Number(selection[0]);
         if (selection[1]) {
             const selectOne = Number(selection[1]);
@@ -1090,7 +1090,7 @@ export default class Player {
     //     }
     // }
 
-    go(message: Message, words: string[]) {
+    go(message: Message, words: string[]): void {
         const userChannel = Helper.take_user_voiceChannel(message);
         if (userChannel) {
             if (Helper.verifyBotLocation(message, connectedGuild[Number(message.guild?.id)], userChannel)) {
@@ -1127,7 +1127,7 @@ export default class Player {
         }
     }
 
-    current(message: Message) {
+    current(message: Message): void {
         const userChannel = Helper.take_user_voiceChannel(message);
         if (userChannel) {
             if (Helper.verifyBotLocation(message, connectedGuild[Number(message.guild?.id)], userChannel)) {
@@ -1145,7 +1145,7 @@ export default class Player {
         }
     }
 
-    sendRemoveEmbed(message: Message, number: number) {
+    sendRemoveEmbed(message: Message, number: number): void {
         const setting = Settings.get(String(message.guild?.id));
         if (!setting || (setting && setting.notif.removed === 'on')) {
             const title = number > 1 ? 'Musiques supprimées' : 'Musique supprimée';
@@ -1163,7 +1163,7 @@ export default class Player {
         }
     }
 
-    static joinChannel(message: Message) {
+    static joinChannel(message: Message): void {
         const voiceChannel = Helper.take_user_voiceChannel(message);
         if (voiceChannel) {
             if (!playlistArray[Number(message.guild?.id)] && !playlistArray[Number(message.guild?.id)]['url'] && !radioPlayed[Number(message.guild?.id)]) {
@@ -1182,7 +1182,7 @@ export default class Player {
         }
     }
 
-    static stop(message: Message, leave: boolean = true) {
+    static stop(message: Message, leave: boolean = true): void {
         const userChannel = Helper.take_user_voiceChannel(message);
         if (Helper.verifyBotLocation(message, connectedGuild[Number(message.guild?.id)], userChannel)) {
             if (streamsArray[Number(message.guild?.id)]) {
@@ -1213,7 +1213,7 @@ export default class Player {
         }
     }
 
-    static pause(message: Message) {
+    static pause(message: Message): void {
         const userChannel = Helper.take_user_voiceChannel(message);
         if (Helper.verifyBotLocation(message, connectedGuild[Number(message.guild?.id)], userChannel)) {
             if ((!playlistArray[Number(message.guild?.id)] && !radioPlayed[Number(message.guild?.id)]) ||
@@ -1227,7 +1227,7 @@ export default class Player {
         }
     }
 
-    static resume(message: Message) {
+    static resume(message: Message): void {
         const userChannel = Helper.take_user_voiceChannel(message);
         if (Helper.verifyBotLocation(message, connectedGuild[Number(message.guild?.id)], userChannel)) {
             if ((!playlistArray[Number(message.guild?.id)] && !radioPlayed[Number(message.guild?.id)]) ||
@@ -1241,7 +1241,7 @@ export default class Player {
         }
     }
 
-    next(message: Message) {
+    next(message: Message): void {
         const userChannel = Helper.take_user_voiceChannel(message);
         if (Helper.verifyBotLocation(message, connectedGuild[Number(message.guild?.id)], userChannel)) {
             if (playlistArray[Number(message.guild?.id)] && playlistArray[Number(message.guild?.id)]['url'].length) {

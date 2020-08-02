@@ -11,7 +11,7 @@ import MessageFunc from './message';
 import { Message, Client } from 'discord.js';
 // import Level from './level';
 
-export default function controller(message: Message, prefix: string, bot: Client) {
+export default function controller(message: Message, prefix: string, bot: Client): void {
     // Prevent bad prefix
     if (message.content.substr(0, prefix.length) === prefix && message.content.substr(0, 3) !== '!!!') {
         const words = message.content.substr(prefix.length, message.content.length - prefix.length).split(' ');

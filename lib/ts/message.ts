@@ -17,7 +17,7 @@ export default class Message {
         }
     }
 
-    remove(message: DMessage, howMany: number, all: boolean = false) {
+    remove(message: DMessage, howMany: number, all: boolean = false): void {
         if (message && message.guild) {
             if (howMany > 99) {
                 message.channel.send('❌ Écrivez un chiffre inférieur ou égal à 99');
@@ -38,7 +38,7 @@ export default class Message {
         }
     }
 
-    removeMessages(message: DMessage, limit: { limit?: number }) {
+    removeMessages(message: DMessage, limit: { limit?: number }): void {
         if (message && message.guild) {
             message.channel.messages.fetch(limit)
                 .then(messages => {

@@ -26,7 +26,7 @@ export default class Radio {
         }
     }
 
-    radioExist(radio: string) {
+    radioExist(radio: string): boolean {
         const check = Radios.filter(r => r.name.toLowerCase() === radio);
         if (check && check.length) {
             return true;
@@ -34,7 +34,7 @@ export default class Radio {
         return false;
     }
 
-    showRadioList(message: Message) {
+    showRadioList(message: Message): void {
         let stringRadioList = '';
         // Create radio list as string and send it
         Radios.map(r => {
@@ -43,7 +43,7 @@ export default class Radio {
         message.channel.send('> Écrivez le nom de la radio que vous voulez écouter.\n > Ex: ' + config.prefix + 'radio nrj\n > \n ' + stringRadioList);
     }
 
-    connectRadio(message: Message, words: string[], radioChoice: string = '', retry: boolean = false) {
+    connectRadio(message: Message, words: string[], radioChoice: string = '', retry: boolean = false): void {
         const radio = Radios.filter(r => r.name.toLowerCase() === radioChoice)[0];
         const voiceChannel = Helper.take_user_voiceChannel(message);
         if (voiceChannel) {
@@ -71,7 +71,7 @@ export default class Radio {
         }
     }
 
-    joinChannelAndPlayRadio(message: Message, words: string[], voiceChannel: VoiceChannel, radio: { name: string, url: string }, retry: boolean) {
+    joinChannelAndPlayRadio(message: Message, words: string[], voiceChannel: VoiceChannel, radio: { name: string, url: string }, retry: boolean): void {
         voiceChannel.join()
             .then(connection => {
                 const setting = Settings.get(String(message.guild?.id));
@@ -91,7 +91,7 @@ export default class Radio {
             });
     }
 
-    sendRadioEmbed(message: Message, radio: { name: string, url: string }) {
+    sendRadioEmbed(message: Message, radio: { name: string, url: string }): void {
         const setting = Settings.get(String(message.guild?.id));
         if (!setting || (setting && setting.notif.radio === 'on')) {
             // #543A99 | Mauve

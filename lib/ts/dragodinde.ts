@@ -11,7 +11,7 @@ type dofusInfosType = {
 
 const dofusInfos: dofusInfosType[] = [];
 
-const controller = (message: Message, words: string[]) => {
+export const controller = (message: Message, words: string[]): Promise<Message> => {
     if (words[1]) {
         if (words[1] === 'notif') {
             return notif(message, words);
@@ -20,7 +20,7 @@ const controller = (message: Message, words: string[]) => {
     return message.channel.send('❌ Commande incomplète !');
 };
 
-const notif = async (message: Message, words: string[]) => {
+export const notif = async (message: Message, words: string[]): Promise<Message> => {
     if (!words[2] || words[2] === 'status') {
         const status = dofusInfos[Number(message.author.id)] ? dofusInfos[Number(message.author.id)].notif.toUpperCase() : 'OFF';
         return message.channel.send('> ** Dragodindes ** \n > `Notifications` : `' + status + '`');
@@ -41,13 +41,14 @@ const notif = async (message: Message, words: string[]) => {
         }
         return message.channel.send('❌ Vous devez écrire une valeur différente de celle actuelle');
     }
+    return message.channel.send('❌ Paramètre `' + words[2] + '` introuvable !');
 };
 
-const getInfos = (userId: string) => {
+export const getInfos = (userId: string): dofusInfosType => {
     return dofusInfos[Number(userId)];
 };
 
-const update = async () => {
+export const update = async (): Promise<boolean> => {
     console.log('Updating dragodindes settings ... | ' + dateFormat(Date.now(), 'HH:MM:ss'));
     const { data } = await axios.post('/api/dofus/dragodindes/notif/all', { token: Config.security.token, type: 'bot' });
     if (data) {
@@ -59,14 +60,5 @@ const update = async () => {
         console.log(' - Dragodindes settings updated !');
         return true;
     }
-    setTimeout(() => {
-        update()
-    }, 1000);
-}
-
-export {
-    controller,
-    notif,
-    getInfos,
-    update
+    return false;
 }

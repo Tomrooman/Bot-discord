@@ -1,7 +1,7 @@
 'use strict';
 
 import commands from '../json/commands.json';
-import { VoiceChannel, Message, Guild, Client, User, ClientUser, Channel, GuildChannel, TextChannel, VoiceConnection, PartialUser } from 'discord.js';
+import { VoiceChannel, Message, Guild, User, TextChannel, VoiceConnection, PartialUser } from 'discord.js';
 
 export default class Helper {
     constructor(message: Message, words: string[]) {
@@ -82,7 +82,7 @@ export default class Helper {
             .first() as TextChannel;
     }
 
-    static verifyBotLocation(message: Message, connectedGuild: VoiceConnection | string | undefined, userChannel: VoiceChannel, sendMessage = true) {
+    static verifyBotLocation(message: Message, connectedGuild: VoiceConnection | string | undefined, userChannel: VoiceChannel, sendMessage = true): boolean {
         if (connectedGuild) {
             if (connectedGuild === userChannel.id) {
                 return true;
@@ -102,7 +102,7 @@ export default class Helper {
         }
     }
 
-    showCommandlist(message: Message) {
+    showCommandlist(message: Message): void {
         let embedDescription = '';
         commands.map(item => {
             embedDescription += item.command + item.exemple;
@@ -121,7 +121,7 @@ export default class Helper {
         });
     }
 
-    getCommandInfos(message: Message, command: string) {
+    getCommandInfos(message: Message, command: string): void {
         const commandObj = commands.filter(c => c.name.split(' | ')[0] === command || c.name.split(' | ')[1] === command || c.name.split(' | ')[2] === command);
         if (commandObj && commandObj[0]) {
             let joinedInfos = '';

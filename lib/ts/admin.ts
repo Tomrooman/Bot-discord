@@ -8,7 +8,7 @@ export default class Admin {
         this.controller(message, words, bot);
     }
 
-    controller(message: Message, words: string[], bot: Client) {
+    controller(message: Message, words: string[], bot: Client): void {
         if (message.author.username + message.author.discriminator === 'Stalyr9246') {
             if (words[1]) {
                 if (words[1] === 'message') {
@@ -37,7 +37,7 @@ export default class Admin {
         }
     }
 
-    sendMessageToAllServer(message: Message, words: string[], bot: Client) {
+    sendMessageToAllServer(message: Message, words: string[], bot: Client): void {
         if (words[2]) {
             delete words[0];
             delete words[1];
