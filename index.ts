@@ -9,7 +9,6 @@ import config from './config.json';
 import Axios from 'axios';
 import chalk from 'chalk';
 // import Streams from './lib/js/streams';
-// import Level from './lib/js/level';
 // const mongoose = require('mongoose');
 
 const bot = new Discord.Client();

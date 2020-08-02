@@ -9,7 +9,6 @@ import Settings from './settings';
 import * as Dragodinde from './dragodinde';
 import MessageFunc from './message';
 import { Message, Client } from 'discord.js';
-// import Level from './level';
 
 export default function controller(message: Message, prefix: string, bot: Client): void {
     // Prevent bad prefix
@@ -60,9 +59,6 @@ export default function controller(message: Message, prefix: string, bot: Client
             else if (command === 'clear') {
                 new MessageFunc(message, words, 'all');
             }
-            // else if (command === 'grade') {
-            //     Level.grade(message);
-            // }
             else if (command === 'help') {
                 new Helper(message, words);
             }
