@@ -1,10 +1,11 @@
 import Discord, { VoiceChannel, Message, MessageReaction, User, PartialUser } from 'discord.js';
 import dateFormat from 'dateformat';
-import Controller from './lib/ts/controller';
-import Helper from './lib/ts/helper';
-import Player from './lib/ts/player';
-import Settings from './lib/ts/settings';
-import { update as dragodindeUpdate } from './lib/ts/dragodinde';
+import { Controller } from './lib/ts/controller';
+import * as Helper from './lib/ts/helper';
+import * as Player from './lib/ts/player';
+import * as Settings from './lib/ts/settings';
+import { update as dragodindeUpdate, verifyNotif } from './lib/ts/dragodinde';
+import { APIsessionType } from './lib/@types/session';
 import config from './config.json';
 import Axios from 'axios';
 import chalk from 'chalk';
@@ -12,13 +13,12 @@ import chalk from 'chalk';
 // const mongoose = require('mongoose');
 
 const bot = new Discord.Client();
+let APIsession: APIsessionType = {} as APIsessionType;
 
 console.log(' ');
 console.log('----- ' + dateFormat(Date.now(), 'HH:MM:ss dd/mm/yyyy') + ' -----');
 
 // connectToDatabase();
-updateSettings();
-
 
 bot.on('ready', (): void => {
     disconnectBotFromOldChannel();
@@ -35,9 +35,11 @@ bot.on('ready', (): void => {
         console.log('Connected => ' + config.WHAT);
         console.log('Guilds =>', bot.guilds.cache.size);
     }
+    // Verify if dragodindes notif need to be send
+    verifyNotif(bot, APIsession);
     // Keep bot connection alive & activity (send signal every 6H)
     setInterval(() => {
-        Axios.post('https://syxbot.com/api/', { token: config.security.token, type: 'bot' });
+        Axios.post('https://syxbot.com/api/', { ...APIsession });
         bot.user!.setActivity(`${config.prefix}help`, { type: 'PLAYING' })
             .catch(e => console.log('Error while set presence in shard reconnecting: ', e.message));
     }, (1000 * 60 * 60 * 6));
@@ -63,33 +65,29 @@ bot.on('shardResume', (replayed, shardID): void => {
     console.log(`Shard ID ${shardID} resumed connection and replayed ${replayed} events.`);
 });
 
-bot.on('messageReactionAdd', (reaction: MessageReaction, user: User | PartialUser): void => {
+bot.on('messageReactionAdd', (reaction: MessageReaction, user: User | PartialUser): void | Promise<void | Message> => {
     if (!user.bot) {
         const playlistExist = reaction.message.content.indexOf('Ex: ' + config.prefix + 'search pl 1') !== -1;
         const videoExist = reaction.message.content.indexOf('Ex: ' + config.prefix + 'search p 2') !== -1;
         if (playlistExist || videoExist) {
             const selection = getSelectionByReaction(reaction);
             if (reaction.emoji.name === '⏩') {
-                nextReaction(reaction, user as User, playlistExist ? 'playlist' : 'video');
+                return nextReaction(reaction, user as User, playlistExist ? 'playlist' : 'video');
             }
-            else {
-                new Player().selectSongInSearchList(reaction.message, selection, playlistExist ? 'playlist' : 'musique', [true, user]);
-            }
+            return Player.selectSongInSearchList(reaction.message, selection, playlistExist ? 'playlist' : 'musique', [true, user]);
         }
     }
 });
 
-function nextReaction(reaction: MessageReaction, user: User, type: string): void {
+const nextReaction = (reaction: MessageReaction, user: User, type: string): void | Promise<Message> => {
     const userChannel = Helper.take_user_voiceChannel_by_reaction(reaction.message, user);
     if (userChannel) {
-        new Player().youtubeResearch(reaction.message, null, type, false, [true, user]);
+        return Player.youtubeResearch(reaction.message, null, type, false, [true, user]);
     }
-    else {
-        reaction.message.channel.send('❌ Vous devez être connecté dans un salon !');
-    }
-}
+    return reaction.message.channel.send('❌ Vous devez être connecté dans un salon !');
+};
 
-function getSelectionByReaction(reaction: MessageReaction): number | false {
+const getSelectionByReaction = (reaction: MessageReaction): number | false => {
     if (reaction.emoji.name === '1️⃣') {
         return 1;
     }
@@ -123,19 +121,50 @@ function getSelectionByReaction(reaction: MessageReaction): number | false {
 //     });
 // }
 
-async function updateSettings(): Promise<void> {
-    if (config.WHAT === 'DEV') console.log(chalk.bgRgb(215, 102, 8)('          SETTINGS          '));
-    if (await Settings.update()) {
-        if (await dragodindeUpdate()) {
-            if (config.WHAT === 'DEV') console.log(chalk.bgRgb(25, 108, 207)('\n         CONNECTION         '));
+const start = async (): Promise<void> => {
+    const session = await createAPIsession();
+    if (session) {
+        const status = await updateSettings();
+        if (status && session) {
             bot.login(config.token);
-            return;
         }
     }
-    updateSettings();
 };
 
-function disconnectBotFromOldChannel(): void {
+const createAPIsession = async (): Promise<boolean> => {
+    // Call API to create session
+    try {
+        const session = await Axios.post('/api/bot/auth', {
+            token: config.security.token,
+            type: 'bot'
+        });
+        APIsession = {
+            jwt: session.data.jwt,
+            token: config.security.token,
+            type: 'bot'
+        };
+        return true;
+    } catch (e) {
+        console.log('Error while creating api session : ', e.message);
+        return false;
+    }
+};
+
+export const getAPIsession = () => {
+    return APIsession;
+};
+
+const updateSettings = async (): Promise<void | boolean> => {
+    if (config.WHAT === 'DEV') console.log(chalk.bgRgb(215, 102, 8)('          SETTINGS          '));
+    if (await Settings.update(APIsession)) {
+        if (await dragodindeUpdate(APIsession)) {
+            if (config.WHAT === 'DEV') console.log(chalk.bgRgb(25, 108, 207)('\n         CONNECTION         '));
+            return true;
+        }
+    }
+};
+
+const disconnectBotFromOldChannel = (): void => {
     console.log('Disconnecting from all channels ...');
     bot.guilds.cache.map(g => {
         g.channels.cache.map(channel => {
@@ -157,9 +186,17 @@ function disconnectBotFromOldChannel(): void {
         });
     });
     console.log(' - Disconnected from all channels !');
-}
+};
 
-process.on('SIGINT', (): void => {
+process.on('SIGINT', async (): Promise<void> => {
     // close connections, clear cache, etc
+    try {
+        console.log('Close api session');
+        await Axios.post('/api/bot/auth/close', { ...APIsession })
+    } catch (e) {
+        console.log('Error while closing api session : ', e.message);
+    }
     process.exit(0);
 });
+
+start();
