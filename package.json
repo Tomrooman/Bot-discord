@@ -9,7 +9,11 @@
         "test": "yarn mocha ./test/runner.js --exit",
         "start-log": "yarn npm-run-all build server log-prod",
         "start": "yarn npm-run-all build server",
+        "start:container:log": "yarn npm-run-all server:container shell:container",
+        "start:container": "yarn npm-run-all server:container",
+        "shell:container": "docker exec -it syxbot sh",
         "server": "pm2 start dist/index.js --name syxbot_prod",
+        "server:container": "docker-compose up -d --build",
         "build": "npm-run-all clean transpile",
         "transpile": "yarn tsc",
         "dev": "yarn rimraf dist && yarn ts-node-dev --respawn --transpile-only --clear index.ts",
@@ -19,7 +23,10 @@
         "stop-prod": "yarn pm2 stop syxbot_prod",
         "stop-dev": "yarn pm2 stop syxbot_dev",
         "stop-all": "yarn pm2 stop all",
+        "stop:container": "docker-compose down",
         "clean": "rimraf dist",
+        "remove:container": "docker rm $(docker ps -a -q)",
+        "remove:untagged": "docker rmi -f $(docker images | grep '<none>')",
         "remove-modules": "yarn rimraf node_modules .yarn/build-state.yml .yarn/cache .yarn/install-state.gz .yarn/unplugged .pnp.js yarn.lock package-lock.json"
     },
     "dependencies": {
