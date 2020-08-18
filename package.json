@@ -12,7 +12,7 @@
         "start:container:log": "yarn start:container && yarn shell:container",
         "start:container": "docker run --network=host --restart=always -d --name syxbot syxbot",
         "shell:container": "docker exec -it syxbot sh",
-        "build:container": "yarn cp:master:config && docker build -t syxbot . && yarn cp:dev:config",
+        "build:container": "docker image prune -f && yarn cp:master:config && docker build -t syxbot . && yarn cp:dev:config",
         "tag:container": "docker tag syxbot syxbot.com:5000/syxbot",
         "push:container": "docker push syxbot.com:5000/syxbot",
         "deploy:container": "yarn build:container && yarn tag:container && yarn push:container",

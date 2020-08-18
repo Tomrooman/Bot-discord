@@ -1,6 +1,6 @@
 'use strict';
 
-import { Message as DMessage, Message } from 'discord.js';
+import { Message as DMessage, TextChannel } from 'discord.js';
 
 const removeInfos: number[] = [];
 
@@ -14,7 +14,7 @@ export const instantiate = (message: DMessage, words: string[], all: string = ''
     return message.channel.send('❌ Vous devez écrire le nombre de messages que vous voulez supprimer.');
 };
 
-const remove = (message: DMessage, howMany: number, all: boolean = false): void | Promise<Message> => {
+const remove = (message: DMessage, howMany: number, all: boolean = false): void | Promise<DMessage> => {
     if (message && message.guild) {
         if (howMany > 99) {
             return message.channel.send('❌ Écrivez un chiffre inférieur ou égal à 99');
@@ -38,7 +38,7 @@ const removeMessages = (message: DMessage, limit: { limit?: number }): void => {
     if (message && message.guild) {
         message.channel.messages.fetch(limit)
             .then(messages => {
-                message.channel.bulkDelete(messages)
+                (message.channel as TextChannel).bulkDelete(messages)
                     .then(() => {
                         message.channel.send('✅ **' + (messages.size - 1) + '** ' + (messages.size - 1 > 1 ? 'messages supprimés' : 'message supprimé'));
                         delete removeInfos[Number(message.guild?.id)];
