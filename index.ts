@@ -58,12 +58,12 @@ bot.on('message', (message: Message): void => {
 });
 
 bot.on('shardReconnecting', (id): void => {
-    console.log(`Shard reconnected, ID => ${id}`);
+    console.log(`Shard reconnected, ID => ${id} => ${dateFormat(Date.now(), 'HH:MM:ss')}`);
 });
 
-bot.on('shardResume', (replayed, shardID): void => {
-    console.log(`Shard ID ${shardID} resumed connection and replayed ${replayed} events.`);
-});
+// bot.on('shardResume', (replayed, shardID): void => {
+//     console.log(`Shard ID ${shardID} resumed connection and replayed ${replayed} events.`);
+// });
 
 bot.on('messageReactionAdd', (reaction: MessageReaction, user: User | PartialUser): void | Promise<void | Message> => {
     if (!user.bot) {

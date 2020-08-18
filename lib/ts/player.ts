@@ -115,7 +115,7 @@ const playSongsAndConnectOrNotBot = (message: Message, command: string, words: s
     if (words[1] && words[1].includes('youtu') && (words[1].includes('http://') || words[1].includes('https://'))) {
         // If words[1] (element after the command) exist and contain 'youtu' + 'http://' or 'https://'
         if (command === 'playlist' || command === 'pl') {
-            if (ytpl.validateURL(words[1])) {
+            if (ytpl.getPlaylistID(words[1])) {
                 // Check playlist url before continue
                 return getPlaylist(message, words, playSongParams, byReaction);
             }
@@ -131,17 +131,20 @@ const playSongsAndConnectOrNotBot = (message: Message, command: string, words: s
     }
     else if (words[1]) {
         // If words[1] (element after the command) exist and DO NOT CONTAIN 'youtu' + 'http://' or 'https://'
-        delete words[0];
-        const title = words.join(' ');
-        // Delete cancel array who said to 'sendCurrentResultAndRecall()' to stop research
-        if (command === 'playlist' || command === 'pl') {
-            delete musicParams.cancel[Number(message.guild?.id)];
-            youtubeResearch(message, title, 'playlist');
+        if (!words[1].includes('http://') && !words[1].includes('https://')) {
+            delete words[0];
+            const title = words.join(' ');
+            // Delete cancel array who said to 'sendCurrentResultAndRecall()' to stop research
+            if (command === 'playlist' || command === 'pl') {
+                delete musicParams.cancel[Number(message.guild?.id)];
+                return youtubeResearch(message, title, 'playlist');
+            }
+            else if (command === 'play' || command === 'p') {
+                delete musicParams.cancel[Number(message.guild?.id)];
+                return youtubeResearch(message, title, 'video');
+            }
         }
-        else if (command === 'play' || command === 'p') {
-            delete musicParams.cancel[Number(message.guild?.id)];
-            youtubeResearch(message, title, 'video');
-        }
+        return message.channel.send('❌ Mauvais arguments de recherche !');
     }
     return message.channel.send('❌ Vous n\'avez pas écrit de recherche !');
 };
@@ -191,15 +194,16 @@ const sendCurrentResultAndRecall = (message: Message, title: string, type: strin
     }, 1500);
 };
 
-const getYoutubeResearch = (message: Message, title: string, type: string, options: ytsr.Options, byReaction: [boolean, User]): void => {
-    ytsr(title, options, (err, searchresults) => {
-        if (searchresults) {
-            const buildedArray = makeSearchArray(message, searchresults.items, type);
-            if ((buildedArray as searchVideoArrayType[]).length < 5 && searchresults.nextpageRef) {
+const getYoutubeResearch = async (message: Message, title: string, type: string, options: ytsr.Options, byReaction: [boolean, User]): Promise<void> => {
+    try {
+        const searchResults = await ytsr(title, options);
+        if (searchResults) {
+            const buildedArray = makeSearchArray(message, searchResults.items, type);
+            if ((buildedArray as searchVideoArrayType[]).length < 5 && searchResults.nextpageRef) {
                 // If results is less than 5 so recall API
-                sendCurrentResultAndRecall(message, title, type, buildedArray, searchresults, byReaction);
+                sendCurrentResultAndRecall(message, title, type, buildedArray, searchResults, byReaction);
             }
-            else if ((buildedArray as searchVideoArrayType[]).length === 5 || !searchresults.nextpageRef) {
+            else if ((buildedArray as searchVideoArrayType[]).length === 5 || !searchResults.nextpageRef) {
                 // If get 5 results send them
                 if (type === 'video') {
                     delete searchVideo[Number(message.guild?.id)]['old'];
@@ -207,7 +211,7 @@ const getYoutubeResearch = (message: Message, title: string, type: string, optio
                 else if (type === 'playlist') {
                     delete searchPlaylist[Number(message.guild?.id)]['old'];
                 }
-                setArrayInfos(message, type, title, searchresults);
+                setArrayInfos(message, type, title, searchResults);
                 sendSearchResultsAsString(message, type);
             }
         }
@@ -222,7 +226,9 @@ const getYoutubeResearch = (message: Message, title: string, type: string, optio
             message.channel.send('❌ Aucun résultat obtenu');
             sendSearchResultsAsString(message, type);
         }
-    });
+    } catch (e) {
+        console.log('Error getting results with YTSR : ', e.message);
+    }
 };
 
 const verifyOldResearch = (message: Message, type: string, byReaction: [boolean, User]): boolean => {
@@ -313,7 +319,7 @@ const setArrayWithChoice = (message: Message, title: string, type: string, nextP
             // Don't have nextPage and have elements in video array so clear it and set nextPage token
             if (byReaction[0]) {
                 nextPageVar = (selectedArray['array'] as any)['nextpage'];
-                message.channel.send('🔎 Recherche de ' + type + ' : ' + '`' + (selectedArray['infos'] as searchVideosInfosType)['title'].trim() + '` #' + (selectedArray['infos'] as searchVideosInfosType)['count']);
+                message.channel.send('🔎 Recherche de ' + type + ' : ' + '`' + (selectedArray['infos'] as searchVideosInfosType)['title'].trim() + '` #' + (selectedArray['infos'] as searchVideosInfosType)['count'] + '\n❓ Pour arrêter la recherche : `' + config.prefix + 'cancel`');
             }
             delete selectedArray['array'];
         }
@@ -322,7 +328,7 @@ const setArrayWithChoice = (message: Message, title: string, type: string, nextP
     if (!byReaction[0] && !nextPage) {
         // If no reaction and no nextPage send message
         const goodTitle = title ? title : type === 'video' ? (searchVideo[Number(message.guild?.id)]['infos'] as searchVideosInfosType)['title'] : (searchPlaylist[Number(message.guild?.id)]['infos'] as searchVideosInfosType)['title'];
-        message.channel.send('🔎 Recherche de ' + type + ' : ' + '`' + goodTitle.trim() + '`');
+        message.channel.send('🔎 Recherche de ' + type + ' : ' + '`' + goodTitle.trim() + '`\n❓ Pour arrêter la recherche : `' + config.prefix + 'cancel`');
     }
     if (nextPageVar) {
         // Save the nextPage token if user use next reaction
@@ -637,15 +643,19 @@ const sendMusicEmbed = (message: Message, embedObj: embedObjType, added: [boolea
     }
 };
 
-const getPlaylist = (message: Message, words: string[], playSongParams: boolean, byReaction: [boolean, User | PartialUser]): void => {
+const getPlaylist = async (message: Message, words: string[], playSongParams: boolean, byReaction: [boolean, User | PartialUser]): Promise<void | Message> => {
     message.channel.send('🛠 Ajout de la playlist en cours ...');
     // Call playlist API
-    ytpl(words[1], { limit: 0 }, (err, playlist: ytpl.result) => {
+    try {
+        const playlist = await ytpl(words[1], { limit: Infinity });
         if (playlist) {
             return addPlaylistItems(message, playlist, playSongParams, byReaction);
         }
-        return message.channel.send('❌ Impossible de charger la playlist, probablement indisponible dans ce pays !');
-    });
+        return message.channel.send('❌ Erreur lors du chargement de la playlist');
+    } catch (e) {
+        console.log('Error while getting YTPL results : ', e.message);
+        return message.channel.send('❌ Erreur lors du chargement de la playlist');
+    }
 };
 
 const addPlaylistItems = (message: Message, playlist: ytpl.result, play: boolean, byReaction: [boolean, User | PartialUser]): void => {
@@ -655,6 +665,9 @@ const addPlaylistItems = (message: Message, playlist: ytpl.result, play: boolean
     }
     if (radioPlayed[Number(message.guild?.id)] || play) {
         // If radio is active or if we tell us to play the song now
+        if (!playlistArray[Number(message.guild?.id)]) {
+            playlistArray[Number(message.guild?.id)] = { url: [] }
+        }
         playlistArray[Number(message.guild?.id)]['url'] = [];
         playlistInfos[Number(message.guild?.id)] = [];
         delete radioPlayed[Number(message.guild?.id)];
@@ -689,23 +702,23 @@ const addPlaylistItems = (message: Message, playlist: ytpl.result, play: boolean
 };
 
 const pushPlaylistItems = (message: Message, playlist: ytpl.result): number => {
-    const videoURL = 'https://www.youtube.com/watch?v=';
+    // const videoURL = 'https://www.youtube.com/watch?v=';
     let pushCount = 0;
-    (playlist.items as any).map((video: any) => {
-        if (video.videoDetails.title !== '[Deleted video]' && video.videoDetails.title !== '[Private video]') {
+    playlist.items.map((video: any) => {
+        if (video.title !== '[Deleted video]' && video.title !== '[Private video]') {
             // Push elements and calculate how many elements was pushed
             pushCount++;
-            addDuration(message, pushCount, video.videoDetails.duration, 'new');
-            playlistArray[Number(message.guild?.id)]['url'].push(videoURL + video.videoDetails.videoId);
+            addDuration(message, pushCount, video.duration, 'new');
+            playlistArray[Number(message.guild?.id)]['url'].push(video.url_simple);
             let thumbnailURL = '';
-            if (video.videoDetails.thumbnail) {
-                thumbnailURL = video.videoDetails.thumbnail;
+            if (video.thumbnail) {
+                thumbnailURL = video.thumbnail;
             }
             playlistInfos[Number(message.guild?.id)].push({
-                title: video.videoDetails.title,
-                id: video.videoDetails.id,
+                title: video.title,
+                id: video.id,
                 thumbnail: thumbnailURL,
-                duration: video.videoDetails.duration
+                duration: video.duration
             });
         }
     });
