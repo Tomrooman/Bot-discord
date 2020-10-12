@@ -53,7 +53,7 @@
 //                     const embed = new Discord.MessageEmbed()
 //                         .setAuthor(tweet.user.name, authorImg)
 //                         .setColor(color)
-//                         .setThumbnail('https://syxbot.com/assets/img/twitter.png')
+//                         .setThumbnail('https://syxbot.com/assets/img/bot/twitter.png')
 //                         .setFooter('📅' + dateFormat(Date(tweet.timestamp_ms), 'dd/mm/yyyy - HH:MM:ss'))
 //                         .setDescription(this.getText(tweet));
 //                     channel.send({ embed });

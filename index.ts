@@ -23,9 +23,9 @@ console.log('----- ' + dateFormat(Date.now(), 'HH:MM:ss dd/mm/yyyy') + ' -----')
 bot.on('ready', (): void => {
     disconnectBotFromOldChannel();
     // new Streams(bot);
-    bot.user!.setActivity(`${config.prefix}help`, { type: 'PLAYING' })
+    bot.user?.setActivity(`${config.prefix}help`, { type: 'PLAYING' })
         .catch(e => console.log('Error while set presence : ', e.message));
-    if (config.WHAT === 'DEV') console.log(chalk.bgRgb(60, 121, 0)(`\n         CONNECTED          `));
+    if (config.WHAT === 'DEV') console.log(chalk.bgRgb(60, 121, 0)('\n         CONNECTED          '));
     if (config.WHAT === 'DEV') {
         console.log('      Connected => ' + config.WHAT);
         console.log('      Guilds =>', bot.guilds.cache.size);
@@ -40,7 +40,7 @@ bot.on('ready', (): void => {
     // Keep bot connection alive & activity (send signal every 6H)
     setInterval(() => {
         Axios.post('https://syxbot.com/api/', { ...APIsession });
-        bot.user!.setActivity(`${config.prefix}help`, { type: 'PLAYING' })
+        bot.user?.setActivity(`${config.prefix}help`, { type: 'PLAYING' })
             .catch(e => console.log('Error while set presence in shard reconnecting: ', e.message));
     }, (1000 * 60 * 60 * 6));
 });
@@ -144,13 +144,14 @@ const createAPIsession = async (): Promise<boolean> => {
             type: 'bot'
         };
         return true;
-    } catch (e) {
+    }
+    catch (e) {
         console.log('Error while creating api session : ', e.message);
         return false;
     }
 };
 
-export const getAPIsession = () => {
+export const getAPIsession = (): APIsessionType => {
     return APIsession;
 };
 
@@ -192,8 +193,9 @@ process.on('SIGINT', async (): Promise<void> => {
     // close connections, clear cache, etc
     try {
         console.log('Close api session');
-        await Axios.post('/api/bot/auth/close', { ...APIsession })
-    } catch (e) {
+        await Axios.post('/api/bot/auth/close', { ...APIsession });
+    }
+    catch (e) {
         console.log('Error while closing api session : ', e.message);
     }
     process.exit(0);

@@ -9,12 +9,11 @@ import * as Settings from './settings';
 import * as Dragodinde from './dragodinde';
 import * as MessageFunc from './message';
 import { Message, Client } from 'discord.js';
-import _ from 'lodash';
 
 export const Controller = (message: Message, prefix: string, bot: Client): void | Promise<void | Message> => {
     // Prevent bad prefix
     if (message.content.substr(0, prefix.length) === prefix && message.content.substr(0, 3) !== '!!!') {
-        let words = message.content.substr(prefix.length, message.content.length - prefix.length).split(' ');
+        const words = message.content.substr(prefix.length, message.content.length - prefix.length).split(' ');
         const command = words[0].toLowerCase();
         if (message.content.length > prefix.length) {
             if (command === 'play' || command === 'playlist' || command === 'p' || command === 'pl') {
@@ -82,4 +81,4 @@ export const Controller = (message: Message, prefix: string, bot: Client): void 
         }
         return message.channel.send('❌ Vous n\'avez pas écrit de commande !');
     }
-}
+};

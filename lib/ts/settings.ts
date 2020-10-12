@@ -24,12 +24,12 @@ type settingsType = {
 
 const settings: settingsType[] = [];
 
-export const instantiate = (message: Message, words: string[]): void | Promise<Message> => {
-    if (message) {
+export const instantiate = (message: Message, words: string[]): void | Promise<Message | void> => {
+    if (message && message.guild) {
         delete words[0];
         words = _.compact(words);
-        if (!settings[Number(message.guild?.id)]) {
-            settings[Number(message.guild?.id)] = setParamObject(message);
+        if (!settings[message.guild.id]) {
+            settings[message.guild.id] = setParamObject(message);
         }
         if (words[0]) {
             if (words[0].toLowerCase() === 'list') {
@@ -60,8 +60,9 @@ const setParamObject = (message: Message): settingsType => {
     };
 };
 
-const showParamsList = (message: Message): Promise<Message> => {
-    const settingsObj = settings[Number(message.guild?.id)];
+const showParamsList = (message: Message): Promise<Message> | void => {
+    if (!message.guild) return;
+    const settingsObj = settings[message.guild.id];
     const current = '>     actuel : `' + settingsObj.notif.current.toUpperCase() + '`\n';
     const added = '>     rajout : `' + settingsObj.notif.added.toUpperCase() + '`\n';
     const removed = '>     suppression : `' + settingsObj.notif.removed.toUpperCase() + '`\n';
@@ -71,10 +72,11 @@ const showParamsList = (message: Message): Promise<Message> => {
     return message.channel.send(listAsString);
 };
 
-const paramsControl = (message: Message, words: string[]): Promise<Message> => {
+const paramsControl = (message: Message, words: string[]): Promise<Message | void> | void => {
+    if (!message.guild) return;
     if (words[1]) {
         const convertedParam = paramConvertor(words[1]);
-        if (settings[Number(message.guild?.id)][words[0]][convertedParam]) {
+        if (settings[message.guild.id][words[0]][convertedParam]) {
             if (words[2]) {
                 if (words[2].toLowerCase() === 'on' || words[2].toLowerCase() === 'off' || (isFinite(Number(words[2])) && Number(words[2]) >= 0 && Number(words[2]) <= 1)) {
                     if (words[1] === 'volume' && isFinite(Number(words[2]))) {
@@ -147,19 +149,21 @@ const paramConvertor = (word: string): string => {
 //     }
 // }
 
-const setParams = async (message: Message, category: string, param: string, value: string | number, convertedParam: string): Promise<Message> => {
-    if (settings[Number(message.guild?.id)][category][convertedParam] !== value) {
-        const cloneSettings = settings[Number(message.guild?.id)];
+const setParams = async (message: Message, category: string, param: string, value: string | number, convertedParam: string): Promise<Message | void> => {
+    if (!message.guild) return;
+    if (settings[message.guild.id][category][convertedParam] !== value) {
+        const cloneSettings = settings[message.guild.id];
         cloneSettings[category][convertedParam] = isFinite(value as number) ? value : (value as string).toLowerCase();
         const session: APIsessionType = getAPIsession();
         try {
             const { data } = await axios.post('/api/settings/update', { ...cloneSettings, ...session });
             if (data) {
-                settings[Number(message.guild?.id)][category][convertedParam] = isFinite(value as number) ? value : (value as string).toLowerCase();
+                settings[message.guild.id][category][convertedParam] = isFinite(value as number) ? value : (value as string).toLowerCase();
                 return message.channel.send('✅ Paramètre modifié => `' + param + '` : `' + (isFinite(value as number) ? value : (value as string).toUpperCase()) + '`');
             }
             return message.channel.send('❌ Erreur lors de la mise à jour des paramètres, veuillez réessayer');
-        } catch (e) {
+        }
+        catch (e) {
             console.log('Erreur /api/settings/update : ', e.message);
             return message.channel.send('❌ Erreur lors de la mise à jour des paramètres, veuillez réessayer');
         }
@@ -197,7 +201,8 @@ export const update = async (session: APIsessionType): Promise<boolean | undefin
             console.log(' - Server settings updated !');
             return true;
         }
-    } catch (e) {
+    }
+    catch (e) {
         console.log('Error while updating server settings, retrying ... : ', e.message);
         setTimeout(async (): Promise<void> => {
             await update(session);

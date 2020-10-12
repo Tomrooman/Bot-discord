@@ -13,6 +13,7 @@
     "sourceMap": false,
     "allowJs": false,
     "resolveJsonModule": true,
+    "suppressImplicitAnyIndexErrors": true,
     "skipLibCheck": true,
     "declaration": false,
     "outDir": "./dist",

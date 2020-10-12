@@ -9,6 +9,7 @@ coverage
 yarn-error.log
 dist
 .circleci
+UPDATER.js
 
 .yarn/*
 !.yarn/releases

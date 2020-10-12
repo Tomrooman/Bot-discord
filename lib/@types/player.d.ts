@@ -1,25 +1,25 @@
 import { Item } from 'ytsr';
 
-export type searchVideoType = {
+export interface searchVideoType {
     infos?: searchVideosInfosType,
     array?: searchVideoArrayType[],
     last?: Item[],
     old?: searchVideoArrayType[]
 }
 
-export type searchVideoArrayType = {
+export interface searchVideoArrayType {
     nextpage?: string | boolean,
     url: string,
     title: string,
     plLength?: number
 }
 
-export type searchVideosInfosType = {
+export interface searchVideosInfosType {
     title: string,
     count: number
 }
 
-export type musicParamsType = {
+export interface musicParamsType {
     cancel: boolean[],
     loop: boolean[],
     tryToNext: boolean[],
@@ -27,20 +27,20 @@ export type musicParamsType = {
     nextSetLoop: boolean[]
 }
 
-export type playlistArrayType = {
+export interface playlistArrayType {
     url: string[]
     newPlaylistDuration?: number,
     currentDuration?: number
 }
 
-export type playlistInfosType = {
+export interface playlistInfosType {
     title: string,
     id: string,
     thumbnail: string,
     duration: string
 }
 
-export type embedObjType = {
+export interface embedObjType {
     title: string;
     id: string;
     duration: string;

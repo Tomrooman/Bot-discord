@@ -1,7 +1,7 @@
 export interface notifArrayType {
     userId: string;
     dragodindes: dragodindesType[] | sortedDragoType[];
-};
+}
 
 export interface dragodindeType {
     name: string;
@@ -13,12 +13,12 @@ export interface dragodindeType {
         date?: number;
     };
     sended: boolean;
-};
+}
 
 export interface userNotifInfos {
     userId: string;
     notif: boolean;
-};
+}
 
 export interface sortedDragoType {
     name: string;
@@ -35,4 +35,4 @@ export interface sortedDragoType {
         date: number;
     };
     sended: boolean;
-};
+}

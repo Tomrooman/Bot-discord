@@ -59,7 +59,8 @@ export const verifyNotif = async (bot: Client, session: APIsessionType): Promise
                     }
                 });
             }
-        } catch (e) {
+        }
+        catch (e) {
             console.log('Error while verifying dragodindes notif, retrying ... : ', e.message);
         }
     }, 1000 * 60 * 2);
@@ -69,10 +70,10 @@ const sendNotifMessage = async (user: User, dragodindes: dragodindeType[]): Prom
     const dragodindesStr = getdragodindesAsString(dragodindes);
     const embed = new MessageEmbed()
         .setAuthor('🔔 Dofus - notifications')
-        .setThumbnail('https://syxbot.com/assets/img/dofus.png')
+        .setThumbnail('https://syxbot.com/assets/img/dofus/logo.png')
         .setColor('#7DBD26')
         .setFooter('\u200b \n ❔ "' + Config.prefix + 'drago notif off" pour désactiver ces messages')
-        .setDescription('\u200b \n **Dragodindes prêtes** ✅ \n' + dragodindesStr)
+        .setDescription('\u200b \n **Dragodindes prêtes** ✅ \n' + dragodindesStr);
     await user.send({ embed });
 };
 
@@ -88,7 +89,7 @@ export const getInfos = (userId: string): dofusInfosType => {
     return dofusInfos[Number(userId)];
 };
 
-export const update = async (session: any): Promise<boolean | undefined> => {
+export const update = async (session: APIsessionType): Promise<boolean | undefined> => {
     try {
         console.log('Updating dragodindes settings ... | ' + dateFormat(Date.now(), 'HH:MM:ss'));
         const { data } = await axios.post('/api/dofus/dragodindes/notif/all', { ...session });
@@ -96,15 +97,16 @@ export const update = async (session: any): Promise<boolean | undefined> => {
             data.map((setting: userNotifInfos) => {
                 dofusInfos[Number(setting.userId)] = {
                     notif: setting.notif ? 'on' : 'off'
-                }
+                };
             });
             console.log(' - Dragodindes settings updated !');
             return true;
         }
-    } catch (e) {
+    }
+    catch (e) {
         console.log('Error while updating dragodindes settings, retrying ... : ', e.message);
         setTimeout(async (): Promise<void> => {
             await update(session);
         }, 5000);
     }
-}
+};

@@ -4,7 +4,7 @@ import { Message as DMessage, TextChannel } from 'discord.js';
 
 const removeInfos: number[] = [];
 
-export const instantiate = (message: DMessage, words: string[], all: string = ''): void | Promise<DMessage> => {
+export const instantiate = (message: DMessage, words: string[], all = ''): void | Promise<DMessage> => {
     if (all !== '') {
         return remove(message, 0, true);
     }
@@ -14,7 +14,7 @@ export const instantiate = (message: DMessage, words: string[], all: string = ''
     return message.channel.send('❌ Vous devez écrire le nombre de messages que vous voulez supprimer.');
 };
 
-const remove = (message: DMessage, howMany: number, all: boolean = false): void | Promise<DMessage> => {
+const remove = (message: DMessage, howMany: number, all = false): void | Promise<DMessage> => {
     if (message && message.guild) {
         if (howMany > 99) {
             return message.channel.send('❌ Écrivez un chiffre inférieur ou égal à 99');
@@ -36,20 +36,21 @@ const remove = (message: DMessage, howMany: number, all: boolean = false): void 
 
 const removeMessages = (message: DMessage, limit: { limit?: number }): void => {
     if (message && message.guild) {
+        const guildID = message.guild.id;
         message.channel.messages.fetch(limit)
             .then(messages => {
                 (message.channel as TextChannel).bulkDelete(messages)
                     .then(() => {
                         message.channel.send('✅ **' + (messages.size - 1) + '** ' + (messages.size - 1 > 1 ? 'messages supprimés' : 'message supprimé'));
-                        delete removeInfos[Number(message.guild?.id)];
+                        delete removeInfos[guildID];
                     })
                     .catch(() => messages.map(oneMessage => {
                         oneMessage.delete({ timeout: 4000 })
                             .then(() => {
-                                removeInfos[Number(message.guild?.id)]++;
-                                if (removeInfos[Number(message.guild?.id)] === messages.size) {
+                                removeInfos[guildID]++;
+                                if (removeInfos[guildID] === messages.size) {
                                     message.channel.send('✅ **' + (messages.size - 1) + '** ' + (messages.size - 1 > 1 ? 'messages supprimés' : 'message supprimé'));
-                                    delete removeInfos[Number(message.guild?.id)];
+                                    delete removeInfos[guildID];
                                 }
                             })
                             .catch((e) => {

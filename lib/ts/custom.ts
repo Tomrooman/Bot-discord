@@ -1,6 +1,6 @@
 'use strict';
 
-import { Message, GuildMember } from "discord.js";
+import { Message, GuildMember } from 'discord.js';
 
 export const pioupiou = (message: Message): void => {
     (message.member as GuildMember).guild.members.cache.map(member => {
@@ -8,4 +8,4 @@ export const pioupiou = (message: Message): void => {
             message.channel.send('<@' + member.user.id + '> pas cher pas cher !');
         }
     });
-}
+};

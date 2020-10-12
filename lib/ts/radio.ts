@@ -38,7 +38,7 @@ const showRadioList = (message: Message): void => {
     message.channel.send('> Écrivez le nom de la radio que vous voulez écouter.\n > Ex: ' + config.prefix + 'radio nrj\n > \n ' + stringRadioList);
 };
 
-const connectRadio = (message: Message, words: string[], radioChoice: string = '', retry: boolean = false): void => {
+const connectRadio = (message: Message, words: string[], radioChoice = '', retry = false): void => {
     const radio = Radios.filter(r => r.name.toLowerCase() === radioChoice)[0];
     const voiceChannel = Helper.take_user_voiceChannel(message);
     if (voiceChannel) {
@@ -92,7 +92,7 @@ const sendRadioEmbed = (message: Message, radio: { name: string, url: string }):
         // #543A99 | Mauve
         const color = 5520025;
         const embed = new Discord.MessageEmbed()
-            .setAuthor('Radio', 'https://syxbot.com/assets/img/radio_icon.png')
+            .setAuthor('Radio', 'https://syxbot.com/assets/img/bot/radio_icon.png')
             .setColor(color)
             .setFooter('📻 "' + config.prefix + 'radio list" pour afficher les radios disponibles')
             .setThumbnail(`https://syxbot.com/assets/img/radio/${radio.name.toLowerCase()}.png`)

@@ -3,4 +3,4 @@ export interface commandType {
     command: string;
     exemple: string;
     infos: string[];
-};
+}

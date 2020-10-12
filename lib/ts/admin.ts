@@ -24,7 +24,7 @@ export const instantiate = (message: Message, words: string[], bot: Client): voi
         return message.channel.send('❌ Ecrit la commande admin a éxécutée, pour l\'instant juste : message');
     }
     return message.channel.send('❌ Vous ne faites pas partit des admins');
-}
+};
 
 const sendMessageToAllServer = (message: Message, words: string[], bot: Client): void | Promise<Message> => {
     if (!words[2]) {
