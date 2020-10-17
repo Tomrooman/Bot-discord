@@ -16,21 +16,22 @@ const dofusInfos: dofusInfosType[] = [];
 
 export const controller = (message: Message, words: string[]): Promise<Message> => {
     if (words[1]) {
-        if (words[1] === 'notif') {
+        if (words[1] === 'notif')
             return notif(message, words);
-        }
     }
     return message.channel.send('❌ Commande incomplète !');
 };
 
 export const notif = async (message: Message, words: string[]): Promise<Message> => {
     if (!words[2] || words[2] === 'status') {
-        const status = dofusInfos[Number(message.author.id)] ? dofusInfos[Number(message.author.id)].notif.toUpperCase() : 'OFF';
+        const status = dofusInfos[Number(message.author.id)] ?
+            dofusInfos[Number(message.author.id)].notif.toUpperCase() : 'OFF';
         return message.channel.send('> ** Dragodindes ** \n > `Notifications` : `' + status + '`');
     }
     if (words[2].toLowerCase() === 'on' || words[2].toLowerCase() === 'off') {
         const status = words[2].toLowerCase() === 'on' ? 'on' : 'off';
-        if ((!dofusInfos[Number(message.author.id)] && status === 'on') || (dofusInfos[Number(message.author.id)] && dofusInfos[Number(message.author.id)].notif !== status)) {
+        if ((!dofusInfos[Number(message.author.id)] && status === 'on') ||
+            (dofusInfos[Number(message.author.id)] && dofusInfos[Number(message.author.id)].notif !== status)) {
             const session: APIsessionType = getAPIsession();
             const { data } = await axios.post('/api/dofus/dragodindes/notif', {
                 userId: message.author.id,
@@ -54,9 +55,7 @@ export const verifyNotif = async (bot: Client, session: APIsessionType): Promise
             if (data && data.length) {
                 data.map(async (infos: notifArrayType) => {
                     const user = bot.users.cache.get(infos.userId);
-                    if (user) {
-                        await sendNotifMessage(user, infos.dragodindes);
-                    }
+                    if (user) await sendNotifMessage(user, infos.dragodindes);
                 });
             }
         }

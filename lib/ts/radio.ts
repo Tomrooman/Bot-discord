@@ -10,22 +10,17 @@ import Radios from '../json/radios.json';
 export const instantiate = (message: Message, words: string[]): void | Promise<Message> => {
     if (words[1]) {
         const radioChoice = words[2] ? words[1].toLowerCase() + ' ' + words[2].toLowerCase() : words[1].toLowerCase();
-        if (words[1].toLowerCase() === 'list') {
-            return showRadioList(message);
-        }
-        if (radioExist(radioChoice)) {
-            return connectRadio(message, words, radioChoice);
-        }
-        return message.channel.send('❌ Cette radio n\'existe pas ! \n📻 Tapez **' + config.prefix + 'radio list** pour obtenir la liste des radios disponibles.');
+        if (words[1].toLowerCase() === 'list') return showRadioList(message);
+        if (radioExist(radioChoice)) return connectRadio(message, words, radioChoice);
+        return message.channel.send('❌ Cette radio n\'existe pas ! \n \
+        📻 Tapez **' + config.prefix + 'radio list** pour obtenir la liste des radios disponibles.');
     }
     return message.channel.send('❌ Choisir une radio, c\'est mieux !');
 };
 
 const radioExist = (radio: string): boolean => {
     const check = Radios.filter(r => r.name.toLowerCase() === radio);
-    if (check && check.length) {
-        return true;
-    }
+    if (check && check.length) return true;
     return false;
 };
 
@@ -35,7 +30,8 @@ const showRadioList = (message: Message): void => {
     Radios.map(r => {
         stringRadioList += '> - **' + r.name + '**\n';
     });
-    message.channel.send('> Écrivez le nom de la radio que vous voulez écouter.\n > Ex: ' + config.prefix + 'radio nrj\n > \n ' + stringRadioList);
+    message.channel.send('> Écrivez le nom de la radio que vous voulez écouter.\n \
+    > Ex: ' + config.prefix + 'radio nrj\n > \n ' + stringRadioList);
 };
 
 const connectRadio = (message: Message, words: string[], radioChoice = '', retry = false): void => {
@@ -46,13 +42,9 @@ const connectRadio = (message: Message, words: string[], radioChoice = '', retry
         Player.removeArray(message, 'trytonext');
         Player.removeArray(message, 'loop');
         Player.setArray(message, 'radio', true);
-        if (!Player.getArray(message, 'connected')) {
-            joinChannelAndPlayRadio(message, words, voiceChannel, radio, retry);
-        }
+        if (!Player.getArray(message, 'connected')) joinChannelAndPlayRadio(message, words, voiceChannel, radio, retry);
         else if (Helper.verifyBotLocation(message, Player.getArray(message, 'connected'), voiceChannel)) {
-            if (!retry) {
-                sendRadioEmbed(message, radio);
-            }
+            if (!retry) sendRadioEmbed(message, radio);
             Player.removeArray(message, 'playlistArray');
             Player.removeArray(message, 'playlistInfos');
             Player.streamDestroy(message);
@@ -61,18 +53,14 @@ const connectRadio = (message: Message, words: string[], radioChoice = '', retry
             Player.setArray(message, 'streams', radioStream);
         }
     }
-    else {
-        message.channel.send('❌ Vous devez être connecté dans un salon !');
-    }
+    else message.channel.send('❌ Vous devez être connecté dans un salon !');
 };
 
 const joinChannelAndPlayRadio = (message: Message, words: string[], voiceChannel: VoiceChannel, radio: { name: string, url: string }, retry: boolean): void => {
     voiceChannel.join()
         .then(connection => {
             const setting = Settings.get(String(message.guild?.id));
-            if (!retry) {
-                sendRadioEmbed(message, radio);
-            }
+            if (!retry) sendRadioEmbed(message, radio);
             Player.setArray(message, 'connections', connection);
             Player.setArray(message, 'connected', voiceChannel.id);
             const radioStream = (Player.getArray(message, 'connections') as VoiceConnection).play(radio.url);

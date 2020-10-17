@@ -2,13 +2,16 @@
 
 import ytdl from 'ytdl-core';
 import ytpl from 'ytpl';
-import ytsr, { Item } from 'ytsr';
+import ytsr from 'ytsr';
 import * as Helper from './helper';
 import * as Settings from './settings';
 import _ from 'lodash';
 import config from '../../config.json';
 import Discord, { VoiceChannel, VoiceConnection, StreamDispatcher, Message, User, PartialUser } from 'discord.js';
-import { playlistArrayType, playlistInfosType, musicParamsType, searchVideoType, searchVideoArrayType, searchVideosInfosType, embedObjType } from '../@types/player';
+import {
+    playlistArrayType, playlistInfosType, musicParamsType, searchVideoType,
+    searchVideoArrayType, searchVideosInfosType, embedObjType
+} from '../@types/player';
 
 const connectionsArray: VoiceConnection[] = [];
 const streamsArray: StreamDispatcher[] = [];
@@ -28,15 +31,12 @@ export const instantiate = (message: Message = {} as Message, command: string | 
             words = _.compact(words);
             return go(message, words);
         }
-        if (words[1] && words[1] === 'list') {
+        if (words[1] && words[1] === 'list')
             return showQueuedSongs(message);
-        }
-        if (words[1] && (words[1] === 'r' || words[1] === 'remove')) {
+        if (words[1] && (words[1] === 'r' || words[1] === 'remove'))
             return removeSelectedSongsMaster(message, words);
-        }
-        if (words[1] && Number.isFinite(parseInt(words[1]))) {
+        if (words[1] && Number.isFinite(parseInt(words[1])))
             return getSongInPlaylist(message, parseInt(words[1]));
-        }
         return playSongs(message as Message, command as string, words);
     }
 };
@@ -44,18 +44,10 @@ export const instantiate = (message: Message = {} as Message, command: string | 
 export const removeArray = (message: Message, choice: string): void => {
     // Call without instance and remove selected array
     if (message.guild && message.guild.id) {
-        if (choice === 'loop') {
-            delete musicParams.loop[message.guild.id];
-        }
-        else if (choice === 'trytonext') {
-            delete musicParams.tryToNext[message.guild.id];
-        }
-        else if (choice === 'playlistArray') {
-            delete playlistArray[message.guild.id];
-        }
-        else if (choice === 'playlistInfos') {
-            delete playlistInfos[message.guild.id];
-        }
+        if (choice === 'loop') delete musicParams.loop[message.guild.id];
+        else if (choice === 'trytonext') delete musicParams.tryToNext[message.guild.id];
+        else if (choice === 'playlistArray') delete playlistArray[message.guild.id];
+        else if (choice === 'playlistInfos') delete playlistInfos[message.guild.id];
     }
 };
 
@@ -63,30 +55,18 @@ export const getArray = (message: Message, choice: string): string | VoiceConnec
     if (!message.guild) return;
     // Call without instance and return selected array
     let object;
-    if (choice === 'connections') {
-        object = connectionsArray[message.guild.id];
-    }
-    else if (choice === 'connected') {
-        object = connectedGuild[message.guild.id];
-    }
+    if (choice === 'connections') object = connectionsArray[message.guild.id];
+    else if (choice === 'connected') object = connectedGuild[message.guild.id];
     return object;
 };
 
 export const setArray = (message: Message, choice: string, value: unknown): void => {
     if (!message.guild) return;
     // Call without instance and set selected array with 'value'
-    if (choice === 'radio') {
-        radioPlayed[message.guild.id] = value;
-    }
-    else if (choice === 'connections') {
-        connectionsArray[message.guild.id] = value;
-    }
-    else if (choice === 'connected') {
-        connectedGuild[message.guild.id] = value;
-    }
-    else if (choice === 'streams') {
-        streamsArray[message.guild.id] = value;
-    }
+    if (choice === 'radio') radioPlayed[message.guild.id] = value;
+    else if (choice === 'connections') connectionsArray[message.guild.id] = value;
+    else if (choice === 'connected') connectedGuild[message.guild.id] = value;
+    else if (choice === 'streams') streamsArray[message.guild.id] = value;
 };
 
 export const streamDestroy = (message: Message): void => {
@@ -159,28 +139,20 @@ const playSongsAndConnectOrNotBot = (message: Message, command: string, words: s
 export const youtubeResearch = (message: Message, title: string | null, type: string, nextPage: string | null | boolean = false, byReaction: [boolean, User] = [false, {} as User]): void => {
     if (!message.guild) return;
     // Create array if it doesn't exist
-    if (!searchVideo[message.guild.id]) {
-        searchVideo[message.guild.id] = [] as searchVideoType;
-    }
-    if (!searchPlaylist[message.guild.id]) {
-        searchPlaylist[message.guild.id] = [] as searchVideoType;
-    }
+    if (!searchVideo[message.guild.id]) searchVideo[message.guild.id] = [] as searchVideoType;
+    if (!searchPlaylist[message.guild.id]) searchPlaylist[message.guild.id] = [] as searchVideoType;
     // Save current result in 'old' array in case of no API results when try to go to the next page
-    if (type === 'video' && searchVideo[message.guild.id]['array']) {
+    if (type === 'video' && searchVideo[message.guild.id]['array'])
         searchVideo[message.guild.id]['old'] = searchVideo[message.guild.id]['array'];
-    }
-    if (type === 'playlist' && searchPlaylist[message.guild.id]['array']) {
+    if (type === 'playlist' && searchPlaylist[message.guild.id]['array'])
         searchPlaylist[message.guild.id]['old'] = searchPlaylist[message.guild.id]['array'];
-    }
     // Create search arrays and set options for the API call
     const options = setArrayWithChoice(message, title as string, type, nextPage, byReaction);
     // Clear 'infos' and 'last' array
     clearSearchArrays(message, type, byReaction);
     // Try to get 5 next results in last research array and call API if results < 5
     const oldArrayResult = verifyOldResearch(message, type, byReaction);
-    if (!oldArrayResult) {
-        getYoutubeResearch(message, title as string, type, options as ytsr.Options, byReaction);
-    }
+    if (!oldArrayResult) getYoutubeResearch(message, title as string, type, options as ytsr.Options, byReaction);
 };
 
 export const cancel = (message: Message): void => {
@@ -195,9 +167,7 @@ const sendCurrentResultAndRecall = (message: Message, title: string, type: strin
     message.channel.send('✅ ' + buildedArray.length + '/5 trouvé');
     setTimeout(() => {
         // If cancel is activate stop the research
-        if (!musicParams.cancel[guildID]) {
-            youtubeResearch(message, title, type, searchresults.nextpageRef, byReaction);
-        }
+        if (!musicParams.cancel[guildID]) youtubeResearch(message, title, type, searchresults.nextpageRef, byReaction);
         else {
             delete musicParams.cancel[guildID];
             message.channel.send('❌ Recherche arrêtée !');
@@ -217,24 +187,18 @@ const getYoutubeResearch = async (message: Message, title: string, type: string,
             }
             else if ((buildedArray as searchVideoArrayType[]).length === 5 || !searchResults.nextpageRef) {
                 // If get 5 results send them
-                if (type === 'video') {
-                    delete searchVideo[message.guild.id]['old'];
-                }
-                else if (type === 'playlist') {
-                    delete searchPlaylist[message.guild.id]['old'];
-                }
+                if (type === 'video') delete searchVideo[message.guild.id]['old'];
+                else if (type === 'playlist') delete searchPlaylist[message.guild.id]['old'];
                 setArrayInfos(message, type, title, searchResults);
                 sendSearchResultsAsString(message, type);
             }
         }
         else {
             // If no results send the last research results
-            if (type === 'video') {
+            if (type === 'video')
                 searchVideo[message.guild.id]['array'] = searchVideo[message.guild.id]['old'];
-            }
-            else if (type === 'playlist') {
+            else if (type === 'playlist')
                 searchPlaylist[message.guild.id]['array'] = searchPlaylist[message.guild.id]['old'];
-            }
             message.channel.send('❌ Aucun résultat obtenu');
             sendSearchResultsAsString(message, type);
         }
@@ -247,12 +211,14 @@ const getYoutubeResearch = async (message: Message, title: string, type: string,
 const verifyOldResearch = (message: Message, type: string, byReaction: [boolean, User]): boolean | void => {
     if (!message.guild) return;
     if (byReaction[0]) {
+        const lastVideo = searchVideo[message.guild.id]['last'];
+        const lastPlaylist = searchPlaylist[message.guild.id]['last'];
         // If activate by reaction (button next)
-        if (type === 'video' && (searchVideo[message.guild.id]['last'] as Item[]).length) {
+        if (type === 'video' && lastVideo.length) {
             // Delete current results and try to get 5 next results in saved results
             delete searchVideo[message.guild.id]['array'];
             searchVideo[message.guild.id]['array'] = [] as searchVideoArrayType[];
-            const lastArray = makeSearchArray(message, searchVideo[message.guild.id]['last'], 'video', true) as searchVideoArrayType[];
+            const lastArray = makeSearchArray(message, lastVideo, 'video', true) as searchVideoArrayType[];
             if (lastArray && lastArray.length === 5) {
                 setArrayInfos(message, type, false, { nextpageRef: false });
                 sendSearchResultsAsString(message, type);
@@ -260,11 +226,11 @@ const verifyOldResearch = (message: Message, type: string, byReaction: [boolean,
             }
             return false;
         }
-        else if (type === 'playlist' && (searchPlaylist[message.guild.id]['last'] as searchVideoType[]).length) {
+        else if (type === 'playlist' && lastPlaylist.length) {
             // Delete current results and try to get 5 next results in saved results
             delete searchPlaylist[message.guild.id]['array'];
             searchPlaylist[message.guild.id]['array'] = [];
-            const lastPlaylistArray = makeSearchArray(message, searchPlaylist[message.guild.id]['last'], 'playlist', true);
+            const lastPlaylistArray = makeSearchArray(message, lastPlaylist, 'playlist', true);
             if (lastPlaylistArray && lastPlaylistArray.length === 5) {
                 setArrayInfos(message, type, false, { nextpageRef: false });
                 sendSearchResultsAsString(message, type);
@@ -280,28 +246,22 @@ const setArrayInfos = (message: Message, type: string, title: string | boolean, 
     if (!message.guild) return;
     // Set research number with title and nextPage token
     if (type === 'video') {
-        if (searchresults.nextpageRef) {
+        if (searchresults.nextpageRef)
             (searchVideo[message.guild.id]['array'] as any)['nextpage'] = searchresults.nextpageRef;
-        }
         if (title) {
             (searchVideo[message.guild.id]['infos'] as searchVideosInfosType)['title'] = String(title);
             (searchVideo[message.guild.id]['infos'] as searchVideosInfosType)['count'] = 2;
         }
-        else {
-            (searchVideo[message.guild.id]['infos'] as searchVideosInfosType)['count']++;
-        }
+        else (searchVideo[message.guild.id]['infos'] as searchVideosInfosType)['count']++;
     }
     else {
-        if (searchresults.nextpageRef) {
+        if (searchresults.nextpageRef)
             (searchPlaylist[message.guild.id]['array'] as any)['nextpage'] = searchresults.nextpageRef;
-        }
         if (title) {
             (searchPlaylist[message.guild.id]['infos'] as searchVideosInfosType)['title'] = String(title);
             (searchPlaylist[message.guild.id]['infos'] as searchVideosInfosType)['count'] = 2;
         }
-        else {
-            (searchPlaylist[message.guild.id]['infos'] as searchVideosInfosType)['count']++;
-        }
+        else (searchPlaylist[message.guild.id]['infos'] as searchVideosInfosType)['count']++;
     }
 };
 
@@ -336,7 +296,10 @@ const setArrayWithChoice = (message: Message, title: string, type: string, nextP
             // Don't have nextPage and have elements in video array so clear it and set nextPage token
             if (byReaction[0]) {
                 nextPageVar = (selectedArray['array'] as any)['nextpage'];
-                message.channel.send('🔎 Recherche de ' + type + ' : ' + '`' + (selectedArray['infos'] as searchVideosInfosType)['title'].trim() + '` #' + (selectedArray['infos'] as searchVideosInfosType)['count'] + '\n❓ Pour arrêter la recherche : `' + config.prefix + 'cancel`');
+                message.channel.send('🔎 Recherche de ' + type + ' : ' + '`' +
+                    (selectedArray['infos'] as searchVideosInfosType)['title'].trim() +
+                    '` #' + (selectedArray['infos'] as searchVideosInfosType)['count'] +
+                    '\n ❓ Pour arrêter la recherche : `' + config.prefix + 'cancel`');
             }
             delete selectedArray['array'];
         }
@@ -344,8 +307,11 @@ const setArrayWithChoice = (message: Message, title: string, type: string, nextP
     }
     if (!byReaction[0] && !nextPage) {
         // If no reaction and no nextPage send message
-        const goodTitle = title ? title : type === 'video' ? (searchVideo[message.guild.id]['infos'] as searchVideosInfosType)['title'] : (searchPlaylist[message.guild.id]['infos'] as searchVideosInfosType)['title'];
-        message.channel.send('🔎 Recherche de ' + type + ' : ' + '`' + goodTitle.trim() + '`\n❓ Pour arrêter la recherche : `' + config.prefix + 'cancel`');
+        const goodTitle = title ? title : type === 'video' ?
+            (searchVideo[message.guild.id]['infos'] as searchVideosInfosType)['title'] :
+            (searchPlaylist[message.guild.id]['infos'] as searchVideosInfosType)['title'];
+        message.channel.send('🔎 Recherche de ' + type + ' : ' + '`' + goodTitle.trim() + '`\n \
+        ❓ Pour arrêter la recherche : `' + config.prefix + 'cancel`');
     }
     if (nextPageVar) {
         // Save the nextPage token if user use next reaction
@@ -370,29 +336,27 @@ const makeSearchArray = (message: Message, searchresults: any, type: string, ver
     if (!message.guild) return;
     const guildID = message.guild.id;
     // Get available results
-    const filteredResult = searchresults.filter((i: any) => i.type === type && i.title !== '[Deleted video]' && i.title !== '[Private video]');
-    if (verify) {
-        clearLastArray(type, message);
-    }
+    const filteredResult = searchresults.filter((i: any) => {
+        if (i.type === type && i.title !== '[Deleted video]' && i.title !== '[Private video]')
+            return i;
+    });
+    if (verify) clearLastArray(type, message);
     filteredResult.map((result: any) => {
         // If selected array length < 5 push element in it ELSE push in last array for the next page
         const resultObj: { url: string, title: string, plLength?: number } = {
             url: result.link,
             title: result.title
         };
-        if (type === 'video' && (searchVideo[guildID]['array'] as searchVideoType[]).length < 5) {
+        if (type === 'video' && (searchVideo[guildID]['array'] as searchVideoType[]).length < 5)
             (searchVideo[guildID]['array'] as searchVideoArrayType[]).push(resultObj);
-        }
         else if (type === 'playlist' && (searchPlaylist[guildID]['array'] as searchVideoArrayType[]).length < 5) {
             resultObj.plLength = result.length;
             (searchPlaylist[guildID]['array'] as searchVideoArrayType[]).push(resultObj);
         }
-        else if (type === 'playlist') {
+        else if (type === 'playlist')
             (searchPlaylist[guildID]['last'] as searchVideoType[]).push(result);
-        }
-        else if (type === 'video') {
+        else if (type === 'video')
             (searchVideo[guildID]['last'] as searchVideoType[]).push(result);
-        }
     });
     const array = type == 'video' ? searchVideo[message.guild.id]['array'] : searchPlaylist[message.guild.id]['array'];
     return array as searchVideoArrayType[];
@@ -418,15 +382,19 @@ export const toggleLoop = (message: Message): undefined | Promise<Message> => {
 const sendSearchResultsAsString = (message: Message, type: string): void | Promise<Message> => {
     if (!message.guild) return;
     // Create string with search results array and send it
-    const selectedArray = type === 'video' ? searchVideo[message.guild.id]['array'] : searchPlaylist[message.guild.id]['array'];
+    const selectedArray = type === 'video' ?
+        searchVideo[message.guild.id]['array'] :
+        searchPlaylist[message.guild.id]['array'];
     if (selectedArray && selectedArray.length) {
         let finalString = '';
         const resultChoices = makeSearchVideoOrPlaylistString(message, type);
         if (type === 'video') {
-            finalString = `> **Écrivez ou sélectionnez une musique ci-dessous.** \n > **Ex: ${config.prefix}search p 2** \n > \n ${resultChoices}`;
+            finalString = `> **Écrivez ou sélectionnez une musique ci-dessous.** \n \
+            > **Ex: ${config.prefix}search p 2** \n > \n ${resultChoices}`;
         }
         else {
-            finalString = `> **Écrivez ou sélectionnez une playlist ci-dessous.** \n > **Ex: ${config.prefix}search pl 1** \n > \n ${resultChoices}`;
+            finalString = `> **Écrivez ou sélectionnez une playlist ci-dessous.** \n \
+            > **Ex: ${config.prefix}search pl 1** \n > \n ${resultChoices}`;
         }
         message.channel.send(finalString)
             .then(newMessage => addSearchReactions(newMessage));
@@ -447,17 +415,13 @@ const addSearchReactions = (message: Message): void => {
 export const selectSongOrPlaylistInSearchList = (message: Message, words: string[]): void | Promise<void | Message> => {
     if (words[1] === 'p' || words[1] === 'play') {
         // If there is something after p|play search for the music
-        if (words[2]) {
-            return selectSongInSearchList(message, parseInt(words[2]));
-        }
+        if (words[2]) return selectSongInSearchList(message, parseInt(words[2]));
         // If nothing after p|play send the list
         return sendSearchResultsAsString(message, 'video');
     }
     else if (words[1] === 'pl' || words[1] === 'playlist') {
         // If there is something after pl|playlist search for the playlist
-        if (words[2]) {
-            return selectSongInSearchList(message, parseInt(words[2]), 'playlist');
-        }
+        if (words[2]) return selectSongInSearchList(message, parseInt(words[2]), 'playlist');
         return sendSearchResultsAsString(message, 'playlist');
     }
     return message.channel.send('❌ Vous devez écrire le type de sélection.```Ex: ' + config.prefix + 'search p```');
@@ -466,20 +430,21 @@ export const selectSongOrPlaylistInSearchList = (message: Message, words: string
 export const selectSongInSearchList = (message: Message, number: number | false, type = 'musique', byReaction: [boolean, User | PartialUser] = [false, {} as User]): void | Promise<Message | void> => {
     if (!message.guild) return;
     let userChannel = Helper.take_user_voiceChannel(message);
-    if (byReaction[0]) {
+    if (byReaction[0])
         userChannel = Helper.take_user_voiceChannel_by_reaction(message, byReaction[1]);
-    }
     if (userChannel) {
         if (Number.isFinite(number)) {
-            const choiceArray = type === 'musique' ? searchVideo[message.guild.id]['array'] : searchPlaylist[message.guild.id]['array'];
+            const choiceArray = type === 'musique' ?
+                searchVideo[message.guild.id]['array'] :
+                searchPlaylist[message.guild.id]['array'];
             if (choiceArray && choiceArray.length) {
                 if (number >= 1 && number <= choiceArray.length) {
                     const command = type === 'musique' ? 'play' : 'playlist';
+                    const url = choiceArray[number as number - 1].url;
                     // Play the selected song with verif number and not too low or higher
-                    if (byReaction[0]) {
-                        return playSongs(message, command, ['useless', choiceArray[number as number - 1].url], byReaction);
-                    }
-                    return playSongs(message, command, ['useless', choiceArray[number as number - 1].url]);
+                    if (byReaction[0])
+                        return playSongs(message, command, ['useless', url], byReaction);
+                    return playSongs(message, command, ['useless', url]);
                 }
                 return message.channel.send(`❌ Choisissez un chiffre compris entre 1 et ${choiceArray.length}`);
             }
@@ -494,11 +459,12 @@ export const getSongInSearchList = (message: Message): void | Promise<Message> =
     if (!message.guild) return;
     const userChannel = Helper.take_user_voiceChannel(message);
     if (userChannel) {
-        const musicExist = searchVideo[message.guild.id]['array'] && (searchVideo[message.guild.id]['array'] as searchVideoArrayType[]).length;
-        const playlistExist = searchPlaylist[message.guild.id]['array'] && (searchPlaylist[message.guild.id]['array'] as searchVideoArrayType[]).length;
-        if (musicExist || playlistExist) {
+        const musicExist = searchVideo[message.guild.id]['array'] &&
+            (searchVideo[message.guild.id]['array'] as searchVideoArrayType[]).length;
+        const playlistExist = searchPlaylist[message.guild.id]['array'] &&
+            (searchPlaylist[message.guild.id]['array'] as searchVideoArrayType[]).length;
+        if (musicExist || playlistExist)
             return makeAndSendSearchListArray(message, !!musicExist, !!playlistExist);
-        }
         return message.channel.send('❌ Aucune musique enregistrée dans la recherche');
     }
     return message.channel.send('❌ Vous devez être connecté dans un salon !');
@@ -507,24 +473,30 @@ export const getSongInSearchList = (message: Message): void | Promise<Message> =
 const makeAndSendSearchListArray = (message: Message, musicExist: boolean, playlistExist: boolean): void => {
     if (!message.guild) return;
     let resultChoices = '';
+    const searchVideoLength = (searchVideo[message.guild.id]['array'] as searchVideoArrayType[]).length;
+    const searchPlLength = (searchPlaylist[message.guild.id]['array'] as searchVideoArrayType[]).length;
     if (musicExist && playlistExist) {
         // Send music and playlist array as string
         resultChoices += makeSearchVideoOrPlaylistString(message, 'video');
         resultChoices += '> \n';
         resultChoices += makeSearchVideoOrPlaylistString(message, 'playlist');
-        const countChoices = (searchPlaylist[message.guild.id]['array'] as searchVideoArrayType[]).length + (searchVideo[message.guild.id]['array'] as searchVideoArrayType[]).length;
-        message.channel.send(`> **Faites un choix parmi les ${countChoices} ci-dessous.** \n > **Ex: ${config.prefix}search p 2** \n > **Ex: ${config.prefix}search pl 1** \n > \n ${resultChoices}`);
+        const countChoices = searchPlLength + searchVideoLength;
+        message.channel.send(`> **Faites un choix parmi les ${countChoices} ci-dessous.** \n \
+        > **Ex: ${config.prefix}search p 2** \n > **Ex: ${config.prefix}search pl 1** \n \
+         > \n ${resultChoices}`);
     }
     else if (musicExist && !playlistExist) {
         // Send music array as string and add reaction for selection
         resultChoices += makeSearchVideoOrPlaylistString(message, 'video');
-        message.channel.send(`> **Écrivez ou sélectionnez une musique parmi les ${(searchVideo[message.guild.id]['array'] as searchVideoArrayType[]).length} ci-dessous.** \n > **Ex: ${config.prefix}search p 2** \n > \n ${resultChoices}`)
+        message.channel.send(`> **Écrivez ou sélectionnez une musique parmi les ${searchVideoLength} ci-dessous.** \n \
+        > **Ex: ${config.prefix}search p 2** \n > \n ${resultChoices}`)
             .then(newMessage => addSearchReactions(newMessage));
     }
     else {
         // Send playlist array as string and add reaction for selection
         resultChoices += makeSearchVideoOrPlaylistString(message, 'playlist');
-        message.channel.send(`> **Écrivez ou sélectionnez une playlist parmi les ${(searchPlaylist[message.guild.id]['array'] as searchVideoArrayType[]).length} ci-dessous.** \n > **Ex: ${config.prefix}search pl 1** \n > \n ${resultChoices}`)
+        message.channel.send(`> **Écrivez ou sélectionnez une playlist parmi les ${searchPlLength} ci-dessous.** \n \
+        > **Ex: ${config.prefix}search pl 1** \n > \n ${resultChoices}`)
             .then(newMessage => addSearchReactions(newMessage));
     }
 };
@@ -550,9 +522,14 @@ const makeSearchVideoOrPlaylistString = (message: Message, type: string): string
 const playSong = (message: Message): void => {
     if (!message.guild) return;
     const setting = Settings.get(String(message.guild.id));
-    const embedObj = setEmbedObj(playlistInfos[message.guild.id][0].title, playlistInfos[message.guild.id][0].id, playlistInfos[message.guild.id][0].thumbnail, playlistInfos[message.guild.id][0].duration);
+    const title = playlistInfos[message.guild.id][0].title;
+    const id = playlistInfos[message.guild.id][0].id;
+    const thumbnail = playlistInfos[message.guild.id][0].thumbnail;
+    const duration = playlistInfos[message.guild.id][0].duration;
+    const embedObj = setEmbedObj(title, id, thumbnail, duration);
     sendMusicEmbed(message, embedObj);
-    const stream = ytdl(playlistArray[message.guild.id]['url'][0], { filter: 'audio', liveBuffer: 10000, highWaterMark: 512 });
+    const url = playlistArray[message.guild.id]['url'][0];
+    const stream = ytdl(url, { filter: 'audio', liveBuffer: 10000, highWaterMark: 512 });
     delete musicParams.tryToNext[message.guild.id];
     streamsArray[message.guild.id] = connectionsArray[message.guild.id].play(stream, { highWaterMark: 512 });
     // CHECK IF SPEAKING --> !streamsArray[message.guild.id].player.voiceConnection.speaking.bitfield
@@ -575,7 +552,8 @@ const handleFinish = (message: Message): void => {
     //     const missingTime = this.getSeconds(playlistInfos[message.guild.id][0].duration) - diffSec
     //     console.log('missing times : ', missingTime)
     //     console.log('music duration : ', this.getSeconds(playlistInfos[message.guild.id][0].duration))
-    //     const beginAt = this.convertSecondsToFormattedDuration(this.getSeconds(playlistInfos[message.guild.id][0].duration) - missingTime)
+    //     const realSeconds = this.getSeconds(playlistInfos[message.guild.id][0].duration) - missingTime;
+    //     const beginAt = this.convertSecondsToFormattedDuration(realSeconds);
     //     this.playSong(message, beginAt)
     // }
     // else {
@@ -590,15 +568,14 @@ const handleFinish = (message: Message): void => {
 
 const handleError = (message: Message, e: Error): void => {
     if (!message.guild) return;
+    const title = playlistInfos[message.guild.id][0].title;
     console.log('--------------------------------------');
-    console.log('Titre : ', playlistInfos[message.guild.id][0].title);
+    console.log('Titre : ', title);
     console.log('e message : ', e.message);
-    if (e.message.indexOf('This video contains content') !== -1) {
-        message.channel.send('❌ Vidéo bloquée par droit d\'auteur : `' + playlistInfos[message.guild.id][0].title + '`');
-    }
-    else if (e.message.indexOf('this video available in your country') !== -1) {
-        message.channel.send('❌ Vidéo non disponible dans ce pays : `' + playlistInfos[message.guild.id][0].title + '`');
-    }
+    if (e.message.indexOf('This video contains content') !== -1)
+        message.channel.send('❌ Vidéo bloquée par droit d\'auteur : `' + title + '`');
+    else if (e.message.indexOf('this video available in your country') !== -1)
+        message.channel.send('❌ Vidéo non disponible dans ce pays : `' + title + '`');
     next(message);
     console.log('--------------------------------------');
 };
@@ -644,18 +621,21 @@ const sendMusicEmbed = (message: Message, embedObj: embedObjType, added: [boolea
     if (!setting || force || add || current) {
         const queuedLength = playlistArray[message.guild.id]['url'].length - 1;
         let formattedDuration = '';
-        const musicLink = type === 'video' ? `[${embedObj.title}](https://www.youtube.com/watch?v=${embedObj.id})` : `[${embedObj.title}](https://www.youtube.com/playlist?list=${embedObj.id})`;
+        const musicLink = type === 'video' ?
+            `[${embedObj.title}](https://www.youtube.com/watch?v=${embedObj.id})` :
+            `[${embedObj.title}](https://www.youtube.com/playlist?list=${embedObj.id})`;
         const color = added[0] ? 3768896 : 5520025;
         const title = added[0] && added[1] > 1 ? 'Playlist ajoutée' : added[0] ? 'Musique ajoutée' : 'Musique';
-        const authorUrl = title.indexOf('ajoutée') !== -1 ? 'https://syxbot.com/assets/img/bot/music_add.png' : 'https://syxbot.com/assets/img/bot/embed_music.png';
+        const authorUrl = title.indexOf('ajoutée') !== -1 ?
+            'https://syxbot.com/assets/img/bot/music_add.png' :
+            'https://syxbot.com/assets/img/bot/embed_music.png';
         // Calculate the queued duration and save as formatted string
         if (playlistArray[message.guild.id]['url'].length >= 2) {
             playlistInfos[message.guild.id].map((video: playlistInfosType, index: number) => {
-                if (index >= 1) {
-                    addDuration(message, index, video.duration, 'current');
-                }
+                if (index >= 1) addDuration(message, index, video.duration, 'current');
             });
-            formattedDuration = convertSecondsToFormattedDuration(Number(playlistArray[message.guild.id]['currentDuration']));
+            const plDuration = Number(playlistArray[message.guild.id]['currentDuration']);
+            formattedDuration = convertSecondsToFormattedDuration(plDuration);
         }
         // Blank field used to align items
         const embed = new Discord.MessageEmbed()
@@ -678,9 +658,7 @@ const getPlaylist = async (message: Message, words: string[], playSongParams: bo
     // Call playlist API
     try {
         const playlist = await ytpl(words[1], { limit: Infinity });
-        if (playlist) {
-            return addPlaylistItems(message, playlist, playSongParams, byReaction);
-        }
+        if (playlist) return addPlaylistItems(message, playlist, playSongParams, byReaction);
         return message.channel.send('❌ Erreur lors du chargement de la playlist');
     }
     catch (e) {
@@ -693,14 +671,10 @@ const addPlaylistItems = (message: Message, playlist: ytpl.result, play: boolean
     if (!message.guild) return;
     const guildID = message.guild.id;
     let voiceChannel: VoiceChannel = Helper.take_user_voiceChannel(message);
-    if (byReaction[0]) {
-        voiceChannel = Helper.take_user_voiceChannel_by_reaction(message, byReaction[1]);
-    }
+    if (byReaction[0]) voiceChannel = Helper.take_user_voiceChannel_by_reaction(message, byReaction[1]);
     if (radioPlayed[message.guild.id] || play) {
         // If radio is active or if we tell us to play the song now
-        if (!playlistArray[message.guild.id]) {
-            playlistArray[message.guild.id] = { url: [] };
-        }
+        if (!playlistArray[message.guild.id]) playlistArray[message.guild.id] = { url: [] };
         playlistArray[message.guild.id]['url'] = [];
         playlistInfos[message.guild.id] = [];
         delete radioPlayed[message.guild.id];
@@ -708,7 +682,8 @@ const addPlaylistItems = (message: Message, playlist: ytpl.result, play: boolean
     // Push items in playlist array and tell us how many was removed
     const playlistLength = pushPlaylistItems(message, playlist);
     // Get new playlist formatted duration
-    const formattedDuration = convertSecondsToFormattedDuration(Number(playlistArray[message.guild.id]['newPlaylistDuration']));
+    const plDuration = Number(playlistArray[message.guild.id]['newPlaylistDuration']);
+    const formattedDuration = convertSecondsToFormattedDuration(plDuration);
     const embedObj = setEmbedObj(playlist.title, playlist.id, playlist.items[0].thumbnail, formattedDuration);
     if (play) {
         voiceChannel.join()
@@ -727,7 +702,8 @@ const addPlaylistItems = (message: Message, playlist: ytpl.result, play: boolean
             delete radioPlayed[message.guild.id];
             playSong(message);
         }
-        else if (musicParams.wait[message.guild.id] || playlistArray[message.guild.id]['url'].length === playlistLength) {
+        else if (musicParams.wait[message.guild.id] ||
+            playlistArray[message.guild.id]['url'].length === playlistLength) {
             delete musicParams.wait[message.guild.id];
             playSong(message);
         }
@@ -746,9 +722,7 @@ const pushPlaylistItems = (message: Message, playlist: ytpl.result): number | vo
             addDuration(message, pushCount, video.duration, 'new');
             playlistArray[guildID]['url'].push(video.url_simple);
             let thumbnailURL = '';
-            if (video.thumbnail) {
-                thumbnailURL = video.thumbnail;
-            }
+            if (video.thumbnail) thumbnailURL = video.thumbnail;
             playlistInfos[guildID].push({
                 title: video.title,
                 id: video.id,
@@ -758,9 +732,8 @@ const pushPlaylistItems = (message: Message, playlist: ytpl.result): number | vo
         }
     });
     const deletedVideo = playlist.total_items - pushCount;
-    if (deletedVideo >= 1) {
+    if (deletedVideo >= 1)
         message.channel.send('🗑 ' + deletedVideo + (deletedVideo === 1 ? ' vidéo supprimée' : ' vidéos supprimées'));
-    }
     return pushCount;
 };
 
@@ -772,7 +745,8 @@ const convertSecondsToFormattedDuration = (duration: number): string => {
     const seconds = videoDate.getUTCSeconds();
     let formatedDuration = '';
     formatedDuration += hours > 0 ? hours.toString() + ':' : '';
-    formatedDuration += minutes > 9 ? minutes.toString() + ':' : hours > 0 ? '0' + minutes.toString() + ':' : minutes.toString() + ':';
+    formatedDuration += minutes > 9 ? minutes.toString() + ':' :
+        hours > 0 ? '0' + minutes.toString() + ':' : minutes.toString() + ':';
     formatedDuration += seconds > 9 ? seconds.toString() : '0' + seconds.toString();
     return formatedDuration;
 };
@@ -781,14 +755,12 @@ const addDuration = (message: Message, count: number, duration: string, type = '
     // Increment seconds value
     if (!message.guild) return;
     if (count === 1) {
-        if (type === 'new') {
+        if (type === 'new')
             return playlistArray[message.guild.id]['newPlaylistDuration'] = getSeconds(duration);
-        }
         return playlistArray[message.guild.id]['currentDuration'] = getSeconds(duration);
     }
-    if (type === 'new') {
+    if (type === 'new')
         return playlistArray[message.guild.id]['newPlaylistDuration'] += getSeconds(duration);
-    }
     return playlistArray[message.guild.id]['currentDuration'] += getSeconds(duration);
 };
 
@@ -812,9 +784,8 @@ export const getVideo = async (message: Message, words: string[], playSongParams
     // Call video API
     const infos = await ytdl.getBasicInfo(words[1]);
     if (infos) {
-        if (infos.videoDetails.title !== '[Deleted video]' && infos.videoDetails.title !== '[Private video]') {
+        if (infos.videoDetails.title !== '[Deleted video]' && infos.videoDetails.title !== '[Private video]')
             return setMusicArrayAndPlayMusic(infos, message, playSongParams, byReaction);
-        }
         return message.channel.send('❌ Cette vidéo est privée ou a été supprimée !');
     }
     return message.channel.send('❌ Impossible de charger la vidéo !');
@@ -827,9 +798,7 @@ const setMusicArrayAndPlayMusic = (infos: ytdl.videoInfo, message: Message, play
         // If must play or bot waiting so join channel
         delete musicParams.wait[message.guild.id];
         let voiceChannel = Helper.take_user_voiceChannel(message);
-        if (byReaction[0]) {
-            voiceChannel = Helper.take_user_voiceChannel_by_reaction(message, byReaction[1]);
-        }
+        if (byReaction[0]) voiceChannel = Helper.take_user_voiceChannel_by_reaction(message, byReaction[1]);
         voiceChannel.join()
             .then(connection => {
                 clearAndAddArrayInfos(message, infos);
@@ -847,10 +816,11 @@ const setMusicArrayAndPlayMusic = (infos: ytdl.videoInfo, message: Message, play
     else {
         // If radio is inactive and song is playing so send the added embed
         const formattedDuration = clearAndAddArrayInfos(message, infos) as string;
-        const embedObj = setEmbedObj(infos.videoDetails.title, infos.videoDetails.videoId, infos.videoDetails.thumbnail.thumbnails[0].url, formattedDuration);
-        if (playlistArray[message.guild.id]['url'].length === 1) {
-            return playSong(message);
-        }
+        const title = infos.videoDetails.title;
+        const videoId = infos.videoDetails.videoId;
+        const url = infos.videoDetails.thumbnail.thumbnails[0].url;
+        const embedObj = setEmbedObj(title, videoId, url, formattedDuration);
+        if (playlistArray[message.guild.id]['url'].length === 1) return playSong(message);
         return sendMusicEmbed(message, embedObj, [true, 1]);
     }
 };
@@ -909,10 +879,9 @@ const getSongInPlaylist = (message: Message, number: number): void | Promise<Mes
             }
             else {
                 let howToSay = 'chiffre';
-                if (playlistInfos[message.guild.id].length >= 10) {
-                    howToSay = 'nombre';
-                }
-                return message.channel.send(`❌ Choisissez un ${howToSay} compris entre 1 et ${playlistInfos[message.guild.id].length - 1}`);
+                if (playlistInfos[message.guild.id].length >= 10) howToSay = 'nombre';
+                const plLength = playlistInfos[message.guild.id].length - 1;
+                return message.channel.send(`❌ Choisissez un ${howToSay} compris entre 1 et ${plLength}`);
             }
         }
         return message.channel.send('❌ Aucune musique dans la file d\'attente');
@@ -928,9 +897,8 @@ const showQueuedSongs = (message: Message): void | Promise<Message> => {
             // Create songs array and send multiple message if needed (max message length to 2000)
             (createSongsString(message) as string[]).map((list: string, index: number) => {
                 if (index === 0) {
-                    if (playlistInfos[guildID].length >= 3) {
+                    if (playlistInfos[guildID].length >= 3)
                         return message.channel.send(`> **Musiques en file d'attente** \n > \n${list}`);
-                    }
                     return message.channel.send(`> **La musique en file d'attente** \n > \n${list}`);
                 }
                 return message.channel.send(`${list}`);
@@ -952,14 +920,10 @@ const createSongsString = (message: Message): string[] | void => {
                 songsArray.push(songs);
                 songs = newSong;
             }
-            else {
-                songs += newSong;
-            }
+            else songs += newSong;
         }
     });
-    if (songs.length) {
-        songsArray.push(songs);
-    }
+    if (songs.length) songsArray.push(songs);
     return songsArray;
 };
 
@@ -975,7 +939,8 @@ const removeSelectedSongsMaster = (message: Message, words: string[]): void | Pr
                         // If there is a playlist and user are in the same channel as the bot
                         return removeSelectedSongs(message, selection);
                     }
-                    return message.channel.send('❌ Écrivez 2 index maximum.```Ex: ' + config.prefix + 'p remove 15-20```');
+                    const exemple = 'Ex: ' + config.prefix + 'p remove 15-20';
+                    return message.channel.send('❌ Écrivez 2 index maximum.```' + exemple + '```');
                 }
                 return message.channel.send('❌ Vous devez sélectionner la/les musique(s) à supprimé');
             }
@@ -988,6 +953,7 @@ const removeSelectedSongsMaster = (message: Message, words: string[]): void | Pr
 const removeSelectedSongs = (message: Message, selection: string[]): void | Promise<Message> => {
     if (!message.guild) return;
     const selectZero = Number(selection[0]);
+    const plLength = playlistArray[message.guild.id]['url'].length - 1;
     if (selection[1]) {
         const selectOne = Number(selection[1]);
         if (selectOne && selectZero && selectZero < selectOne) {
@@ -1001,7 +967,7 @@ const removeSelectedSongs = (message: Message, selection: string[]): void | Prom
                 playlistInfos[message.guild.id] = _.compact(playlistInfos[message.guild.id]);
                 return sendRemoveEmbed(message, (selectOne - selectZero) + 1);
             }
-            return message.channel.send('❌ Sélectionnez des musiques compris entre 1 et ' + (playlistArray[message.guild.id]['url'].length - 1));
+            return message.channel.send('❌ Sélectionnez des musiques compris entre 1 et ' + plLength);
         }
         return message.channel.send('❌ Le 2ème index doit être plus grand que le premier !');
     }
@@ -1013,7 +979,7 @@ const removeSelectedSongs = (message: Message, selection: string[]): void | Prom
         playlistInfos[message.guild.id] = _.compact(playlistInfos[message.guild.id]);
         return sendRemoveEmbed(message, 1);
     }
-    return message.channel.send('❌ Sélectionnez une musique compris entre 1 et ' + (playlistArray[message.guild.id]['url'].length - 1));
+    return message.channel.send('❌ Sélectionnez une musique compris entre 1 et ' + plLength);
 };
 
 export const go = (message: Message, words: string[]): void | Promise<Message> => {
@@ -1025,7 +991,8 @@ export const go = (message: Message, words: string[]): void | Promise<Message> =
                 const number = Number(words[1]);
                 if (playlistArray[message.guild.id] && playlistArray[message.guild.id]['url'].length > 1) {
                     if (number > 0 && number < playlistArray[message.guild.id]['url'].length) {
-                        // If playlist exist and number is between 1 and queued length && verif user channel and bot location
+                        // If playlist exist and number >= 1 && number <= playlist.length
+                        // And verif user channel and bot location
                         streamsArray[message.guild.id].destroy();
                         for (let i = 0; i < number; i++) {
                             delete playlistInfos[message.guild.id][i];
@@ -1036,7 +1003,8 @@ export const go = (message: Message, words: string[]): void | Promise<Message> =
                         sendRemoveEmbed(message, number);
                         return playSong(message);
                     }
-                    return message.channel.send('❌ Sélectionnez une musique compris entre 1 et ' + (playlistArray[message.guild.id]['url'].length - 1));
+                    const length = playlistArray[message.guild.id]['url'].length - 1;
+                    return message.channel.send('❌ Sélectionnez une musique compris entre 1 et ' + length);
                 }
                 return message.channel.send('❌ Aucune musique dans la file d\'attente');
             }
@@ -1052,7 +1020,11 @@ export const current = (message: Message): void | Promise<Message> => {
     if (userChannel) {
         if (Helper.verifyBotLocation(message, connectedGuild[message.guild.id], userChannel)) {
             if (playlistArray[message.guild.id] && playlistArray[message.guild.id]['url'].length) {
-                const embedObj = setEmbedObj(playlistInfos[message.guild.id][0].title, playlistInfos[message.guild.id][0].id, playlistInfos[message.guild.id][0].thumbnail, playlistInfos[message.guild.id][0].duration);
+                const title = playlistInfos[message.guild.id][0].title;
+                const id = playlistInfos[message.guild.id][0].id;
+                const thumbnail = playlistInfos[message.guild.id][0].thumbnail;
+                const duration = playlistInfos[message.guild.id][0].duration;
+                const embedObj = setEmbedObj(title, id, thumbnail, duration);
                 return sendMusicEmbed(message, embedObj, [false, 1], 'video', true);
             }
             return message.channel.send('❌ Aucune musique dans la file d\'attente');
@@ -1085,7 +1057,9 @@ export const joinChannel = (message: Message): void | Promise<Message> => {
     const guildID = message.guild.id;
     const voiceChannel = Helper.take_user_voiceChannel(message);
     if (voiceChannel) {
-        if (!playlistArray[message.guild.id] && !playlistArray[message.guild.id]['url'] && !radioPlayed[message.guild.id]) {
+        if (!playlistArray[message.guild.id] &&
+            !playlistArray[message.guild.id]['url'] &&
+            !radioPlayed[message.guild.id]) {
             voiceChannel.join()
                 .then(connection => {
                     connectedGuild[guildID] = voiceChannel.id;
@@ -1102,18 +1076,14 @@ export const stop = (message: Message, leave = true): void => {
     if (!message.guild) return;
     const userChannel = Helper.take_user_voiceChannel(message);
     if (Helper.verifyBotLocation(message, connectedGuild[message.guild.id], userChannel)) {
-        if (streamsArray[message.guild.id]) {
-            streamsArray[message.guild.id].destroy();
-        }
+        if (streamsArray[message.guild.id]) streamsArray[message.guild.id].destroy();
         if (leave) {
             connectionsArray[message.guild.id].channel.leave();
             delete connectedGuild[message.guild.id];
             delete connectionsArray[message.guild.id];
             delete musicParams.wait[message.guild.id];
         }
-        else {
-            musicParams.wait[message.guild.id] = true;
-        }
+        else musicParams.wait[message.guild.id] = true;
         if (leave || playlistArray[message.guild.id] && playlistArray[message.guild.id]['url'].length) {
             delete streamsArray[message.guild.id];
             delete playlistArray[message.guild.id];
@@ -1124,9 +1094,8 @@ export const stop = (message: Message, leave = true): void => {
         }
         else if ((!playlistArray[message.guild.id] && !radioPlayed[message.guild.id]) ||
             (playlistArray[message.guild.id] && !playlistArray[message.guild.id]['url'].length)
-        ) {
+        )
             message.channel.send('❌ Aucune musique en file d\'attente');
-        }
     }
 };
 
@@ -1136,12 +1105,9 @@ export const pause = (message: Message): void => {
     if (Helper.verifyBotLocation(message, connectedGuild[message.guild.id], userChannel)) {
         if ((!playlistArray[message.guild.id] && !radioPlayed[message.guild.id]) ||
             (playlistArray[message.guild.id] && !playlistArray[message.guild.id]['url'].length)
-        ) {
+        )
             message.channel.send('❌ Aucune musique en cours d\'écoute');
-        }
-        else if (streamsArray[message.guild.id]) {
-            streamsArray[message.guild.id].pause(true);
-        }
+        else if (streamsArray[message.guild.id]) streamsArray[message.guild.id].pause(true);
     }
 };
 
@@ -1151,12 +1117,9 @@ export const resume = (message: Message): void => {
     if (Helper.verifyBotLocation(message, connectedGuild[message.guild.id], userChannel)) {
         if ((!playlistArray[message.guild.id] && !radioPlayed[message.guild.id]) ||
             (playlistArray[message.guild.id] && !playlistArray[message.guild.id]['url'].length)
-        ) {
+        )
             message.channel.send('❌ Aucune musique en cours d\'écoute');
-        }
-        else if (streamsArray[message.guild.id]) {
-            streamsArray[message.guild.id].resume();
-        }
+        else if (streamsArray[message.guild.id]) streamsArray[message.guild.id].resume();
     }
 };
 

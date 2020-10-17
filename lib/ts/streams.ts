@@ -28,12 +28,13 @@
 //                 console.log('entities: ', tweet.entities);
 //                 console.log('url entities: ', tweet.entities.urls);
 //                 if (tweet.retweeted_status) {
+//                     const extended = tweet.retweeted_status.extended_tweet;
 //                     console.log('Retweeted entities url: ', tweet.retweeted_status.entities.urls);
 //                     if (tweet.retweeted_status.extended_tweet) {
-//                         console.log('retweeted extended tweet entities: ', tweet.retweeted_status.extended_tweet.entities);
-//                         console.log('retweeted extended tweet entities urls: ', tweet.retweeted_status.extended_tweet.entities.urls);
-//                         console.log('retweeted extended tweet extended entities: ', tweet.retweeted_status.extended_tweet.extended_entities);
-//                         console.log('retweeted extended tweet extended entities urls: ', tweet.retweeted_status.extended_tweet.extended_entities.urls);
+//                         console.log('tweet entities: ', extended.entities);
+//                         console.log('tweet entities urls: ', extended.entities.urls);
+//                         console.log('tweet extended entities: ', extended.extended_entities);
+//                         console.log('tweet extended entities urls: ', extended.extended_entities.urls);
 //                     }
 //                 }
 //                 const game = userId === ids[0] ? 'wolcen' : 'warzone';
@@ -45,9 +46,11 @@
 //     sendReceivedTweet(game, allSettings, bot, tweet) {
 //         Object.values(allSettings).map((set, index) => {
 //             if (set.twitter && (set.twitter.wolcen.status === 'on' || set.twitter.warzone.status === 'on')) {
-//                 const channel = bot.channels.cache.get(game === 'wolcen' ? set.twitter.wolcen.channelID : set.twitter.warzone.channelID);
+//                 const channelId = game === 'wolcen' ? set.twitter.wolcen.channelID : set.twitter.warzone.channelID;
+//                 const channel = bot.channels.cache.get(channelId);
 //                 if (channel) {
-//                     const authorImg = tweet.user.profile_image_url_https ? tweet.user.profile_image_url_https : tweet.user.profile_image_url;
+//                     const imgHttps = tweet.user.profile_image_url_https;
+//                     const authorImg = imgHttps ? imgHttps : tweet.user.profile_image_url;
 //                     // #44A2FF | Bleu clair
 //                     const color = '#44A2FF';
 //                     const embed = new Discord.MessageEmbed()
@@ -59,9 +62,10 @@
 //                     channel.send({ embed });
 //                 }
 //                 else {
+//                     const guild = bot.guilds.cache.get(Object.keys(allSettings)[index]);
 //                     const message = {
 //                         guild: { id: Object.keys(allSettings)[index] },
-//                         channel: Helper.getFirstAuthorizedChannel(bot.guilds.cache.get(Object.keys(allSettings)[index]))
+//                         channel: Helper.getFirstAuthorizedChannel(guild)
 //                     };
 //                     Settings.setStreamsParams(message, 'twitter', game, 'off');
 //                 }
@@ -71,7 +75,8 @@
 
 //     getText(tweet) {
 //         if (tweet.truncated) return tweet.extended_tweet.full_text;
-//         else if (tweet.retweeted_status && tweet.retweeted_status.extended_tweet) return tweet.retweeted_status.extended_tweet.full_text;
+//         else if (tweet.retweeted_status && tweet.retweeted_status.extended_tweet)
+//             return tweet.retweeted_status.extended_tweet.full_text;
 //         else if (tweet.retweeted_status) return tweet.retweeted_status.text;
 //         else return tweet.text;
 //     }

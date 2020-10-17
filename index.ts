@@ -25,14 +25,14 @@ bot.on('ready', (): void => {
     // new Streams(bot);
     bot.user?.setActivity(`${config.prefix}help`, { type: 'PLAYING' })
         .catch(e => console.log('Error while set presence : ', e.message));
-    if (config.WHAT === 'DEV') console.log(chalk.bgRgb(60, 121, 0)('\n         CONNECTED          '));
-    if (config.WHAT === 'DEV') {
-        console.log('      Connected => ' + config.WHAT);
+    if (config.env === 'DEV') console.log(chalk.bgRgb(60, 121, 0)('\n         CONNECTED          '));
+    if (config.env === 'DEV') {
+        console.log('      Connected => ' + config.env);
         console.log('      Guilds =>', bot.guilds.cache.size);
     }
     else {
         console.log(' ');
-        console.log('Connected => ' + config.WHAT);
+        console.log('Connected => ' + config.env);
         console.log('Guilds =>', bot.guilds.cache.size);
     }
     // Verify if dragodindes notif need to be send
@@ -47,11 +47,12 @@ bot.on('ready', (): void => {
 
 bot.on('message', (message: Message): void => {
     if (message.type === 'GUILD_MEMBER_JOIN' && message.author.id === config.clientId) {
-        message.channel.send('🖐 **Salut !** 🖐\n\n🔑 Mon préfix est : `' + config.prefix + '` \n❓ Pour afficher la liste des commandes faites : `' + config.prefix + 'help`');
+        message.channel.send('🖐 **Salut !** 🖐\n\n'
+            + '🔑 Mon préfix est : `' + config.prefix + '` \n'
+            + '❓ Pour afficher la liste des commandes faites : `' + config.prefix + 'help`');
     }
-    else if (message.content.toLowerCase().startsWith(config.prefix) && message.content.indexOf('!!!') === -1) {
+    else if (message.content.toLowerCase().startsWith(config.prefix) && message.content.indexOf('!!!') === -1)
         Controller(message, config.prefix, bot);
-    }
     // else if (message.author.id !== config.clientId) {
     //     Level.addXp(message);
     // }
@@ -71,38 +72,27 @@ bot.on('messageReactionAdd', (reaction: MessageReaction, user: User | PartialUse
         const videoExist = reaction.message.content.indexOf('Ex: ' + config.prefix + 'search p 2') !== -1;
         if (playlistExist || videoExist) {
             const selection = getSelectionByReaction(reaction);
-            if (reaction.emoji.name === '⏩') {
+            if (reaction.emoji.name === '⏩')
                 return nextReaction(reaction, user as User, playlistExist ? 'playlist' : 'video');
-            }
-            return Player.selectSongInSearchList(reaction.message, selection, playlistExist ? 'playlist' : 'musique', [true, user]);
+            const type = playlistExist ? 'playlist' : 'musique';
+            return Player.selectSongInSearchList(reaction.message, selection, type, [true, user]);
         }
     }
 });
 
 const nextReaction = (reaction: MessageReaction, user: User, type: string): void | Promise<Message> => {
     const userChannel = Helper.take_user_voiceChannel_by_reaction(reaction.message, user);
-    if (userChannel) {
+    if (userChannel)
         return Player.youtubeResearch(reaction.message, null, type, false, [true, user]);
-    }
     return reaction.message.channel.send('❌ Vous devez être connecté dans un salon !');
 };
 
 const getSelectionByReaction = (reaction: MessageReaction): number | false => {
-    if (reaction.emoji.name === '1️⃣') {
-        return 1;
-    }
-    if (reaction.emoji.name === '2️⃣') {
-        return 2;
-    }
-    if (reaction.emoji.name === '3️⃣') {
-        return 3;
-    }
-    if (reaction.emoji.name === '4️⃣') {
-        return 4;
-    }
-    if (reaction.emoji.name === '5️⃣') {
-        return 5;
-    }
+    if (reaction.emoji.name === '1️⃣') return 1;
+    if (reaction.emoji.name === '2️⃣') return 2;
+    if (reaction.emoji.name === '3️⃣') return 3;
+    if (reaction.emoji.name === '4️⃣') return 4;
+    if (reaction.emoji.name === '5️⃣') return 5;
     return false;
 };
 
@@ -125,9 +115,7 @@ const start = async (): Promise<void> => {
     const session = await createAPIsession();
     if (session) {
         const status = await updateSettings();
-        if (status && session) {
-            bot.login(config.token);
-        }
+        if (status && session) bot.login(config.token);
     }
 };
 
@@ -156,10 +144,10 @@ export const getAPIsession = (): APIsessionType => {
 };
 
 const updateSettings = async (): Promise<void | boolean> => {
-    if (config.WHAT === 'DEV') console.log(chalk.bgRgb(215, 102, 8)('          SETTINGS          '));
+    if (config.env === 'DEV') console.log(chalk.bgRgb(215, 102, 8)('          SETTINGS          '));
     if (await Settings.update(APIsession)) {
         if (await dragodindeUpdate(APIsession)) {
-            if (config.WHAT === 'DEV') console.log(chalk.bgRgb(25, 108, 207)('\n         CONNECTION         '));
+            if (config.env === 'DEV') console.log(chalk.bgRgb(25, 108, 207)('\n         CONNECTION         '));
             return true;
         }
     }

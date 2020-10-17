@@ -5,9 +5,7 @@ import { VoiceChannel, Message, Guild, User, TextChannel, VoiceConnection, Parti
 import { commandType } from 'lib/@types/helper';
 
 export const instantiate = (message: Message, words: string[]): void | Promise<Message> => {
-    if (words[1]) {
-        return getCommandInfos(message, words[1].toLowerCase());
-    }
+    if (words[1]) return getCommandInfos(message, words[1].toLowerCase());
     return showCommandlist(message);
 };
 
@@ -18,9 +16,7 @@ export const take_user_voiceChannel = (message: Message): VoiceChannel => {
             if (channel.type === 'voice') {
                 if (channel.members) {
                     channel.members.map(member => {
-                        if (member.user.id === message.author.id) {
-                            voiceChannel = channel;
-                        }
+                        if (member.user.id === message.author.id) voiceChannel = channel;
                     });
                 }
             }
@@ -35,9 +31,7 @@ export const take_user_voiceChannel_by_reaction = (message: Message, author: Use
         if (channel.type === 'voice') {
             if (channel.members) {
                 channel.members.map(member => {
-                    if (member.user.id === (author as User).id) {
-                        voiceChannel = channel;
-                    }
+                    if (member.user.id === (author as User).id) voiceChannel = channel;
                 });
             }
         }
@@ -82,17 +76,11 @@ export const getFirstAuthorizedChannel = (guild: Guild): TextChannel | undefined
 
 export const verifyBotLocation = (message: Message, connectedGuild: VoiceConnection | string | undefined, userChannel: VoiceChannel, sendMessage = true): boolean => {
     if (connectedGuild) {
-        if (connectedGuild === userChannel.id) {
-            return true;
-        }
-        if (sendMessage) {
-            message.channel.send('❌ Vous n\'êtes pas dans le même salon que le bot !');
-        }
+        if (connectedGuild === userChannel.id) return true;
+        if (sendMessage) message.channel.send('❌ Vous n\'êtes pas dans le même salon que le bot !');
         return false;
     }
-    if (sendMessage) {
-        message.channel.send('❌ Je ne suis pas connecté dans un salon !');
-    }
+    if (sendMessage) message.channel.send('❌ Je ne suis pas connecté dans un salon !');
     return false;
 };
 
@@ -116,10 +104,14 @@ const showCommandlist = (message: Message): void => {
 };
 
 const getCommandInfos = (message: Message, command: string): void | Promise<Message> => {
-    const commandObj: commandType[] = commands.filter(c => c.name.split(' | ')[0] === command || c.name.split(' | ')[1] === command || c.name.split(' | ')[2] === command);
-    if (!commandObj && !commandObj[0]) {
+    const commandObj: commandType[] = commands.filter(c => {
+        if (c.name.split(' | ')[0] === command ||
+            c.name.split(' | ')[1] === command ||
+            c.name.split(' | ')[2] === command)
+            return c;
+    });
+    if (!commandObj && !commandObj[0])
         return message.channel.send('> La commande `' + command + '` n\'existe pas !');
-    }
     let joinedInfos = '';
     commandObj[0].infos.map(info => {
         joinedInfos += info;

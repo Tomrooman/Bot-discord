@@ -41,8 +41,7 @@
         "comma-style": "error",
         "curly": [
             "error",
-            "multi-line",
-            "consistent"
+            "multi-or-nest"
         ],
         "dot-location": [
             "error",
@@ -53,12 +52,13 @@
             "error",
             4
         ],
-        // "max-len": [
-        //   "error",
-        //   {
-        //     "code": 100
-        //   }
-        // ],
+        "max-len": [
+            "error",
+            {
+                "code": 120,
+                "ignorePattern": "^(\\w[a-zA-Z]+(.| ))+= [a-zA-Z()\\[\\]=_:,<>|{ ]*"
+            }
+        ],
         "max-nested-callbacks": [
             "error",
             {
