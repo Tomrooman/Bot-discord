@@ -187,7 +187,7 @@ export const update = async (session: APIsessionType): Promise<boolean | undefin
     console.log('Updating server settings ... | ' + dateFormat(Date.now(), 'HH:MM:ss'));
     try {
         const { data } = await axios.post('/api/settings/', { ...session });
-        if (data) {
+        if (data && data.length) {
             data.map((setting: settingsType) => {
                 settings[Number(setting.guildId)] = {
                     guildId: setting.guildId,
