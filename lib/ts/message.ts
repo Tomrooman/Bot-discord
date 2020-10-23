@@ -15,9 +15,9 @@ const remove = (message: DMessage, howMany: number, all = false): void | Promise
     if (message && message.guild) {
         if (howMany > 99)
             return message.channel.send('❌ Écrivez un chiffre inférieur ou égal à 99');
-        if (removeInfos[Number(message.guild.id)])
+        if (removeInfos[message.guild.id])
             return message.channel.send('❌ Vous devez attendre la confirmation de suppression des messages');
-        removeInfos[Number(message.guild.id)] = 0;
+        removeInfos[message.guild.id] = 0;
         let limit = {};
         if (!all) {
             limit = {

@@ -24,21 +24,21 @@ export const controller = (message: Message, words: string[]): Promise<Message> 
 
 export const notif = async (message: Message, words: string[]): Promise<Message> => {
     if (!words[2] || words[2] === 'status') {
-        const status = dofusInfos[Number(message.author.id)] ?
-            dofusInfos[Number(message.author.id)].notif.toUpperCase() : 'OFF';
+        const status = dofusInfos[message.author.id] ?
+            dofusInfos[message.author.id].notif.toUpperCase() : 'OFF';
         return message.channel.send('> ** Dragodindes ** \n > `Notifications` : `' + status + '`');
     }
     if (words[2].toLowerCase() === 'on' || words[2].toLowerCase() === 'off') {
         const status = words[2].toLowerCase() === 'on' ? 'on' : 'off';
-        if ((!dofusInfos[Number(message.author.id)] && status === 'on') ||
-            (dofusInfos[Number(message.author.id)] && dofusInfos[Number(message.author.id)].notif !== status)) {
+        if ((!dofusInfos[message.author.id] && status === 'on') ||
+            (dofusInfos[message.author.id] && dofusInfos[message.author.id].notif !== status)) {
             const session: APIsessionType = getAPIsession();
             const { data } = await axios.post('/api/dofus/dragodindes/notif', {
                 userId: message.author.id,
                 status: status,
                 ...session
             });
-            dofusInfos[Number(message.author.id)] = {
+            dofusInfos[message.author.id] = {
                 notif: data.notif ? 'on' : 'off'
             };
             return message.channel.send('> ** Dragodindes ** \n > `Notifications` : `' + status.toUpperCase() + '`');
@@ -85,7 +85,7 @@ const getdragodindesAsString = (dragodindes: dragodindeType[]): string => {
 };
 
 export const getInfos = (userId: string): dofusInfosType => {
-    return dofusInfos[Number(userId)];
+    return dofusInfos[userId];
 };
 
 export const update = async (session: APIsessionType): Promise<boolean | undefined> => {
@@ -94,7 +94,7 @@ export const update = async (session: APIsessionType): Promise<boolean | undefin
         const { data } = await axios.post('/api/dofus/dragodindes/notif/all', { ...session });
         if (data) {
             data.map((setting: userNotifInfos) => {
-                dofusInfos[Number(setting.userId)] = {
+                dofusInfos[setting.userId] = {
                     notif: setting.notif ? 'on' : 'off'
                 };
             });

@@ -634,7 +634,7 @@ const sendMusicEmbed = (message: Message, embedObj: embedObjType, added: [boolea
             playlistInfos[message.guild.id].map((video: playlistInfosType, index: number) => {
                 if (index >= 1) addDuration(message, index, video.duration, 'current');
             });
-            const plDuration = Number(playlistArray[message.guild.id]['currentDuration']);
+            const plDuration = playlistArray[message.guild.id]['currentDuration'];
             formattedDuration = convertSecondsToFormattedDuration(plDuration);
         }
         // Blank field used to align items
@@ -682,7 +682,7 @@ const addPlaylistItems = (message: Message, playlist: ytpl.result, play: boolean
     // Push items in playlist array and tell us how many was removed
     const playlistLength = pushPlaylistItems(message, playlist);
     // Get new playlist formatted duration
-    const plDuration = Number(playlistArray[message.guild.id]['newPlaylistDuration']);
+    const plDuration = playlistArray[message.guild.id]['newPlaylistDuration'];
     const formattedDuration = convertSecondsToFormattedDuration(plDuration);
     const embedObj = setEmbedObj(playlist.title, playlist.id, playlist.items[0].thumbnail, formattedDuration);
     if (play) {

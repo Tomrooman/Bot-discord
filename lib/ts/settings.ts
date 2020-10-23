@@ -176,7 +176,7 @@ const setParams = async (message: Message, category: string, param: string, valu
 };
 
 export const get = (guildId: string): settingsType => {
-    return settings[Number(guildId)];
+    return settings[guildId];
 };
 
 export const getAll = (): settingsType[] => {
@@ -189,7 +189,7 @@ export const update = async (session: APIsessionType): Promise<boolean | undefin
         const { data } = await axios.post('/api/settings/', { ...session });
         if (data && data.length) {
             data.map((setting: settingsType) => {
-                settings[Number(setting.guildId)] = {
+                settings[setting.guildId] = {
                     guildId: setting.guildId,
                     notif: {
                         current: setting.notif.current,
