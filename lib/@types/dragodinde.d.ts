@@ -1,5 +1,5 @@
 export interface notifArrayType {
-    userId: string;
+    userID: string;
     dragodindes: dragodindesType[] | sortedDragoType[];
 }
 
@@ -16,7 +16,7 @@ export interface dragodindeType {
 }
 
 export interface userNotifInfos {
-    userId: string;
+    userID: string;
     notif: boolean;
 }
 

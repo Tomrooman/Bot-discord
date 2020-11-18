@@ -34,7 +34,7 @@ export const notif = async (message: Message, words: string[]): Promise<Message>
             (dofusInfos[message.author.id] && dofusInfos[message.author.id].notif !== status)) {
             const session: APIsessionType = getAPIsession();
             const { data } = await axios.post('/api/dofus/dragodindes/notif', {
-                userId: message.author.id,
+                userID: message.author.id,
                 status: status,
                 ...session
             });
@@ -54,7 +54,7 @@ export const verifyNotif = async (bot: Client, session: APIsessionType): Promise
             const { data } = await axios.post('/api/dofus/dragodindes/notif/verify', { ...session });
             if (data && data.length) {
                 data.map(async (infos: notifArrayType) => {
-                    const user = bot.users.cache.get(infos.userId);
+                    const user = bot.users.cache.get(infos.userID);
                     if (user) await sendNotifMessage(user, infos.dragodindes);
                 });
             }
@@ -84,8 +84,8 @@ const getdragodindesAsString = (dragodindes: dragodindeType[]): string => {
     return dragoStr;
 };
 
-export const getInfos = (userId: string): dofusInfosType => {
-    return dofusInfos[userId];
+export const getInfos = (userID: string): dofusInfosType => {
+    return dofusInfos[userID];
 };
 
 export const update = async (session: APIsessionType): Promise<boolean | undefined> => {
@@ -94,7 +94,7 @@ export const update = async (session: APIsessionType): Promise<boolean | undefin
         const { data } = await axios.post('/api/dofus/dragodindes/notif/all', { ...session });
         if (data) {
             data.map((setting: userNotifInfos) => {
-                dofusInfos[setting.userId] = {
+                dofusInfos[setting.userID] = {
                     notif: setting.notif ? 'on' : 'off'
                 };
             });

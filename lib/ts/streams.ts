@@ -22,8 +22,8 @@
 //     setStream(T, allSettings, ids, bot) {
 //         const stream = T.stream('statuses/filter', { follow: ids, tweet_mode: 'extended' });
 //         stream.on('tweet', tweet => {
-//             const userId = tweet.user.id_str;
-//             if (ids.includes(userId) && !tweet.in_reply_to_status_id) {
+//             const userID = tweet.user.id_str;
+//             if (ids.includes(userID) && !tweet.in_reply_to_status_id) {
 //                 console.log('Received tweet: ', tweet);
 //                 console.log('entities: ', tweet.entities);
 //                 console.log('url entities: ', tweet.entities.urls);
@@ -37,7 +37,7 @@
 //                         console.log('tweet extended entities urls: ', extended.extended_entities.urls);
 //                     }
 //                 }
-//                 const game = userId === ids[0] ? 'wolcen' : 'warzone';
+//                 const game = userID === ids[0] ? 'wolcen' : 'warzone';
 //                 this.sendReceivedTweet(game, allSettings, bot, tweet);
 //             }
 //         });
